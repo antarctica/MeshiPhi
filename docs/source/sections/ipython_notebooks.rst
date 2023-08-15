@@ -25,75 +25,13 @@ Loading configuration from *json* file:
 The digital environment **`Mesh`** object can then be initialised. This mesh object will be constructed using parameters in it
 configuration file. This mesh object can be manipulated further, such as increasing its resolution through further 
 splitting, adding additional data sources or altering is configuration parameters using functions listed in 
-the :ref:`Methods - Mesh Construction` section of the documentation.
+the :ref:`Methods - Mesh Construction` section of the documentation. The digital environment **`Mesh`** object can then be cast to 
+a json object and saved to a file. 
 ::
 
-   from polar_route.mesh import Mesh
-   cg = Mesh(config)
-   
-The digital environment **`Mesh`** object can then be cast to a json object and saved to a file. This *mesh.json* file can then
-be used by the CLI entry-point :ref:`add_vehicle`, or the json object can be passed to the **`VesselPerformance`** object in a python 
-terminal.
-::
+    from polar_route.mesh import Mesh
 
+    cg = Mesh(config)
     mesh = cg.to_json()
     with open('mesh.json') as f:
         json.dumps(mesh)
-
-
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Simulating a Vessel in a Digital Environment
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Once a digital environment **`Mesh`** object has been created, how a vessel interacts with it may be simulated. The **`VesselPerformance`**
-object requires a digital environment in *json* format and vessel specific configuration parameters, also in *json* format. These may either
-be loaded from a file, or created within the python terminal.
-
-Loading mesh and vessel from *json* files:
-::
-
-    import json
-    # Loading digital environment from file
-    with open('mesh.json', 'r') as f:
-        mesh = json.load(f)  
-
-    # Loading vessel configuration parameters from file
-    with open('vessel.json', 'r') as f:
-        vessel = json.load(f) 
-
-The **`VesselPerformance`** object can then be initialised. This will simulate the performance of the vessel and encodes this information 
-into the digital environment.
-::
-
-   from polar_route.vessel_performance import VesselPerformance
-   vp = VesselPerformance(mesh, vessel)
-
-The **`VesselPerformance`** object can then be cast to a json object and saved to a file. This *vessel_mesh.json* file can then 
-be used by the CLI entry-point :ref:`optimise_routes`, or the json object can be passed to the **`RoutePlanner`** object in a python 
-terminal.
-::
-
-    vessel_mesh = vp.to_json()
-    with open('vessel_mesh.json') as f:
-        json.dumps(vessel_mesh)
-
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Route Optimisation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Now that the vessel dependent environmental mesh is defined, and represented in the `vessel_performance` object, we can 
-construct routes, with parameters defined by the user in the configuration file. Waypoints are passed as an input 
-file path, `waypoints.csv`, discussed more in the Inputs section of the manual pages.  The route construction is done 
-in two stages: construction of the meshed dijkstra optimal routes, `.compute_routes()`; and, the smoothing of the 
-dijkstra routes to further optimise the solution and reduce mesh dependencies, `.compute_smooth_routes()`. 
-During `.compute_routes()` the paths are appended to the object as an entry `paths`, which are replaced by the 
-smoothed paths after running `.compute_smooth_routes()`. An additional entry `waypoints` is generated to give the 
-waypoints information used in route construction. For further info about the structure of the outputs of the 
-paths please see the Outputs section of the manual.
-
-::
-
-    from polar_route.route_planner import RoutePlanner
-    rp = RoutePlanner(vessel_mesh, route_config , waypoints)
-    rp.compute_routes()
-    rp.compute_smoothed_routes()
-    info = rp.to_json()

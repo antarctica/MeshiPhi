@@ -14,19 +14,11 @@ Example configuration files are provided in the `config` directory.
 Descriptions of the configuration options for the Mesh Construction can be found in 
 the :ref:`Configuration - Mesh Construction` section of the documentation.
 
-Descriptions of the configuration options for the Vessel Performance Modelling can 
-be found in the :ref:`Configuration - Vessel Performance Modeller` section of the 
-documentation.
-
-Descriptions of the configuration options for Route Planning can be found in the 
-:ref:`Configuration - Route Planning` section of the documentation.
 
 .. toctree::
    :maxdepth: 1
 
    ./Mesh_construction_config
-   ./Vessel_performance_config
-   ./Route_planning_config
 
 
 Config Validation

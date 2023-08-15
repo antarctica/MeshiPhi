@@ -27,8 +27,5 @@ Contents:
    ./sections/Outputs
    ./sections/Dataloaders/overview
    ./sections/Mesh_Construction/Mesh_construction_overview
-   ./sections/Vehicle_specifics
-   ./sections/Route_calculation
-   ./sections/Route_optimisation
    ./sections/Examples
    
