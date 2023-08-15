@@ -18,27 +18,6 @@ Pull requests will not be accepted unless all required regression tests pass.
 | `direction.py`             |                                       |
 | `environment_mesh.py`      |                                       |
 |                            |                                       |
-
-
-## Vessel Performance Modelling
-| **Files altered**                | **Tests**                               |
-|----------------------------------|-----------------------------------------|
-| `abstract_vessel.py`             | `tests/regression_tests/test_vessel.py` |
-| `vessel_factory.py`              |                                         |
-| `vessel_performance_modeller.py` |                                         |
-| `SDA.py`                         |                                         |
-| `underwater_vessel.py`           |                                         |
-| `abstract_ship.py`               |                                         |
-
-
-## Route Planning
-| **Files altered**    | **Tests**                                           |
-|----------------------|-----------------------------------------------------|
-| `crossing.py`        | `tests/regression_tests/test_routes_dijkstra.py`    |
-| `route_planner.py`   | `tests/regression_tests/test_routes_smoothed.py`    |
-|                      |                                                     |
-
-
 ## Testing files
 Some updates to PolarRoute may result in changes to meshes calculated in our tests suite (*such as adding additional attributes to the cellbox object*). These changes will cause the test suite to fail, though the mode of failure should be predictable. 
 
@@ -49,4 +28,3 @@ If the changes made are valid, the test files should be updated so-as the tests 
 ### Files
 
 `tests/regression_tests/example_meshes/*` 
-`tests/regression_tests/example_routes/*` 
