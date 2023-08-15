@@ -1,6 +1,6 @@
 
 
-from polar_route.mesh_generation.direction import Direction
+from cartographi.mesh_generation.direction import Direction
 
 
 class NeighbourGraph:

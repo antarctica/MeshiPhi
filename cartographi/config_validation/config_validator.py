@@ -5,10 +5,10 @@ import datetime
 import re
 import pandas as pd
 
-from polar_route.config_validation.mesh_schema import mesh_schema
-from polar_route.config_validation.vessel_schema import vessel_schema
-from polar_route.config_validation.route_schema import route_schema
-from polar_route.config_validation.waypoints_schema import waypoints_columns
+from cartographi.config_validation.mesh_schema import mesh_schema
+from cartographi.config_validation.vessel_schema import vessel_schema
+from cartographi.config_validation.route_schema import route_schema
+from cartographi.config_validation.waypoints_schema import waypoints_columns
 
 def flexi_json_input(config):
     """

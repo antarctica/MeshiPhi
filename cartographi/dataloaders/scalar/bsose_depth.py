@@ -1,4 +1,4 @@
-from polar_route.dataloaders.scalar.abstract_scalar import ScalarDataLoader
+from cartographi.dataloaders.scalar.abstract_scalar import ScalarDataLoader
 
 import xarray as xr
 

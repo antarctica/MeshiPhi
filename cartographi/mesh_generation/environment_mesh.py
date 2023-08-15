@@ -9,13 +9,13 @@ import sys
 import os
 import tempfile
 
-from polar_route.mesh_generation.jgrid_aggregated_cellbox import JGridAggregatedCellBox
-from polar_route.mesh_generation.boundary import Boundary
-from polar_route.mesh_generation.aggregated_cellbox import AggregatedCellBox
-from polar_route.mesh_generation.neighbour_graph import NeighbourGraph
+from cartographi.mesh_generation.jgrid_aggregated_cellbox import JGridAggregatedCellBox
+from cartographi.mesh_generation.boundary import Boundary
+from cartographi.mesh_generation.aggregated_cellbox import AggregatedCellBox
+from cartographi.mesh_generation.neighbour_graph import NeighbourGraph
 
 
-from polar_route.mesh_validation.sampler import Sampler
+from cartographi.mesh_validation.sampler import Sampler
 import collections.abc
 import math
 from pathlib import Path

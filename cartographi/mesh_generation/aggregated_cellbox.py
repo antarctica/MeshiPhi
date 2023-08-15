@@ -1,5 +1,5 @@
 from shapely.geometry import Polygon
-from polar_route.mesh_generation.boundary import Boundary
+from cartographi.mesh_generation.boundary import Boundary
 import shapely.wkt
 
 

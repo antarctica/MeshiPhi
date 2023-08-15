@@ -1,4 +1,4 @@
-from polar_route.dataloaders.dataloader_interface import DataLoaderInterface
+from cartographi.dataloaders.dataloader_interface import DataLoaderInterface
 from abc import abstractmethod
 
 from pyproj import Transformer, CRS
@@ -8,7 +8,7 @@ import numpy as np
 import xarray as xr
 import pandas as pd
 
-from polar_route.utils import round_to_sigfig
+from cartographi.utils import round_to_sigfig
 
 class ScalarDataLoader(DataLoaderInterface):
     '''

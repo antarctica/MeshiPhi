@@ -1,6 +1,6 @@
 import numpy as np
 
-from polar_route.dataloaders.vector.abstract_vector import VectorDataLoader
+from cartographi.dataloaders.vector.abstract_vector import VectorDataLoader
 
 import logging
 

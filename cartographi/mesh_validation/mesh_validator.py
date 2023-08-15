@@ -1,15 +1,15 @@
 
 
-from polar_route.mesh_validation.sampler import Sampler
+from cartographi.mesh_validation.sampler import Sampler
 
 
-from polar_route.mesh_generation.mesh_builder import MeshBuilder
-from polar_route.mesh_generation.mesh import Mesh
+from cartographi.mesh_generation.mesh_builder import MeshBuilder
+from cartographi.mesh_generation.mesh import Mesh
 import numpy as np
 import json
 import math
 import logging
-from polar_route.mesh_generation.boundary import Boundary
+from cartographi.mesh_generation.boundary import Boundary
 from sklearn.metrics import mean_squared_error
 class MeshValidator:
 

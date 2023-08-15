@@ -1,5 +1,5 @@
-from polar_route.dataloaders.scalar.abstract_scalar import ScalarDataLoader
-from polar_route.utils import gaussian_random_field
+from cartographi.dataloaders.scalar.abstract_scalar import ScalarDataLoader
+from cartographi.utils import gaussian_random_field
 
 import logging
 import pandas as pd

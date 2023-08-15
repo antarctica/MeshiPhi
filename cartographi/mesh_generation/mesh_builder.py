@@ -1,11 +1,11 @@
 """
 
-In this section we will discuss the usage of the MeshBuilder functionality of PolarRoute.\n
+In this section we will discuss the usage of the MeshBuilder functionality of CartograPhi.\n
 
 Example:
     An example of how to run this code can be executed by running the following in an ipython/Jupyter Notebook::\n
 
-        from polar_route.mesh_generation.mesh_builder import MeshBuilder
+        from cartographi.mesh_generation.mesh_builder import MeshBuilder
 
         import json
         with open('./config.json', 'r') as f:
@@ -22,16 +22,16 @@ import numpy as np
 
 from tqdm import tqdm
 
-from polar_route.mesh_generation.jgrid_cellbox import JGridCellBox
-from polar_route.mesh_generation.boundary import Boundary
-from polar_route.mesh_generation.cellbox import CellBox
-from polar_route.mesh_generation.direction import Direction
-from polar_route.mesh_generation.environment_mesh import EnvironmentMesh
-from polar_route.mesh_generation.metadata import Metadata
-from polar_route.mesh_generation.neighbour_graph import NeighbourGraph
-from polar_route.mesh_generation.mesh import Mesh
-from polar_route.dataloaders.factory import DataLoaderFactory
-from polar_route.config_validation.config_validator import validate_mesh_config
+from cartographi.mesh_generation.jgrid_cellbox import JGridCellBox
+from cartographi.mesh_generation.boundary import Boundary
+from cartographi.mesh_generation.cellbox import CellBox
+from cartographi.mesh_generation.direction import Direction
+from cartographi.mesh_generation.environment_mesh import EnvironmentMesh
+from cartographi.mesh_generation.metadata import Metadata
+from cartographi.mesh_generation.neighbour_graph import NeighbourGraph
+from cartographi.mesh_generation.mesh import Mesh
+from cartographi.dataloaders.factory import DataLoaderFactory
+from cartographi.config_validation.config_validator import validate_mesh_config
 
 
 class MeshBuilder:

@@ -1,5 +1,5 @@
 """
-Miscellaneous utility functions that may be of use throughout PolarRoute
+Miscellaneous utility functions that may be of use throughout CartograPhi
 """
 
 import logging

@@ -1,5 +1,5 @@
-from polar_route.dataloaders.vector.abstract_vector import VectorDataLoader
-from polar_route.utils import gaussian_random_field
+from cartographi.dataloaders.vector.abstract_vector import VectorDataLoader
+from cartographi.utils import gaussian_random_field
 
 import logging
 import pandas as pd

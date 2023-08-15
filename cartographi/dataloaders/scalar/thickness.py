@@ -1,5 +1,5 @@
-from polar_route.dataloaders.scalar.abstract_scalar import ScalarDataLoader
-from polar_route.utils import date_range
+from cartographi.dataloaders.scalar.abstract_scalar import ScalarDataLoader
+from cartographi.utils import date_range
 
 from datetime import datetime
 import logging

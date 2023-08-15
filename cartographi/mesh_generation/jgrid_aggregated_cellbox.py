@@ -3,8 +3,8 @@
 from shapely.geometry import Polygon
 import numpy as np
 import pandas as pd
-from polar_route.mesh_generation.boundary import Boundary
-from polar_route.mesh_generation.aggregated_cellbox import AggregatedCellBox
+from cartographi.mesh_generation.boundary import Boundary
+from cartographi.mesh_generation.aggregated_cellbox import AggregatedCellBox
 import logging
 class JGridAggregatedCellBox (AggregatedCellBox):
     """

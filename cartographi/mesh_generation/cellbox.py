@@ -1,5 +1,5 @@
 """
-Outlined in this section we will discuss the usage of the CellBox functionality of the PolarRoute package.
+Outlined in this section we will discuss the usage of the CellBox functionality of the CartograPhi package.
 In this series of class distributions we house our discrete representation of input data. In each CellBox,
 we represent a way of accessing the information governing our numerical world,
 this includes and is not limited to: Ocean Currents, Sea Ice Concentration and Bathymetric depth.\n
@@ -8,7 +8,7 @@ this includes and is not limited to: Ocean Currents, Sea Ice Concentration and B
     Example:\n
     An example of running this code can be executed by running the following in a ipython/Jupyter Notebook:: \n
 
-            from polar_route.mesh_generation.cellbox import cellbox \n
+            from cartographi.mesh_generation.cellbox import cellbox \n
             .... \n
 
     Note:\n
@@ -19,8 +19,8 @@ this includes and is not limited to: Ocean Currents, Sea Ice Concentration and B
 
 
 import numpy as np
-from polar_route.mesh_generation.boundary import Boundary
-from polar_route.mesh_generation.aggregated_cellbox import AggregatedCellBox
+from cartographi.mesh_generation.boundary import Boundary
+from cartographi.mesh_generation.aggregated_cellbox import AggregatedCellBox
 
 
 class CellBox:
