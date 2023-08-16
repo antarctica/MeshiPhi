@@ -1,3 +1,6 @@
 include pyproject.toml
-include *.md
 include LICENSE
+include *.md
+include requirements.txt
+include tests/*.md
+include tests/requirements.txt
