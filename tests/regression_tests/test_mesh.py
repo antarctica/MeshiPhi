@@ -7,8 +7,8 @@ import json
 import pytest
 import time
 
-from polar_route import __version__ as pr_version
-from polar_route import MeshBuilder
+from cartographi import __version__ as pr_version
+from cartographi import MeshBuilder
 
 # Import tests, which are automatically run
 

@@ -1,6 +1,6 @@
 import pandas as pd
 
-from polar_route.utils import round_to_sigfig
+from cartographi.utils import round_to_sigfig
 
 SIG_FIG_TOLERANCE = 4
 
