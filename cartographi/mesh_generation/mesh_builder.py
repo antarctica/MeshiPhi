@@ -312,7 +312,7 @@ class MeshBuilder:
                     }
         """
         output = dict()
-        output['config'] = self.config
+        output['config'] = {'mesh_info': self.config}
         output["cellboxes"] = self.mesh.get_cellboxes()
         output['neighbour_graph'] = self.neighbour_graph.get_graph()
 

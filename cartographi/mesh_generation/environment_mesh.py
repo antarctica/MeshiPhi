@@ -123,7 +123,7 @@ class EnvironmentMesh:
                     }\n
         """
         output = dict()
-        output['config'] = self.config
+        output['config'] = {'mesh_info': self.config}
         output["cellboxes"] = self.cellboxes_to_json()
         output['neighbour_graph'] = self.neighbour_graph.get_graph()
 
