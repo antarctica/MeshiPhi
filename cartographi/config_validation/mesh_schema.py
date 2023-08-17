@@ -40,26 +40,20 @@ splitting_schema = {
 
 mesh_schema = {
     "type": "object",
-    "required": ["Mesh_info"],
+    "required": ["Region", "Data_sources", "splitting"],
+    "additionalProperties": False,
     "properties":{
-        "Mesh_info": {
-            "type": "object",
-            "required": ["Region", "Data_sources", "splitting"],
-            "additionalProperties": False,
-            "properties":{
-                "Region": {
-                    "$ref": "#/region_schema"
-                },
-                "Data_sources": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/dataloader_schema"
-                    },
-                },
-                "splitting": {
-                    "$ref": "#/splitting_schema"
-                }
-            }
+        "Region": {
+            "$ref": "#/region_schema"
+        },
+        "Data_sources": {
+            "type": "array",
+            "items": {
+                "$ref": "#/dataloader_schema"
+            },
+        },
+        "splitting": {
+            "$ref": "#/splitting_schema"
         }
     },
     "region_schema": region_schema,

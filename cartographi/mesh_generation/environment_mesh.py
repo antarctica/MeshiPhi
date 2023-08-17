@@ -39,49 +39,45 @@ class EnvironmentMesh:
                 mesh_json (dict): a dictionary loaded from an Env-mesh json file of the following format - \n
                     \n
                     {\n
-                        "config": {\n
-                            "Mesh_info":{\n
-                                "Region": {\n
-                                    "latMin": (real),\n
-                                    "latMax": (real),\n
-                                    "longMin": (real),\n
-                                    "longMax": (real),\n
-                                    "startTime": (string) 'YYYY-MM-DD',\n
-                                    "endTime": (string) 'YYYY-MM-DD',\n
-                                    "cellWidth": (real),\n
-                                    "cellHeight" (real),\n
-                                    "splitDepth" (int)\n
-                                },\n
-                                "Data_sources": [\n
-                                    {\n
-                                        "loader": (string)\n
-                                        "params" (dict)\n
-                                    },\n
-                                    ...,\n
-                                    {...}
-                                    ], \n
-                                "splitting":\n
-                                {\n
-                                     "split_depth": (int),\n
-                                     "minimum_datapoints": (int)\n
-                                }\n
-                                "cellboxes": [\n
-                                    {\n
-
-                                    },\n
-                                    ...,\n
-                                    {...}\n
-
-                                ],\n
-                                "neighbour_graph": [\n
-                                    {\n
-
-                                    },\n
-                                    ...,\n
-                                    {...}\n
-                                ]\n
-                            }\n
+                        "Region": {\n
+                            "latMin": (real),\n
+                            "latMax": (real),\n
+                            "longMin": (real),\n
+                            "longMax": (real),\n
+                            "startTime": (string) 'YYYY-MM-DD',\n
+                            "endTime": (string) 'YYYY-MM-DD',\n
+                            "cellWidth": (real),\n
+                            "cellHeight" (real),\n
+                            "splitDepth" (int)\n
+                        },\n
+                        "Data_sources": [\n
+                            {\n
+                                "loader": (string)\n
+                                "params" (dict)\n
+                            },\n
+                            ...,\n
+                            {...}
+                            ], \n
+                        "splitting":\n
+                        {\n
+                                "split_depth": (int),\n
+                                "minimum_datapoints": (int)\n
                         }\n
+                        "cellboxes": [\n
+                            {\n
+
+                            },\n
+                            ...,\n
+                            {...}\n
+
+                        ],\n
+                        "neighbour_graph": [\n
+                            {\n
+
+                            },\n
+                            ...,\n
+                            {...}\n
+                        ]\n
                     }\n
             Returns:
                 EnvironmentMesh: object that contains all the json file mesh information.\n

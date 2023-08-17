@@ -48,31 +48,29 @@ class MeshBuilder:
             
             Args:
                 config (dict): config file which defines the attributes of the Mesh to be constructed. config is of the form: \n
-                        "config": {\n
-                            "Mesh_info":{\n
-                                "Region": {\n
-                                    "latMin": (real),\n
-                                    "latMax": (real),\n
-                                    "longMin": (real),\n
-                                    "longMax": (real),\n
-                                    "startTime": (string) 'YYYY-MM-DD',\n
-                                    "endTime": (string) 'YYYY-MM-DD',\n
-                                    "cellWidth": (real),\n
-                                    "cellHeight" (real),\n
-                                    "splitDepth" (int)\n
-                                },\n
-                                "Data_sources": [\n
-                                    {\n
-                                        "loader": (string)\n
-                                        "params" (dict)\n
-                                    }\n
-                                ],\n
-                                "splitting": { \n
-                                    "split_depth": (int),\n
-                                    "minimum_datapoints": (int)\n
-                                    }\n
+                        {\n
+                        "Region": {\n
+                            "latMin": (real),\n
+                            "latMax": (real),\n
+                            "longMin": (real),\n
+                            "longMax": (real),\n
+                            "startTime": (string) 'YYYY-MM-DD',\n
+                            "endTime": (string) 'YYYY-MM-DD',\n
+                            "cellWidth": (real),\n
+                            "cellHeight" (real),\n
+                            "splitDepth" (int)\n
+                        },\n
+                        "Data_sources": [\n
+                            {\n
+                                "loader": (string)\n
+                                "params" (dict)\n
                             }\n
-                        }\n
+                        ],\n
+                        "splitting": { \n
+                            "split_depth": (int),\n
+                            "minimum_datapoints": (int)\n
+                            }\n
+                        }
                    
                     NOTE: In the case of constructing a global mesh, the longtitude range should be -180:180.
 
@@ -87,12 +85,12 @@ class MeshBuilder:
         # Configs may contain reference to system time for startTime and endTime
         # which are parsed to datetime format when initialising boundary.
         # updates config startTime/ endTime once system time has been parsed.
-        self.config['Mesh_info']['Region']['startTime'] = bounds.get_time_min()
-        self.config['Mesh_info']['Region']['endTime'] = bounds.get_time_max()
+        self.config['Region']['startTime'] = bounds.get_time_min()
+        self.config['Region']['endTime'] = bounds.get_time_max()
 
         
-        cell_width = config['Mesh_info']['Region']['cellWidth']
-        cell_height = config['Mesh_info']['Region']['cellHeight']
+        cell_width = config['Region']['cellWidth']
+        cell_height = config['Region']['cellHeight']
 
         self.validate_bounds(bounds, cell_width, cell_height)
 
@@ -108,8 +106,8 @@ class MeshBuilder:
   
 
         min_datapoints = 5
-        if 'splitting' in self.config['Mesh_info']:
-            min_datapoints = self.config['Mesh_info']['splitting']['minimum_datapoints']
+        if 'splitting' in self.config:
+            min_datapoints = self.config['splitting']['minimum_datapoints']
         meta_data_list = self.initialize_meta_data(bounds, min_datapoints)
 
         # checking to avoid any dummy cellboxes (the ones that was splitted and replaced)
@@ -126,8 +124,8 @@ class MeshBuilder:
         self.neighbour_graph.set_global_mesh (self.check_global_mesh(bounds, cellboxes, int(grid_width)))
 
         max_split_depth = 0
-        if 'splitting' in self.config['Mesh_info']:
-            max_split_depth = self.config['Mesh_info']['splitting']['split_depth']
+        if 'splitting' in self.config:
+            max_split_depth = self.config['splitting']['split_depth']
         self.mesh = Mesh(bounds, cellboxes,
                          self.neighbour_graph, max_split_depth)
         self.mesh.set_config(config)
@@ -138,8 +136,8 @@ class MeshBuilder:
     def initialize_meta_data(self, bounds, min_datapoints):
         meta_data_list = []
         splitting_conds = []
-        if 'Data_sources' in self.config['Mesh_info'].keys():
-            for data_source in self.config['Mesh_info']['Data_sources']:
+        if 'Data_sources' in self.config.keys():
+            for data_source in self.config['Data_sources']:
                 loader_name = data_source['loader']
                 loader = DataLoaderFactory.get_dataloader(
                     loader_name, bounds, data_source['params'], min_datapoints)
@@ -183,8 +181,8 @@ class MeshBuilder:
         return value_fill_type
 
     def is_jgrid_mesh(self):
-        if 'j_grid' in self.config['Mesh_info'].keys():
-            if  self.config['Mesh_info']['j_grid'] == "True":
+        if 'j_grid' in self.config.keys():
+            if  self.config['j_grid'] == "True":
                 return True
         return False
 

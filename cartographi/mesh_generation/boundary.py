@@ -30,12 +30,12 @@ class Boundary:
                config (json): json object that contains the boundary attributes
                 
         """
-        long_min = config['Mesh_info']['Region']['longMin']
-        long_max = config['Mesh_info']['Region']['longMax']
-        lat_min = config['Mesh_info']['Region']['latMin']
-        lat_max = config['Mesh_info']['Region']['latMax']
-        start_time = config['Mesh_info']['Region']['startTime']
-        end_time = config['Mesh_info']['Region']['endTime']
+        long_min = config['Region']['longMin']
+        long_max = config['Region']['longMax']
+        lat_min = config['Region']['latMin']
+        lat_max = config['Region']['latMax']
+        start_time = config['Region']['startTime']
+        end_time = config['Region']['endTime']
         lat_range = [lat_min, lat_max]
         long_range = [long_min , long_max]
         time_range = [start_time , end_time]
