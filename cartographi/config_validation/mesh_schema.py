@@ -41,7 +41,6 @@ splitting_schema = {
 mesh_schema = {
     "type": "object",
     "required": ["Mesh_info"],
-    "additionalProperties": False,
     "properties":{
         "Mesh_info": {
             "type": "object",
