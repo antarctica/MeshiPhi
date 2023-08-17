@@ -41,7 +41,6 @@ splitting_schema = {
 mesh_schema = {
     "type": "object",
     "required": ["Region", "Data_sources", "splitting"],
-    "additionalProperties": False,
     "properties":{
         "Region": {
             "$ref": "#/region_schema"
