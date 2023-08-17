@@ -1,6 +1,6 @@
 {
     "config": {
-        "Mesh_info": {
+        "mesh_info": {
             "Region": {
                 "latMin": -65,
                 "latMax": -60,
@@ -11,8 +11,7 @@
                 "cellWidth": 2.5,
                 "cellHeight": 2.5
             },
-
-            "Data_sources":[
+            "Data_sources": [
                 {
                     "loader": "circle",
                     "params": {
@@ -21,7 +20,10 @@
                         "nx": 201,
                         "ny": 201,
                         "radius": 3,
-                        "centre": [-65, -70],
+                        "centre": [
+                            -65,
+                            -70
+                        ],
                         "splitting_conditions": [
                             {
                                 "dummy_data": {
@@ -30,14 +32,24 @@
                                     "lower_bound": 0.4
                                 }
                             }
-                        ]
+                        ],
+                        "dataloader_name": "circle",
+                        "min_dp": 5,
+                        "downsample_factors": [
+                            1,
+                            1
+                        ],
+                        "aggregate_type": "MEAN",
+                        "in_proj": "EPSG:4326",
+                        "out_proj": "EPSG:4326",
+                        "x_col": "lat",
+                        "y_col": "long"
                     }
                 }
             ],
             "splitting": {
                 "split_depth": 6,
                 "minimum_datapoints": 5
-
             }
         }
     },
