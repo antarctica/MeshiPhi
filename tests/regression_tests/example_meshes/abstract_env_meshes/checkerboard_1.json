@@ -1,17 +1,17 @@
 {
     "config": {
         "mesh_info": {
-            "Region": {
-                "latMin": -65,
-                "latMax": -60,
-                "longMin": -70,
-                "longMax": -50,
-                "startTime": "2019-01-01",
-                "endTime": "2019-01-14",
-                "cellWidth": 5,
-                "cellHeight": 2.5
+            "region": {
+                "lat_min": -65,
+                "lat_max": -60,
+                "long_min": -70,
+                "long_max": -50,
+                "start_time": "2019-01-01",
+                "end_time": "2019-01-14",
+                "cell_width": 5,
+                "cell_height": 2.5
             },
-            "Data_sources": [
+            "data_sources":[
                 {
                     "loader": "checkerboard",
                     "params": {
@@ -19,10 +19,7 @@
                         "value_fill_types": "parent",
                         "nx": 201,
                         "ny": 201,
-                        "gridsize": [
-                            2.5,
-                            2.5
-                        ],
+                        "gridsize": [2.5, 2.5],
                         "splitting_conditions": [
                             {
                                 "dummy_data": {
@@ -31,18 +28,7 @@
                                     "lower_bound": 0.15
                                 }
                             }
-                        ],
-                        "dataloader_name": "checkerboard",
-                        "min_dp": 5,
-                        "downsample_factors": [
-                            1,
-                            1
-                        ],
-                        "aggregate_type": "MEAN",
-                        "in_proj": "EPSG:4326",
-                        "out_proj": "EPSG:4326",
-                        "x_col": "lat",
-                        "y_col": "long"
+                        ]
                     }
                 }
             ],

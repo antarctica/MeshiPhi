@@ -1,17 +1,17 @@
 {"config": {
-    "Mesh_info": {
+    "mesh_info": {
         "j_grid": "True",
-        "Region": {
-            "latMin": -80.0,
-            "latMax": -40.0,
-            "longMin": -129.9999,
-            "longMax": 30.0001,
-            "startTime": "2013-01-31",
-            "endTime": "2013-03-01",
-            "cellWidth": 5.0,
-            "cellHeight": 2.5
+        "region": {
+            "lat_min": -80.0,
+            "lat_max": -40.0,
+            "long_min": -129.9999,
+            "long_max": 30.0001,
+            "start_time": "2013-01-31",
+            "end_time": "2013-03-01",
+            "cell_width": 5.0,
+            "cell_height": 2.5
         },
-        "Data_sources": [
+        "data_sources": [
             {
                 "loader": "bsose_sic",
                 "params": {
