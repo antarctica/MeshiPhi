@@ -102,17 +102,17 @@ def validate_mesh_config(config):
     # Validate against the schema to check syntax is correct
     jsonschema.validate(instance=config_json, schema=mesh_schema)
     
-    # Check that the dates in the Region are valid
-    assert_valid_time(config['Region']['startTime'])
-    assert_valid_time(config['Region']['endTime'])
+    # Check that the dates in the region are valid
+    assert_valid_time(config['region']['start_time'])
+    assert_valid_time(config['region']['end_time'])
     
     # Check that cellbox width and height evenly divide boundary
-    assert_valid_cellsize(config['Region']['latMin'],
-                          config['Region']['latMax'],
-                          config['Region']['cellHeight'])
-    assert_valid_cellsize(config['Region']['longMin'],
-                          config['Region']['longMax'],
-                          config['Region']['cellHeight'])
+    assert_valid_cellsize(config['region']['lat_min'],
+                          config['region']['lat_max'],
+                          config['region']['cell_height'])
+    assert_valid_cellsize(config['region']['long_min'],
+                          config['region']['long_max'],
+                          config['region']['cell_height'])
     
 def validate_vessel_config(config):
     """

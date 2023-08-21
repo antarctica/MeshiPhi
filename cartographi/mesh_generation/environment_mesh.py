@@ -39,18 +39,18 @@ class EnvironmentMesh:
                 mesh_json (dict): a dictionary loaded from an Env-mesh json file of the following format - \n
                     \n
                     {\n
-                        "Region": {\n
-                            "latMin": (real),\n
-                            "latMax": (real),\n
-                            "longMin": (real),\n
-                            "longMax": (real),\n
-                            "startTime": (string) 'YYYY-MM-DD',\n
-                            "endTime": (string) 'YYYY-MM-DD',\n
-                            "cellWidth": (real),\n
-                            "cellHeight" (real),\n
-                            "splitDepth" (int)\n
+                        "region": {\n
+                            "lat_min": (real),\n
+                            "lat_max": (real),\n
+                            "long_min": (real),\n
+                            "long_max": (real),\n
+                            "start_time": (string) 'YYYY-MM-DD',\n
+                            "end_time": (string) 'YYYY-MM-DD',\n
+                            "cell_width": (real),\n
+                            "cell_height" (real),\n
+                            "split_depth" (int)\n
                         },\n
-                        "Data_sources": [\n
+                        "data_sources": [\n
                             {\n
                                 "loader": (string)\n
                                 "params" (dict)\n

@@ -49,18 +49,18 @@ class MeshBuilder:
             Args:
                 config (dict): config file which defines the attributes of the Mesh to be constructed. config is of the form: \n
                         {\n
-                        "Region": {\n
-                            "latMin": (real),\n
-                            "latMax": (real),\n
-                            "longMin": (real),\n
-                            "longMax": (real),\n
-                            "startTime": (string) 'YYYY-MM-DD',\n
-                            "endTime": (string) 'YYYY-MM-DD',\n
-                            "cellWidth": (real),\n
-                            "cellHeight" (real),\n
-                            "splitDepth" (int)\n
+                        "region": {\n
+                            "lat_min": (real),\n
+                            "lat_max": (real),\n
+                            "long_min": (real),\n
+                            "long_max": (real),\n
+                            "start_time": (string) 'YYYY-MM-DD',\n
+                            "end_time": (string) 'YYYY-MM-DD',\n
+                            "cell_width": (real),\n
+                            "cell_height" (real),\n
+                            "split_depth" (int)\n
                         },\n
-                        "Data_sources": [\n
+                        "data_sources": [\n
                             {\n
                                 "loader": (string)\n
                                 "params" (dict)\n
@@ -82,15 +82,15 @@ class MeshBuilder:
         self.config = config
         bounds = Boundary.from_json(config)
 
-        # Configs may contain reference to system time for startTime and endTime
+        # Configs may contain reference to system time for start_time and end_time
         # which are parsed to datetime format when initialising boundary.
-        # updates config startTime/ endTime once system time has been parsed.
-        self.config['Region']['startTime'] = bounds.get_time_min()
-        self.config['Region']['endTime'] = bounds.get_time_max()
+        # updates config start_time/ end_time once system time has been parsed.
+        self.config['region']['start_time'] = bounds.get_time_min()
+        self.config['region']['end_time'] = bounds.get_time_max()
 
         
-        cell_width = config['Region']['cellWidth']
-        cell_height = config['Region']['cellHeight']
+        cell_width = config['region']['cell_width']
+        cell_height = config['region']['cell_height']
 
         self.validate_bounds(bounds, cell_width, cell_height)
 
@@ -136,8 +136,8 @@ class MeshBuilder:
     def initialize_meta_data(self, bounds, min_datapoints):
         meta_data_list = []
         splitting_conds = []
-        if 'Data_sources' in self.config.keys():
-            for data_source in self.config['Data_sources']:
+        if 'data_sources' in self.config.keys():
+            for data_source in self.config['data_sources']:
                 loader_name = data_source['loader']
                 loader = DataLoaderFactory.get_dataloader(
                     loader_name, bounds, data_source['params'], min_datapoints)
