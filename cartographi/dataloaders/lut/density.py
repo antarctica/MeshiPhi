@@ -54,13 +54,12 @@ class DensityDataLoader(LutDataLoader):
                         [pd.DataFrame(
                             {'time': dates,
                             'geometry': northern_hemisphere & bounds_polygon,    # Intersect shapes
-                            'value': [densities[northern_seasons[month]] for month in dates.month]}),
+                            'density': [densities[northern_seasons[month]] for month in dates.month]}),
                         pd.DataFrame(
                             {'time': dates,
                             'geometry': southern_hemisphere & bounds_polygon,    # Intersect shapes
                             'density': [densities[southern_seasons[month]] for month in dates.month]})
                         ]
         )
-        density_df = density_df.set_index(['time', 'shape']).sort_index()
 
         return density_df

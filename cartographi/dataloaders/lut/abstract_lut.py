@@ -54,7 +54,7 @@ class LutDataLoader(DataLoaderInterface):
             logging.info('\tFiles read:')
             for file in self.files:
                 logging.info(f'\t\t{file}')
-
+        
         # Get data name from column name if not set in params
         if self.data_name is None:
             logging.debug('\tSetting self.data_name from column name')
@@ -83,7 +83,7 @@ class LutDataLoader(DataLoaderInterface):
                 ))
             
             self.data = self.trim_datapoints(bounds)
-
+        
     @abstractmethod
     def import_data(self, bounds):
         '''
@@ -151,14 +151,16 @@ class LutDataLoader(DataLoaderInterface):
         """
         if data is None:
             data = self.data
-            
+        # Extract just polygons as a series if it's a dataframe
+        if type(data) == pd.core.frame.DataFrame:
+            data = data['geometry']
         # No coverage if no data
         if data.empty:
             return 0
         else:    
             # Calculate coverage fraction
             bounds_polygon = bounds.to_polygon()
-            data_polygon = MultiPolygon([data['geometry'].tolist()])
+            data_polygon = MultiPolygon([data.tolist()])
             coverage = data_polygon.area / bounds_polygon.area
 
             # Cap output at 100%
@@ -180,7 +182,6 @@ class LutDataLoader(DataLoaderInterface):
         '''
         if data is None:
             data = self.data
-            
         # Limit time to boundary
         if 'time' in data.columns:
             data = data[(data['time'] >= bounds.get_time_min()) & \
@@ -191,9 +192,10 @@ class LutDataLoader(DataLoaderInterface):
         data['geometry'] = data['geometry'].apply(lambda p: p & bounds_polygon)
         
         # Drop empty polygons (i.e. no coverage with bounds)
-        data = data[(data['geometry'].geom_type in ['Polygon', 
-                                                    'MultiPolygon']) & \
-                    (data['geometry'].is_empty == False)]
+        is_polygon = data['geometry'].apply(lambda row: 
+                                            row.geom_type == 'Polygon' and 
+                                            not row.is_empty)
+        data = data[is_polygon == True]
         
         return data
 
@@ -249,6 +251,9 @@ class LutDataLoader(DataLoaderInterface):
         polygons = self.trim_datapoints(bounds)
         logging.debug(f"\t{len(polygons)} polygons found for attribute " + \
                       f"'{self.data_name}' within bounds '{bounds}'")
+        
+        if agg_type is None:
+            agg_type = self.aggregate_type
         # If want the number of datapoints
         if agg_type =='COUNT':
             return len(polygons)
@@ -264,10 +269,9 @@ class LutDataLoader(DataLoaderInterface):
         # Skipna not easily parsed to remaining calculations, so force it here
         if skipna: polygons = polygons.dropna()
         # Mean, median, and std dev need to be weighted by size of polygons
-        polygons['weights'] = polygons.apply(
-                lambda row: self.calculate_coverage(bounds, data=row)
-            )
-        
+        polygons = polygons.assign(weights=lambda row: self.calculate_coverage(bounds, row['geometry']))
+        # [self.calculate_coverage(bounds, data=row)
+        #                        for _,row in polygons.iterrows()]
         if agg_type == 'MEAN':
             return np.average(polygons[self.data_name], weights=polygons['weights'])
         
