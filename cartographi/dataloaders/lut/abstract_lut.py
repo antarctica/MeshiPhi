@@ -271,25 +271,30 @@ class LutDataLoader(DataLoaderInterface):
         # Skipna not easily parsed to remaining calculations, so force it here
         if skipna: polygons = polygons.dropna()
         # Mean, median, and std dev need to be weighted by size of polygons
-        polygons = polygons.assign(weights=lambda row: self.calculate_coverage(bounds, row['geometry']))
+        polygons = polygons.assign(weights=lambda row: 
+                                    self.calculate_coverage(bounds, 
+                                                            row['geometry']))
 
         if agg_type == 'MEAN':
-            return np.average(polygons[self.data_name], weights=polygons['weights'])
+            return np.average(polygons[self.data_name], 
+                              weights=polygons['weights'])
         
         elif agg_type == 'MEDIAN':
             # Chunk by cumulative weight
-            polygons['cumulative_weights'] = polygons['weights'].cumsum(skipna=skipna)
+            polygons['cumulative_weights'] = polygons['weights'].cumsum(
+                                                                 skipna=skipna)
             # Find middle of cumulative weight
             total_weight = polygons['weights'].sum(skipna=skipna)
             median_pos = total_weight/2
-            # Extract top half and return lowest value (so closest to halfway)
+            # Extract top half and return lowest value (value closest to halfway)
             top_half = polygons.loc[polygons['cumulative_weights'] >= median_pos]
             return top_half.iloc[0]
         
         elif agg_type == 'STD':
-            # Calculate std dev manually
-            average = np.average(polygons[self.data_name], weights=polygons['weights'])
-            variance = np.average(np.power(polygons[self.data_name]-average, 2), 
+            # Calculate std dev manually to account for weight
+            average = np.average(polygons[self.data_name], 
+                                 weights=polygons['weights'])
+            variance = np.average(np.power(polygons[self.data_name]-average,2),
                                   weights=polygons['weights'])
             return np.sqrt(variance)
         # If aggregation_type not available
