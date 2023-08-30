@@ -160,7 +160,9 @@ class LutDataLoader(DataLoaderInterface):
         else:    
             # Calculate coverage fraction
             bounds_polygon = bounds.to_polygon()
-            data_polygon = MultiPolygon([data.tolist()])
+            # Extract out polygons, add to multipolygon
+            data_polygon = MultiPolygon([datum for datum in data.tolist() 
+                                         if datum.geom_type == 'Polygon'])
             coverage = data_polygon.area / bounds_polygon.area
 
             # Cap output at 100%
@@ -270,8 +272,7 @@ class LutDataLoader(DataLoaderInterface):
         if skipna: polygons = polygons.dropna()
         # Mean, median, and std dev need to be weighted by size of polygons
         polygons = polygons.assign(weights=lambda row: self.calculate_coverage(bounds, row['geometry']))
-        # [self.calculate_coverage(bounds, data=row)
-        #                        for _,row in polygons.iterrows()]
+
         if agg_type == 'MEAN':
             return np.average(polygons[self.data_name], weights=polygons['weights'])
         
