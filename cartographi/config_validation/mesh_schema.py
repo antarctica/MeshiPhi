@@ -1,19 +1,19 @@
 region_schema = {
     "type": "object",
-    "required": ["latMin",  "latMax", 
-                 "longMin", "longMax",
-                 "startTime", "endTime",
-                 "cellWidth", "cellHeight"],
+    "required": ["lat_min",  "lat_max", 
+                 "long_min", "long_max",
+                 "start_time", "end_time",
+                 "cell_width", "cell_height"],
     "additionalProperties": False,
     "properties":{    
-        "latMin": {"type": "number"},
-        "latMax": {"type": "number"},
-        "longMin": {"type": "number"},
-        "longMax": {"type": "number"},
-        "startTime": {"type": "string"},
-        "endTime": {"type": "string"},
-        "cellWidth": {"type": "number"},
-        "cellHeight": {"type": "number"}
+        "lat_min": {"type": "number"},
+        "lat_max": {"type": "number"},
+        "long_min": {"type": "number"},
+        "long_max": {"type": "number"},
+        "start_time": {"type": "string"},
+        "end_time": {"type": "string"},
+        "cell_width": {"type": "number"},
+        "cell_height": {"type": "number"}
     }
 }
 
@@ -40,27 +40,19 @@ splitting_schema = {
 
 mesh_schema = {
     "type": "object",
-    "required": ["Mesh_info"],
-    "additionalProperties": False,
+    "required": ["region", "data_sources", "splitting"],
     "properties":{
-        "Mesh_info": {
-            "type": "object",
-            "required": ["Region", "Data_sources", "splitting"],
-            "additionalProperties": False,
-            "properties":{
-                "Region": {
-                    "$ref": "#/region_schema"
-                },
-                "Data_sources": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/dataloader_schema"
-                    },
-                },
-                "splitting": {
-                    "$ref": "#/splitting_schema"
-                }
-            }
+        "region": {
+            "$ref": "#/region_schema"
+        },
+        "data_sources": {
+            "type": "array",
+            "items": {
+                "$ref": "#/dataloader_schema"
+            },
+        },
+        "splitting": {
+            "$ref": "#/splitting_schema"
         }
     },
     "region_schema": region_schema,

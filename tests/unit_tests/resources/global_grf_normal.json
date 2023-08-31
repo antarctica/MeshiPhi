@@ -1,17 +1,17 @@
 {
     "config": {
-        "Mesh_info": {
-            "Region": {
-                "latMin": -90.0,
-                "latMax": 90.0,
-                "longMin": -180.0,
-                "longMax": 180,
-                "startTime": "2023-04-18",
-                "endTime": "2023-04-19",
-                "cellWidth": 5.0,
-                "cellHeight": 5.0
+        "mesh_info": {
+            "region": {
+                "lat_min": -90.0,
+                "lat_max": 90.0,
+                "long_min": -180.0,
+                "long_max": 180,
+                "start_time": "2023-04-18",
+                "end_time": "2023-04-19",
+                "cell_width": 5.0,
+                "cell_height": 5.0
             },
-            "Data_sources": [
+            "data_sources": [
                 {
                     "loader": "scalar_grf",
                     "params": {
