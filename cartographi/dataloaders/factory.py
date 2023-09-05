@@ -20,8 +20,8 @@ from cartographi.dataloaders.vector.vector_grf import VectorGRFDataLoader
 from cartographi.dataloaders.vector.duacs_current import DuacsCurrentDataLoader
 from cartographi.dataloaders.vector.era5_wave_direction import ERA5WaveDirectionLoader
 
-from cartographi.dataloaders.scalar.density import DensityDataLoader
-from cartographi.dataloaders.scalar.thickness import ThicknessDataLoader
+from cartographi.dataloaders.lut.density import DensityDataLoader
+from cartographi.dataloaders.lut.thickness import ThicknessDataLoader
 
 from glob import glob
 import os
@@ -79,8 +79,6 @@ class DataLoaderFactory:
             'icenet':       (IceNetDataLoader, ['files']),
             'modis':        (MODISDataLoader, ['files']),
             'era5_wave_height': (ERA5WaveHeightDataLoader, ['files']),
-            'thickness':    (ThicknessDataLoader, []),
-            'density':      (DensityDataLoader, []),
             # Scalar - Abstract shapes
             'circle':       (ShapeDataLoader, []),
             'square':       (ShapeDataLoader, []),
@@ -95,8 +93,10 @@ class DataLoaderFactory:
             'northsea_currents':(NorthSeaCurrentDataLoader, ['files']),
             'duacs_currents':     (DuacsCurrentDataLoader, ['files']),
             'oras5_currents':   (ORAS5CurrentDataLoader, ['files']),
-            'sose':             (SOSEDataLoader, ['files'])
-
+            'sose':             (SOSEDataLoader, ['files']),
+            # LUT
+            'thickness':    (ThicknessDataLoader, []),
+            'density':      (DensityDataLoader, [])
         }
         # If name is recognised as a dataloader
         if name in dataloader_requirements:

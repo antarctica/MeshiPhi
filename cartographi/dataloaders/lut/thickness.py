@@ -1,5 +1,5 @@
 from cartographi.dataloaders.lut.abstract_lut import LutDataLoader
-from cartographi import Boundary
+from cartographi.mesh_generation.boundary import Boundary
 import logging
 
 import pandas as pd
@@ -20,7 +20,7 @@ southern_seasons = {
     9: 'sp', 10: 'sp', 11: 'sp',
     }
 
-class DensityDataLoader(LutDataLoader):
+class ThicknessDataLoader(LutDataLoader):
     
     class Region:
         """
@@ -63,9 +63,8 @@ class DensityDataLoader(LutDataLoader):
         """
         regions = [
             self.Region('Ross', 
-                        unary_union(
-                            Boundary([-90, 0], [160,   180]).to_polygon(),
-                            Boundary([-90, 0], [-180, -130]).to_polygon()),
+                        unary_union([Boundary([-90, 0], [160,   180]).to_polygon(),
+                                     Boundary([-90, 0], [-180, -130]).to_polygon()]),
                         {'wi': 0.72, 'sp': 0.67, 'su': 1.32, 'au': 0.82, 'y': 1.07}),
             self.Region('Bellinghausen',
                         Boundary([-90, 0], [-130, -60]).to_polygon(),
