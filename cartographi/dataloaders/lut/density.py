@@ -17,12 +17,13 @@ class DensityDataLoader(LutDataLoader):
         Returns:
             density_df (pd.DataFrame): 
                 Sea Ice Density dataset within limits of bounds. 
-                DataFrame has coordinates 'date', 'shape', and variable 'density'
+                DataFrame has coordinates 'date', 'shape', 
+                and variable 'density'
         '''
         
         # Look up table parameters hardcoded
-        northern_hemisphere = wkt.loads('POLYGON((-180 -90, -180 0, 180 0, 180 -90, -180 -90))')
-        southern_hemisphere = wkt.loads('POLYGON((-180 0, -180 90, 180 90, 180 0, -180 0))')
+        northern_hemisphere = wkt.loads('POLYGON((-180 0, -180 90, 180 90, 180 0, -180 0))')
+        southern_hemisphere = wkt.loads('POLYGON((-180 -90, -180 0, 180 0, 180 -90, -180 -90))')
         
         northern_seasons = {
             1: 'wi',  2: 'wi', 12: 'wi',
