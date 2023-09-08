@@ -6,9 +6,9 @@ from pyproj import Transformer, CRS
 import logging
 import numpy as np
 import pandas as pd
-from shapely.geometry import MultiPolygon
-from shapely.geometry import Point
-from shapely.geometry import LineString
+from shapely.geometry import MultiPolygon, Point, LineString
+from shapely.strtree import STRtree
+from shapely.ops import unary_union
 
 from cartographi.utils import round_to_sigfig
 
@@ -161,7 +161,7 @@ class LutDataLoader(DataLoaderInterface):
             # Calculate coverage fraction
             bounds_polygon = bounds.to_polygon()
             # Extract out polygons, add to multipolygon
-            data_polygon = MultiPolygon([datum for datum in data.tolist() 
+            data_polygon = unary_union([datum for datum in data.tolist() 
                                          if datum.geom_type == 'Polygon'])
             coverage = data_polygon.area / bounds_polygon.area
 
@@ -185,21 +185,15 @@ class LutDataLoader(DataLoaderInterface):
         if data is None:
             data = self.data
         # Limit time to boundary
-        if 'time' in data.columns:
-            data = data[(data['time'] >= bounds.get_time_min()) & \
-                        (data['time'] <= bounds.get_time_max())]
-        
+        if 'time' in data.index.names:
+            data = data.loc[bounds.get_time_min():bounds.get_time_max()]
+            
         # Find intersection of each polygon to the boundary
         bounds_polygon = bounds.to_polygon()    
-        data['geometry'] = data['geometry'].apply(lambda p: p & bounds_polygon)
-        
-        # Drop empty polygons (i.e. no coverage with bounds)
-        is_polygon = data['geometry'].apply(lambda row: 
-                                            row.geom_type == 'Polygon' and 
-                                            not row.is_empty)
-        data = data[is_polygon == True]
-        
-        return data
+        lut_polys = STRtree(list(data['geometry']))
+        intersections = lut_polys.query(bounds_polygon)
+        # Return only rows intersecting with cellbox boundary
+        return data.iloc[intersections]
 
     def get_val_from_coord(self, long=None, lat=None, return_coords=False):
         '''

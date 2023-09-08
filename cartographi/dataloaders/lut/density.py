@@ -62,5 +62,5 @@ class DensityDataLoader(LutDataLoader):
                             'density': [densities[southern_seasons[month]] for month in dates.month]})
                         ]
         )
-
+        density_df = density_df.set_index('time').sort_index()
         return density_df

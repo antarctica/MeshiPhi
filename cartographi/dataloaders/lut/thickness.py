@@ -62,9 +62,8 @@ class ThicknessDataLoader(LutDataLoader):
                 and variable 'thickness'
         """
         regions = [
-            self.Region('Ross', 
-                        unary_union([Boundary([-90, 0], [160,   180]).to_polygon(),
-                                     Boundary([-90, 0], [-180, -130]).to_polygon()]),
+            self.Region('Ross E', 
+                        Boundary([-90, 0], [-180, -130]).to_polygon(),
                         {'wi': 0.72, 'sp': 0.67, 'su': 1.32, 'au': 0.82, 'y': 1.07}),
             self.Region('Bellinghausen',
                         Boundary([-90, 0], [-130, -60]).to_polygon(),
@@ -81,6 +80,9 @@ class ThicknessDataLoader(LutDataLoader):
             self.Region('West Pacific',
                         Boundary([-90, 0], [90, 160]).to_polygon(),
                         {'wi': 0.72, 'sp': 0.68, 'su': 1.17, 'au': 0.75, 'y': 0.79}),
+            self.Region('Ross W', 
+                        Boundary([-90, 0], [160,   180]).to_polygon(),
+                        {'wi': 0.72, 'sp': 0.67, 'su': 1.32, 'au': 0.82, 'y': 1.07}),
             self.Region('None',
                         Boundary([0, 90], [-180, 180]).to_polygon(),
                         {'wi': 0.72, 'sp': 0.67, 'su': 1.32, 'au': 0.82, 'y': 1.07},
@@ -100,5 +102,7 @@ class ThicknessDataLoader(LutDataLoader):
                               'thickness': region.get_value(month)})
                 for region in regions for month  in dates.month
             ])
-
+        
+        thickness_df = thickness_df.set_index('time').sort_index()
+        
         return thickness_df
