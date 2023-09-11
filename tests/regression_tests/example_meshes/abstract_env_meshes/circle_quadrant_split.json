@@ -27,7 +27,8 @@
                                 "dummy_data": {
                                     "threshold": 0.5,
                                     "upper_bound": 0.8,
-                                    "lower_bound": 0.01
+                                    "lower_bound": 0.01,
+                                    "split_lock": true
                                 }
                             }
                         ]

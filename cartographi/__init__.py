@@ -1,4 +1,4 @@
-__version__ = "1.0.4"
+__version__ = "1.0.5"
 __description__ = "CartograPhi: Earth's digital twin mapped on a non-uniform mesh"
 __license__ = "MIT"
 __author__ = "Samuel Hall, George Coombs, Harrison Abbot, Ayat Fekry, Jonathan Smith, Maria Fox, James Byrne, Michael Thorne"
