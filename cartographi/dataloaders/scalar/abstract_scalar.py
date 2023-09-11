@@ -609,7 +609,11 @@ class ScalarDataLoader(DataLoaderInterface):
 
                 # Return homogeneity condition
                 if   frac_over_threshold <= splitting_conds['lower_bound']: hom_type = "CLR"
-                elif frac_over_threshold >= splitting_conds['upper_bound']: hom_type = "HOM"
+                elif frac_over_threshold >= splitting_conds['upper_bound']:
+                    if splitting_conds['split_lock']: 
+                        hom_type = "HOM"
+                    else: 
+                        hom_type = "CLR"
                 else: hom_type = "HET"
 
             logging.debug(f"\thom_condition for attribute: '{self.data_name}' in bounds:'{bounds}' returned '{hom_type}'")
@@ -639,7 +643,11 @@ class ScalarDataLoader(DataLoaderInterface):
                        
                 # Return homogeneity condition
                 if   frac_over_threshold <= splitting_conds['lower_bound']: hom_type = "CLR"
-                elif frac_over_threshold >= splitting_conds['upper_bound']: hom_type = "HOM"
+                elif frac_over_threshold >= splitting_conds['upper_bound']: 
+                    if splitting_conds['split_lock']:
+                        hom_type = "HOM"
+                        logging.debug(f"\tSplitting locked by attribute: '{self.data_name}' in bounds:'{bounds}'")
+                    else: hom_type = "CLR"
                 else: hom_type = "HET"
                 
             logging.debug(f"\thom_condition for attribute: '{self.data_name}' in bounds:'{bounds}' returned '{hom_type}'")
