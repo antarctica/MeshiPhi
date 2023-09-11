@@ -598,7 +598,7 @@ class VectorDataLoader(DataLoaderInterface):
 
         # Check to see if it's above the minimum threshold
         if num_dp < self.min_dp:
-            hom_type = 'MIN'
+            hom_type = 'CLR'
         else:
             # To allow multiple modes of splitting, chuck them in the splitting conditions
             # Split if magnitude of curl(data) is larger than threshold 
