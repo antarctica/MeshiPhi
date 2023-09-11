@@ -638,7 +638,9 @@ class ScalarDataLoader(DataLoaderInterface):
                     Homogeneity condition of dataset, as described in 
                     get_hom_condition() docstring
             '''
-            if dps.size < self.min_dp: hom_type = "CLR"
+            if dps.size < self.min_dp: 
+                hom_type = "CLR"
+                logging.debug(f"\t{num_dp} datapoints found for attribute '{self.data_name}' within bounds '{bounds}'")
             else:
                 # Determine fraction of datapoints over threshold value
                 num_over_threshold = np.count_nonzero(dps > splitting_conds['threshold'])
