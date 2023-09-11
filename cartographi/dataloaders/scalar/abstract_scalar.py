@@ -569,6 +569,9 @@ class ScalarDataLoader(DataLoaderInterface):
                     `(float)` The upperbound of acceptable percentage 
                     of data_points of type value within this boundary that are 
                     above 'threshold'
+                'split_lock':
+                    `(bool)` If true, a cellbox will not be split by other 
+                    splitting conditions if it is deemed homogeneous. default = False.
 
         Returns:
             str:
