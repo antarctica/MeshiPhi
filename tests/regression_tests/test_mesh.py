@@ -67,7 +67,7 @@ def mesh_pair(request):
     with open(request.param, 'r') as fp:
         old_mesh = json.load(fp)
     
-    mesh_config = old_mesh['config']
+    mesh_config = old_mesh['config']['mesh_info']
     new_mesh = calculate_env_mesh(mesh_config)
     
     return [old_mesh, new_mesh]

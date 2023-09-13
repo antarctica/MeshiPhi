@@ -72,7 +72,7 @@ def rebuild_mesh_cli():
     logging.info("{} {}".format(inspect.stack()[0][3][:-4], version))
 
     mesh_json = json.load(args.mesh)
-    config = mesh_json['config']
+    config = mesh_json['config']['mesh_info']
 
     # rebuilding mesh...
     rebuilt_mesh = MeshBuilder(config).build_environmental_mesh()
