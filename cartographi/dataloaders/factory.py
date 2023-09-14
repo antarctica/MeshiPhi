@@ -22,6 +22,7 @@ from cartographi.dataloaders.vector.era5_wave_direction import ERA5WaveDirection
 
 from cartographi.dataloaders.lut.density import DensityDataLoader
 from cartographi.dataloaders.lut.thickness import ThicknessDataLoader
+from cartographi.dataloaders.lut.scotland_ncmpa import ScotlandNCMPA
 
 from glob import glob
 import os
@@ -95,8 +96,9 @@ class DataLoaderFactory:
             'oras5_currents':   (ORAS5CurrentDataLoader, ['files']),
             'sose':             (SOSEDataLoader, ['files']),
             # LUT
-            'thickness':    (ThicknessDataLoader, []),
-            'density':      (DensityDataLoader, [])
+            'thickness':        (ThicknessDataLoader, []),
+            'density':          (DensityDataLoader, []),
+            'scotland_ncmpa':   (ScotlandNCMPA, ['files'])
         }
         # If name is recognised as a dataloader
         if name in dataloader_requirements:

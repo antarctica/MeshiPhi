@@ -63,6 +63,9 @@ class LutDataLoader(DataLoaderInterface):
         else:
             logging.debug(f'\tSetting data column name to {self.data_name}')
             self.data = self.set_data_col_name(self.data_name)
+            
+        # Verify that all geometries are acceptable inputs
+        self.data = self.verify_data()
 
         # Calculate fraction of boundary that data covers
         data_coverage = self.calculate_coverage(bounds)
@@ -133,6 +136,46 @@ class LutDataLoader(DataLoaderInterface):
             params['aggregate_type']  = 'MEAN'
             
         return params
+    
+    def verify_data(self, data=None):
+        """
+        Verifies that all geometries read in are Polygons or MultiPolygons
+        If MultiPolygon, then split out into multiple Polygons
+
+        Args:
+            data (pd.DataFrame, optional): 
+                DataFrame with at least columns 'geometry' and a variable. 
+                Defaults to dataloader's data attribute.
+
+        Raises:
+            ValueError: If read in a geometry that is not Polygon or MultiPolygon
+        """
+        
+        if data is None:
+            data = self.data
+        
+        # List of rows to include in cleaned dataframe
+        new_data = []
+        # For each entry
+        for index, row in data.iterrows():
+            # Add row if Polygon
+            if row.geometry.geom_type == 'Polygon':
+                new_data.append(data.loc[[index]])
+            # Split out multipolygons to single polygons, and add rows
+            elif row.geometry.geom_type == 'MultiPolygon':
+                polygons = list(row.geometry.geoms)
+                new_df = pd.concat([data.loc[[index]]]*len(polygons))
+                new_df['geometry'] = polygons
+                new_data.append(new_df)
+            # Otherwise, geometry not usable
+            else:
+                raise ValueError(
+                    f'{row.geometry.geom_type} not acceptable geometry type.'+\
+                     ' Must be a Polygon or MultiPolygon!'
+                )
+        data = pd.concat(new_data, ignore_index=True)
+        
+        return data
 
     def calculate_coverage(self, bounds, data=None):
         """
@@ -161,8 +204,7 @@ class LutDataLoader(DataLoaderInterface):
             # Calculate coverage fraction
             bounds_polygon = bounds.to_polygon()
             # Extract out polygons, add to multipolygon
-            data_polygon = unary_union([datum for datum in data.tolist() 
-                                         if datum.geom_type == 'Polygon'])
+            data_polygon = unary_union([datum for datum in data.tolist()])
             coverage = data_polygon.area / bounds_polygon.area
 
             # Cap output at 100%
@@ -191,7 +233,7 @@ class LutDataLoader(DataLoaderInterface):
         # Find intersection of each polygon to the boundary
         bounds_polygon = bounds.to_polygon()    
         lut_polys = STRtree(list(data['geometry']))
-        intersections = lut_polys.query(bounds_polygon)
+        intersections = lut_polys.query(bounds_polygon, predicate='intersects').tolist()
         # Return only rows intersecting with cellbox boundary
         return data.iloc[intersections]
 
@@ -298,6 +340,10 @@ class LutDataLoader(DataLoaderInterface):
         else:
             raise ValueError(f'Unknown aggregation type {agg_type}')
         
+        # Convert numpy bool to python bool for JSON serialisation
+        if type(ret_val) is np.bool_:
+            ret_val = bool(ret_val)
+        
         return { self.data_name: ret_val}
 
     def get_hom_condition(self, bounds, splitting_conds):
@@ -325,21 +371,35 @@ class LutDataLoader(DataLoaderInterface):
         bounds_polygon = bounds.to_polygon()
         # Extract polygons that overlap the boundary
         polygons = self.trim_datapoints(bounds)['geometry'].tolist()
+        
     
         # If there's no polygon that overlaps with bounds        
         if not any([polygon.intersects(bounds_polygon) for polygon in polygons]):
-            return 'MIN'
+            return 'CLR'
         # If we want to split on the boundary
         elif splitting_conds['boundary']:
-            # Extract boundary from polygons
-            boundaries = [p.boundary.coords for p in polygons]
-            # Convert each boundary to a list of LineStrings
-            edges = list(set([LineString(b[k:k+2]) for b in boundaries 
-                                                        for k in range(len(b)-1)]))
-            # If any polygon boundary intersects bounds
-            for edge in edges:
-                if edge.intersects(bounds_polygon):
-                    return 'HET'
+            if any(p.boundary.intersects(bounds_polygon) for p in polygons):
+                return 'HET'
+            # # Extract boundary from polygons
+            # boundaries = [b.coords for p in polygons 
+            #                        for b in list(p.boundary.geoms)]
+            # # boundaries = []
+            # # for p in polygons:
+            # #     try:
+            # #         logging.info(p)
+            # #         logging.info(type(p))
+            # #         boundaries.append(p.boundary.coords)
+            # #     except:
+            # #         # logging.info(p)
+            # #         assert(False)
+            # # boundaries = [p.boundary.coords for p in polygons]
+            # # Convert each boundary to a list of LineStrings
+            # edges = list(set([LineString(b[k:k+2]) for b in boundaries 
+            #                                             for k in range(len(b)-1)]))
+            # # If any polygon boundary intersects bounds
+            # for edge in edges:
+            #     if edge.intersects(bounds_polygon):
+            #         return 'HET'
             
         # Otherwise no boundaries intersected bounds
         return 'CLR'

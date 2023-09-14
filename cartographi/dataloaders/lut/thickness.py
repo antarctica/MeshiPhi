@@ -4,7 +4,7 @@ import logging
 
 import pandas as pd
 from shapely import wkt
-from shapely.ops import unary_union
+
 
 # Mapping of month number to season per hemisphere
 northern_seasons = {
@@ -58,7 +58,7 @@ class ThicknessDataLoader(LutDataLoader):
         Returns:
             thickness_df (pd.DataFrame): 
                 Sea Ice thickness dataset within limits of bounds. 
-                DataFrame has coordinates 'date', 'shape', 
+                DataFrame has coordinates 'date', 'geometry', 
                 and variable 'thickness'
         """
         regions = [
