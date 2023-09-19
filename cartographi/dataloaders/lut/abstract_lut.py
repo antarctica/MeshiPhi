@@ -380,26 +380,6 @@ class LutDataLoader(DataLoaderInterface):
         elif splitting_conds['boundary']:
             if any(p.boundary.intersects(bounds_polygon) for p in polygons):
                 return 'HET'
-            # # Extract boundary from polygons
-            # boundaries = [b.coords for p in polygons 
-            #                        for b in list(p.boundary.geoms)]
-            # # boundaries = []
-            # # for p in polygons:
-            # #     try:
-            # #         logging.info(p)
-            # #         logging.info(type(p))
-            # #         boundaries.append(p.boundary.coords)
-            # #     except:
-            # #         # logging.info(p)
-            # #         assert(False)
-            # # boundaries = [p.boundary.coords for p in polygons]
-            # # Convert each boundary to a list of LineStrings
-            # edges = list(set([LineString(b[k:k+2]) for b in boundaries 
-            #                                             for k in range(len(b)-1)]))
-            # # If any polygon boundary intersects bounds
-            # for edge in edges:
-            #     if edge.intersects(bounds_polygon):
-            #         return 'HET'
             
         # Otherwise no boundaries intersected bounds
         return 'CLR'
