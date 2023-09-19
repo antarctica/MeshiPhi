@@ -34,7 +34,7 @@ class MeshValidator:
         self.conf = None
         self.validation_length = .1 
         with open (mesh_config_file , "r") as config_file:
-            self.conf = json.load(config_file)['config']
+            self.conf = json.load(config_file)['config']['mesh_info']
 
         mesh_builder = MeshBuilder (self.conf)
         self.env_mesh =  mesh_builder.build_environmental_mesh()

@@ -40,7 +40,7 @@ class TestBoundary (unittest.TestCase):
       
       json_file = "../regression_tests/example_meshes/env_meshes/grf_reprojection.json"
       with open (json_file , "r") as config_file:
-          config = json.load(config_file) ['config']
+          config = json.load(config_file) ['config']['mesh_info']
           boundary = Boundary.from_json (config)
           self.assertEqual ( boundary.get_bounds() , [[-70.0, -70.0], [-70.0, -50.0], [-50.0, -50.0], [-50.0, -70.0], [-70.0, -70.0]] )
 
