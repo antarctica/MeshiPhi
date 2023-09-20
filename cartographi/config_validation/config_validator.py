@@ -68,6 +68,8 @@ def validate_mesh_config(config):
         # If relative time is parsed
         if re.match('TODAY[+,-]\d+', time_str.replace(' ','')):
             correctly_formatted = True
+        elif time_str == 'TODAY':
+            correctly_formatted = True
         # Otherwise check if date is parsed correctly
         else:
             try:
