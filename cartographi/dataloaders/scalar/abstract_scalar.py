@@ -643,7 +643,7 @@ class ScalarDataLoader(DataLoaderInterface):
             '''
             if dps.size < self.min_dp: 
                 hom_type = "CLR"
-                logging.debug(f"\t{num_dp} datapoints found for attribute '{self.data_name}' within bounds '{bounds}'")
+                logging.debug(f"\t{dps.size} datapoints found for attribute '{self.data_name}' within bounds '{bounds}'")
             else:
                 # Determine fraction of datapoints over threshold value
                 num_over_threshold = np.count_nonzero(dps > splitting_conds['threshold'])
