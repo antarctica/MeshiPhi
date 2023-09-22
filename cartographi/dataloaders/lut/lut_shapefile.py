@@ -48,10 +48,10 @@ class LutShapefile(LutDataLoader):
                 DataFrame has columns 'geometry' and 
                 data_name ('dummy_data' by default)
         """
-        # Read in all files specified and extract geometry of exclusion zones
+        # Read in all files specified and extract geometry of shapes
         gdf_list = [gpd.read_file(file) for file in self.files]
         shape_df = gpd.GeoDataFrame(pd.concat(gdf_list, ignore_index=True))
-        # Denote all geometries as exclusion zones
+        # Give shapes a value defined in config
         shape_df[self.data_name] = self.value
         shape_df = pd.DataFrame(shape_df[['geometry',self.data_name]])
         

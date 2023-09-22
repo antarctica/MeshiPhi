@@ -48,21 +48,21 @@ class LutGeoJSON(LutDataLoader):
                 DataFrame has columns 'geometry' and 
                 data_name ('dummy_data' by default)
         """
-        # Read in all files specified and extract geometry of exclusion zones
+        # Read in all files specified and extract geometry of geojsons
         gdf_list = [gpd.read_file(file) for file in self.files]
-        exclusion_df = gpd.GeoDataFrame(pd.concat(gdf_list, ignore_index=True))
-        # Denote all geometries as exclusion zones
-        exclusion_df[self.data_name] = self.value
-        exclusion_df = pd.DataFrame(exclusion_df[['geometry',self.data_name]])
+        geojson_df = gpd.GeoDataFrame(pd.concat(gdf_list, ignore_index=True))
+        # Give geometries a value defined in config
+        geojson_df[self.data_name] = self.value
+        geojson_df = pd.DataFrame(geojson_df[['geometry',self.data_name]])
         
         # Create boundary denoting the world 
         world_polygon = Boundary([-90, 90], [-180, 180]).to_polygon()
-        # Subtract out all exclusion zones
-        exclusion_polygon = unary_union(exclusion_df.geometry)
-        inclusion_polygon = world_polygon - exclusion_polygon
-        # Add line
-        exclusion_df.loc[len(exclusion_df.index)] = [inclusion_polygon, np.nan]
+        # Subtract out all regions with defined values
+        defined_polygon = unary_union(geojson_df.geometry)
+        undefined_polygon = world_polygon - defined_polygon
+        # Set remainder to have value np.nan
+        geojson_df.loc[len(geojson_df.index)] = [undefined_polygon, np.nan]
         # Limit to boundary
-        exclusion_df = self.trim_datapoints(bounds, data=exclusion_df)
+        geojson_df = self.trim_datapoints(bounds, data=geojson_df)
 
-        return exclusion_df
+        return geojson_df

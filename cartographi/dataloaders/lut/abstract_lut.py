@@ -266,7 +266,7 @@ class LutDataLoader(DataLoaderInterface):
             
         return data
     
-    def get_value(self, bounds, agg_type=None, skipna=True):
+    def get_value(self, bounds, agg_type=None, skipna=False):
         '''
         Retrieve aggregated value from within bounds
         
@@ -276,7 +276,7 @@ class LutDataLoader(DataLoaderInterface):
                 Accepts 'MIN', 'MAX', 'MEAN', 'MEDIAN', 'STD', 'COUNT'
             bounds (Boundary): Boundary object with limits of lat/long
             skipna (bool): Defines whether to propogate NaN's or not
-                Default = True (ignore's NaN's)
+                Default = False (includes NaN's)
 
         Returns:
             dict: 

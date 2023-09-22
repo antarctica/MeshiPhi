@@ -3,7 +3,10 @@ from cartographi.mesh_generation.boundary import Boundary
 
 import pandas as pd
 from shapely.ops import unary_union
+from shapely import wkt
 import numpy as np
+
+import logging
 
 class LutCSV(LutDataLoader):    
     
@@ -28,14 +31,15 @@ class LutCSV(LutDataLoader):
         # Make sure .csv is well formed
         assert ('geometry' in csv_df.columns), \
                 "'geometry' column required"
-        assert ('POLYGON' in csv_df['geometry']).all(), \
+        assert (csv_df.geometry.str.contains('POLYGON').all()), \
                 "Only 'Polygon' or 'MultiPolygon' geometry allowed"
         assert (len(csv_df.columns) == 2), \
                 "Dataloader only accepts .csv with 2 columns, 'geometry' and {{data_name}}"
         
-        # Set data name to column in CSV        
-        self.data_name = csv_df.columns.remove('geometry')[0]
-        
+        # Set data name to column in CSV
+        self.data_name = list(set(csv_df.columns.values) - set(['geometry']))[0]
+        # Convert strings to shapely geometries
+        csv_df['geometry'] = csv_df['geometry'].apply(wkt.loads)
         # Create boundary denoting the world 
         world_polygon = Boundary([-90, 90], [-180, 180]).to_polygon()
         # Subtract out all regions with defined values
