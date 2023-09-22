@@ -572,6 +572,9 @@ class ScalarDataLoader(DataLoaderInterface):
                     `(float)` The upperbound of acceptable percentage 
                     of data_points of type value within this boundary that are 
                     above 'threshold'
+                'split_lock':
+                    `(bool)` If true, a cellbox will not be split by other 
+                    splitting conditions if it is deemed homogeneous. default = False.
 
         Returns:
             str:
@@ -603,7 +606,7 @@ class ScalarDataLoader(DataLoaderInterface):
                     get_hom_condition() docstring
             '''
             # If not enough datapoints
-            if len(dps) < self.min_dp: hom_type = "MIN"
+            if len(dps) < self.min_dp: hom_type = "CLR"
             # Otherwise, extract the homogeneity condition
             else:
                 # Determine fraction of datapoints over threshold value
@@ -612,7 +615,11 @@ class ScalarDataLoader(DataLoaderInterface):
 
                 # Return homogeneity condition
                 if   frac_over_threshold <= splitting_conds['lower_bound']: hom_type = "CLR"
-                elif frac_over_threshold >= splitting_conds['upper_bound']: hom_type = "HOM"
+                elif frac_over_threshold >= splitting_conds['upper_bound']:
+                    if splitting_conds['split_lock'] == True: 
+                        hom_type = "HOM"
+                    else: 
+                        hom_type = "CLR"
                 else: hom_type = "HET"
 
             logging.debug(f"\thom_condition for attribute: '{self.data_name}' in bounds:'{bounds}' returned '{hom_type}'")
@@ -634,7 +641,9 @@ class ScalarDataLoader(DataLoaderInterface):
                     Homogeneity condition of dataset, as described in 
                     get_hom_condition() docstring
             '''
-            if dps.size < self.min_dp: hom_type = "MIN"
+            if dps.size < self.min_dp: 
+                hom_type = "CLR"
+                logging.debug(f"\t{num_dp} datapoints found for attribute '{self.data_name}' within bounds '{bounds}'")
             else:
                 # Determine fraction of datapoints over threshold value
                 num_over_threshold = np.count_nonzero(dps > splitting_conds['threshold'])
@@ -642,16 +651,23 @@ class ScalarDataLoader(DataLoaderInterface):
                        
                 # Return homogeneity condition
                 if   frac_over_threshold <= splitting_conds['lower_bound']: hom_type = "CLR"
-                elif frac_over_threshold >= splitting_conds['upper_bound']: hom_type = "HOM"
+                elif frac_over_threshold >= splitting_conds['upper_bound']: 
+                    if splitting_conds['split_lock'] == True:
+                        hom_type = "HOM"
+                        logging.debug(f"\tSplitting locked by attribute: '{self.data_name}' in bounds:'{bounds}'")
+                    else: hom_type = "CLR"
                 else: hom_type = "HET"
                 
             logging.debug(f"\thom_condition for attribute: '{self.data_name}' in bounds:'{bounds}' returned '{hom_type}'")
             
             return hom_type
         
-        # Retrieve datapoints to analyse
-        dps = self.trim_datapoints(bounds)[self.data_name]
+        # Set default values for splitting_conds if not provided
+        if 'split_lock' not in splitting_conds:
+            splitting_conds['split_lock'] = False
 
+        dps = self.trim_datapoints(bounds)[self.data_name]
+        # Retrieve datapoints to analyse
         if type(dps) == pd.core.series.Series:
             return get_hom_condition_from_df(dps, splitting_conds)
         elif type(dps) == xr.core.dataarray.DataArray:
