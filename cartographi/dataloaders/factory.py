@@ -8,7 +8,12 @@ from cartographi.dataloaders.scalar.modis import MODISDataLoader
 from cartographi.dataloaders.scalar.scalar_csv import ScalarCSVDataLoader
 from cartographi.dataloaders.scalar.scalar_grf import ScalarGRFDataLoader
 from cartographi.dataloaders.scalar.shape import ShapeDataLoader
-from cartographi.dataloaders.scalar.era5_wave_height import ERA5WaveHeightDataLoader
+from cartographi.dataloaders.scalar.era5_sig_wave_height import ERA5SigWaveHeightDataLoader
+from cartographi.dataloaders.scalar.era5_max_wave_height import ERA5MaxWaveHeightDataLoader
+from cartographi.dataloaders.scalar.era5_wave_period import ERA5WavePeriodDataLoader
+from cartographi.dataloaders.scalar.era5_mean_wave_direction import ERA5MeanWaveDirDataLoader
+from cartographi.dataloaders.scalar.era5_wind_mag import ERA5WindMagDataLoader
+from cartographi.dataloaders.scalar.era5_wind_dir import ERA5WindDirDataLoader
 
 from cartographi.dataloaders.vector.baltic_current import BalticCurrentDataLoader
 from cartographi.dataloaders.vector.era5_wind import ERA5WindDataLoader
@@ -18,7 +23,7 @@ from cartographi.dataloaders.vector.sose import SOSEDataLoader
 from cartographi.dataloaders.vector.vector_csv import VectorCSVDataLoader
 from cartographi.dataloaders.vector.vector_grf import VectorGRFDataLoader
 from cartographi.dataloaders.vector.duacs_current import DuacsCurrentDataLoader
-from cartographi.dataloaders.vector.era5_wave_direction import ERA5WaveDirectionLoader
+from cartographi.dataloaders.vector.era5_wave_direction_vector import ERA5WaveDirectionLoader
 
 from cartographi.dataloaders.scalar.density import DensityDataLoader
 from cartographi.dataloaders.scalar.thickness import ThicknessDataLoader
@@ -78,9 +83,14 @@ class DataLoaderFactory:
             'gebco':        (GEBCODataLoader, ['files']),
             'icenet':       (IceNetDataLoader, ['files']),
             'modis':        (MODISDataLoader, ['files']),
-            'era5_wave_height': (ERA5WaveHeightDataLoader, ['files']),
+            'era5_sig_wave_height': (ERA5SigWaveHeightDataLoader, ['files']),
             'thickness':    (ThicknessDataLoader, []),
             'density':      (DensityDataLoader, []),
+            'era5_max_wave_height': (ERA5MaxWaveHeightDataLoader, ['files']),
+            'era5_wave_dir': (ERA5MeanWaveDirDataLoader, ['files']),
+            'era5_wave_period': (ERA5WavePeriodDataLoader, ['files']),
+            'era5_wind_mag': (ERA5WindMagDataLoader, ['files']),
+            'era5_wind_dir': (ERA5WindDirDataLoader, ['files']),
             # Scalar - Abstract shapes
             'circle':       (ShapeDataLoader, []),
             'square':       (ShapeDataLoader, []),
@@ -92,7 +102,7 @@ class DataLoaderFactory:
             'baltic_currents':  (BalticCurrentDataLoader, ['files']),
             'era5_wind':        (ERA5WindDataLoader, ['files']),
             'era5_wave_direction': (ERA5WaveDirectionLoader, ['files']),
-            'northsea_currents':(NorthSeaCurrentDataLoader, ['files']),
+            'northsea_currents': (NorthSeaCurrentDataLoader, ['files']),
             'duacs_currents':     (DuacsCurrentDataLoader, ['files']),
             'oras5_currents':   (ORAS5CurrentDataLoader, ['files']),
             'sose':             (SOSEDataLoader, ['files'])
