@@ -160,6 +160,9 @@ class ScalarDataLoader(DataLoaderInterface):
         if 'y_col' not in params:
             params['y_col'] = 'long'
             
+        if 'fast_reprojection' not in params:
+            params['fast_reprojection'] = False
+            
         return params
 
     def calculate_coverage(self, bounds, data=None):
@@ -740,7 +743,7 @@ class ScalarDataLoader(DataLoaderInterface):
             
             return data
             
-        def reproject_xr(data, in_proj, out_proj, x_col, y_col):
+        def reproject_xr(data, in_proj, out_proj, x_col, y_col, fast=False):
             '''
             Reprojects a xr.Dataset
             
@@ -766,19 +769,25 @@ class ScalarDataLoader(DataLoaderInterface):
                     Reprojected dataset, with columns 'lat', 'long', 
                     ('time' if in original dataset), and data_name
             '''
-            max_size = sum(data.sizes.values())
-            # Set data CRS
-            data = data.rio.write_crs(in_proj)
-            # Reproject
-            data = data.rio.reproject(out_proj, resampling=Resampling.average,
-                                                shape=((max_size,max_size)), 
-                                                nodata=np.nan)
-            # Rename coordinates
-            data = data.rename({x_col: 'long', y_col: 'lat'})
-            # Reorder coords in case they are wrong
-            data = data.sortby('lat', ascending=True)
-            data = data.sortby('long', ascending=True)
-            return data
+            if fast:
+            # If want fast results (uses interpolation)
+                max_size = sum(data.sizes.values())
+                # Set data CRS
+                data = data.rio.write_crs(in_proj)
+                # Reproject
+                data = data.rio.reproject(out_proj, resampling=Resampling.average,
+                                                    shape=((max_size,max_size)), 
+                                                    nodata=np.nan)
+                # Rename coordinates
+                data = data.rename({x_col: 'long', y_col: 'lat'})
+                # Reorder coords in case they are wrong
+                data = data.sortby('lat', ascending=True)
+                data = data.sortby('long', ascending=True)
+                return data
+            # If want accurate results
+            else:
+                df = data.to_dataframe().reset_index().dropna()
+                return reproject_df(df, in_proj, out_proj, x_col, y_col)
 
         # If no reprojection to do
         if in_proj == out_proj:
@@ -790,7 +799,8 @@ class ScalarDataLoader(DataLoaderInterface):
         if type(self.data) == pd.core.frame.DataFrame:
             return reproject_df(self.data, in_proj, out_proj, x_col, y_col)
         elif type(self.data) == xr.core.dataset.Dataset:
-            return reproject_xr(self.data, in_proj, out_proj, x_col, y_col)
+            return reproject_xr(self.data, in_proj, out_proj, x_col, y_col, 
+                                fast=self.fast_reprojection)
     
     def downsample(self, agg_type=None):
         '''
