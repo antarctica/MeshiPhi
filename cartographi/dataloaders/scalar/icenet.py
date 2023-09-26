@@ -88,7 +88,7 @@ class IceNetDataLoader(ScalarDataLoader):
         # rather than date on which prediction made
         df.time = df.time + to_timedelta(df.leadtime, unit='d')
         # Remove unwanted columns
-        df = df.drop(columns=['yc','xc','leadtime', 'Lambert_Azimuthal_Grid', 'sic_stddev', 'forecast_date'])
+        df = df.drop(columns=['yc','xc','leadtime', 'Lambert_Azimuthal_Grid', 'sic_stddev', 'forecast_date','ensemble_members'])
         # Trim to initial datapoints
         df = self.trim_datapoints(bounds, data=df)
         
