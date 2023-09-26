@@ -19,6 +19,7 @@ this includes and is not limited to: Ocean Currents, Sea Ice Concentration and B
 
 
 import numpy as np
+import logging
 from cartographi.mesh_generation.boundary import Boundary
 from cartographi.mesh_generation.aggregated_cellbox import AggregatedCellBox
 
@@ -296,6 +297,7 @@ class CellBox:
             if ',' in data_name:
                 agg_value = self.check_vector_data(
                     source, loader, agg_value, data_name)
+
             elif np.isnan(agg_value[data_name]):
                 if source.get_value_fill_type() == 'parent':
                     # if the agg_value empty and get_value_fill_type is parent, then use the parent bounds
@@ -304,10 +306,15 @@ class CellBox:
                         parent = parent.get_parent()
                 else:  # not parent, so either float or Nan so set the agg_Data to value_fill_type
                     agg_value[data_name] = source.get_value_fill_type()
-
-            # combine the aggregated values in one dict
-            agg_dict.update(agg_value)
-
+                    
+            # If already and value for {data_name} in cellbox and it's a NaN, overwrite
+            if (data_name in agg_dict):
+                if np.isnan(agg_dict[data_name]):
+                    logging.warning(f'\t{data_name} already exists in cellbox! Overwriting only NaN values')
+                    agg_dict.update(agg_value)
+            else:
+                agg_dict.update(agg_value)
+                
         agg_cellbox = AggregatedCellBox(self.bounds, agg_dict, self.get_id())
         # free the memory space used by the cellbox
         self.deallocate_cellbox()
