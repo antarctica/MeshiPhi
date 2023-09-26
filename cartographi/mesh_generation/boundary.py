@@ -139,7 +139,7 @@ class Boundary:
         if long_range[0] < -180 or long_range[1] > 180:
             raise ValueError('Boundary: Longtitude range should be within -180:180')
         if len (time_range) > 0:
-            if datetime.strptime(time_range[0], '%Y-%m-%d') >= datetime.strptime(time_range[1], '%Y-%m-%d'):
+            if datetime.strptime(time_range[0], '%Y-%m-%d') > datetime.strptime(time_range[1], '%Y-%m-%d'):
                      raise ValueError('Boundary: Start time range should be smaller than range end')
 
     # Functions used for getting data from a cellbox
