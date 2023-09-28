@@ -14,7 +14,7 @@ from cartographi.utils import round_to_sigfig
 
 class LutDataLoader(DataLoaderInterface):
     '''
-    Abstract class for all scalar Datasets.
+    Abstract class for all LookUp Table Datasets.
     '''
     def __init__(self, bounds, params):
         '''
@@ -30,13 +30,12 @@ class LutDataLoader(DataLoaderInterface):
                 dataloader
 
         Attributes:
-            self.data (pd.DataFrame or xr.Dataset): 
+            self.data (gpd.DataFrame): 
                 Data stored by dataloader to use when called upon by the mesh.
                 Must be saved in mercator projection (EPSG:4326), with 
-                coordinates names 'lat', 'long', and 'time' (if applicable).
+                columns 'geometry' and data_name.
             self.data_name (str): 
-                Name of scalar variable. Must be the column name if self.data
-                is pd.DataFrame. Must be variable if self.data is xr.Dataset
+                Name of scalar variable. Must be the column name in the dataframe
                 
         Raises:
             ValueError: If no data lies within the parsed boundary
@@ -94,23 +93,18 @@ class LutDataLoader(DataLoaderInterface):
         data from scratch
                 
         Returns:
-            xr.Dataset or pd.DataFrame:
+            pd.DataFrame:
                 Coordinates and data being imported from file \n
-                if xr.Dataset, 
-                    - Must have coordinates 'lat' and 'long'
-                    - Must have single data variable
-                    
                 if pd.DataFrame, 
-                    - Must have columns 'lat' and 'long'
+                    - Must have columns 'geometry' and data_name
                     - Must have single data column
                     
-                Downsampling and reprojecting happen in __init__() method
         '''
         pass
         
     def add_default_params(self, params):
         '''
-        Set default values for all scalar dataloaders. This function should be
+        Set default values for all LUT dataloaders. This function should be
         overloaded to include any extra params for a specific dataloader
         
         Args:
@@ -398,8 +392,8 @@ class LutDataLoader(DataLoaderInterface):
         
     def get_data_col_name(self):
         '''
-        Retrieve name of data column (for pd.DataFrame), or variable 
-        (for xr.Dataset). Used for when data_name not defined in params.
+        Retrieve name of data column. 
+        Used for when data_name not defined in params.
 
         Returns:
             str: 
@@ -428,7 +422,7 @@ class LutDataLoader(DataLoaderInterface):
             name (str): Name to replace currently stored name with
 
         Returns:
-            xr.Dataset or pd.DataFrame: 
+            pd.DataFrame: 
                 Data with variable name changed
         '''
         
