@@ -538,6 +538,9 @@ class ScalarDataLoader(DataLoaderInterface):
             elif agg_type == 'STD':
                 if skipna:  return np.nanstd(dps)
                 else:       return np.std(dps)
+            elif agg_type == 'RMSE':
+                if skipna:  return np.sqrt(np.nanmean((dps-np.nanmean(dps))**2))
+                else:       return np.sqrt(np.mean((dps-np.mean(dps))**2))
             # If aggregation_type not available
             else:
                 raise ValueError(f'Unknown aggregation type {agg_type}')
