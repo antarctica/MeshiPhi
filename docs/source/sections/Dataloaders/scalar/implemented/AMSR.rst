@@ -15,6 +15,6 @@ This issue will be rectified soon by updating the regression tests.
 Data can be downloaded from `here <https://seaice.uni-bremen.de/data-archive/>`_
 
 
-.. automodule:: polar_route.dataloaders.scalar.amsr
+.. automodule:: cartographi.dataloaders.scalar.amsr
    :special-members: __init__
    :members:

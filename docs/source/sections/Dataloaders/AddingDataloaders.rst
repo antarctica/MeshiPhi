@@ -10,12 +10,12 @@ Each dataloader is to be implemented as a separate object for the Environmental 
 The general workflow for creating a new dataloader is as follows:
 
 #. Choose an appropriate dataloader type (see :ref:`Dataloader Types`).
-#. Create a new file under :code:`polar_route/DataLoaders/{dataloader-type}` with an appropriate name.
+#. Create a new file under :code:`cartographi.DataLoaders/{dataloader-type}` with an appropriate name.
 #. Create :code:`import_data()` and (optionally) :code:`add_default_params()` methods. Examples of how to do this are shown on the :ref:`abstractScalar<abstract-scalar-dataloader-index>` and :ref:`abstractVector<abstract-vector-dataloader-index>` pages.
-#. Add a new entry to the dataloader factory object, within :code:`polar_route/Dataloaders/Factory.py`. Instructions on how to do so are shown in :ref:`dataloader-factory`
+#. Add a new entry to the dataloader factory object, within :code:`cartographi.Dataloaders/Factory.py`. Instructions on how to do so are shown in :ref:`dataloader-factory`
 
 After performing these actions, the dataloader should be ready to go. It is useful for debugging purposes 
-to create the dataloader object from within :code:`polar_route/Dataloaders/Factory.py` (e.g. within
+to create the dataloader object from within :code:`cartographi.Dataloaders/Factory.py` (e.g. within
 :code:`if __name__=='__main__':` ) and test its functionality before deploying it.
 
 
@@ -33,7 +33,7 @@ basic steps would be to
    ::
       
       # Import the abstract dataloader as the base class
-      from polar_route.dataloaders.scalar.abstract_scalar import ScalarDataLoader
+      from cartographi.dataloaders.scalar.abstract_scalar import ScalarDataLoader
       
       # Set up dataloader in the same way as the existing dataloaders
       class MyDataLoader(ScalarDataLoader):
@@ -73,7 +73,7 @@ basic steps would be to
    ::
 
       import json
-      from polar_route import MeshBuilder
+      from cartographi.import MeshBuilder
 
       # Config to initialise mesh from
       with open('config.json', 'r') as fp:
@@ -87,7 +87,7 @@ basic steps would be to
    ::
 
       # Set up bounds of data in dataloader
-      from polar_route import Boundary
+      from cartographi.import Boundary
       bounds = Boundary.from_json(config)
 
       # Add dataloader to mesh builder and regenerate mesh
