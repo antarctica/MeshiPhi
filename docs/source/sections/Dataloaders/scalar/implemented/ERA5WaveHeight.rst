@@ -17,6 +17,6 @@ Instructions for how to download their data products are
 available `here <https://confluence.ecmwf.int/display/CKB/How+to+download+ERA5>`_
 
 
-.. automodule:: polar_route.dataloaders.scalar.era5_wave_height
+.. automodule:: cartographi.dataloaders.scalar.era5_wave_height
    :special-members: __init__
    :members:
