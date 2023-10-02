@@ -720,7 +720,7 @@ class VectorDataLoader(DataLoaderInterface):
                 # Set data CRS
                 data = data.rio.write_crs(in_proj)
                 # Reproject
-                data = data.rio.reproject(out_proj, resampling=Resampling.average,
+                data = data.rio.reproject(out_proj, resampling=Resampling.bilinear,
                                                     shape=((max_size,max_size)), 
                                                     nodata=np.nan)
                 # Rename coordinates
