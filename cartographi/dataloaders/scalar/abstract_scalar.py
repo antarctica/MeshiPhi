@@ -121,12 +121,9 @@ class ScalarDataLoader(DataLoaderInterface):
         overloaded to include any extra params for a specific dataloader
         
         Args:
-            name (str):
-                Name of dataloader entry in dataloader_requirements. Used to
-                specify default parameters for a specific dataloader.
             params (dict): 
                 Dictionary containing attributes that are required for each 
-                dataloader. 
+                dataloader.
             
         Returns:
             (dict): 
