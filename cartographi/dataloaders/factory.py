@@ -25,8 +25,12 @@ from cartographi.dataloaders.vector.vector_grf import VectorGRFDataLoader
 from cartographi.dataloaders.vector.duacs_current import DuacsCurrentDataLoader
 from cartographi.dataloaders.vector.era5_wave_direction_vector import ERA5WaveDirectionLoader
 
-from cartographi.dataloaders.scalar.density import DensityDataLoader
-from cartographi.dataloaders.scalar.thickness import ThicknessDataLoader
+from cartographi.dataloaders.lut.density import DensityDataLoader
+from cartographi.dataloaders.lut.thickness import ThicknessDataLoader
+from cartographi.dataloaders.lut.scotland_ncmpa import ScotlandNCMPA
+from cartographi.dataloaders.lut.lut_csv import LutCSV
+from cartographi.dataloaders.lut.lut_geojson import LutGeoJSON
+from cartographi.dataloaders.lut.lut_shapefile import LutShapefile
 
 from glob import glob
 import os
@@ -75,7 +79,7 @@ class DataLoaderFactory:
             # Scalar
             'scalar_csv':   (ScalarCSVDataLoader, ['files']),
             'scalar_grf':   (ScalarGRFDataLoader, ['binary']),
-            'binary_grf':   (ScalarGRFDataLoader,['binary']),
+            'binary_grf':   (ScalarGRFDataLoader, ['binary']),
             'amsr':         (AMSRDataLoader, ['files', 'hemisphere']),
             'bsose_sic':    (BSOSESeaIceDataLoader, ['files']),
             'bsose_depth':  (BSOSEDepthDataLoader, ['files']),
@@ -84,8 +88,6 @@ class DataLoaderFactory:
             'icenet':       (IceNetDataLoader, ['files']),
             'modis':        (MODISDataLoader, ['files']),
             'era5_sig_wave_height': (ERA5SigWaveHeightDataLoader, ['files']),
-            'thickness':    (ThicknessDataLoader, []),
-            'density':      (DensityDataLoader, []),
             'era5_max_wave_height': (ERA5MaxWaveHeightDataLoader, ['files']),
             'era5_wave_dir': (ERA5MeanWaveDirDataLoader, ['files']),
             'era5_wave_period': (ERA5WavePeriodDataLoader, ['files']),
@@ -97,16 +99,22 @@ class DataLoaderFactory:
             'gradient':     (ShapeDataLoader, []),
             'checkerboard': (ShapeDataLoader, []),
             # Vector
-            'vector_csv':       (VectorCSVDataLoader, ['files']),
-            'vector_grf':       (VectorGRFDataLoader, []),
-            'baltic_currents':  (BalticCurrentDataLoader, ['files']),
-            'era5_wind':        (ERA5WindDataLoader, ['files']),
-            'era5_wave_direction': (ERA5WaveDirectionLoader, ['files']),
-            'northsea_currents': (NorthSeaCurrentDataLoader, ['files']),
-            'duacs_currents':     (DuacsCurrentDataLoader, ['files']),
-            'oras5_currents':   (ORAS5CurrentDataLoader, ['files']),
-            'sose':             (SOSEDataLoader, ['files'])
-
+            'vector_csv':           (VectorCSVDataLoader, ['files']),
+            'vector_grf':           (VectorGRFDataLoader, []),
+            'baltic_currents':      (BalticCurrentDataLoader, ['files']),
+            'era5_wind':            (ERA5WindDataLoader, ['files']),
+            'era5_wave_direction':  (ERA5WaveDirectionLoader, ['files']),
+            'northsea_currents':    (NorthSeaCurrentDataLoader, ['files']),
+            'duacs_currents':       (DuacsCurrentDataLoader, ['files']),
+            'oras5_currents':       (ORAS5CurrentDataLoader, ['files']),
+            'sose':                 (SOSEDataLoader, ['files']),
+            # LUT
+            'thickness':        (ThicknessDataLoader, []),
+            'density':          (DensityDataLoader, []),
+            'scotland_ncmpa':   (ScotlandNCMPA, ['files']),
+            'lut_csv':          (LutCSV, ['files']),
+            'lut_geojson':      (LutGeoJSON, ['files', 'value']),
+            'lut_shapefile':    (LutShapefile, ['files', 'value'])
         }
         # If name is recognised as a dataloader
         if name in dataloader_requirements:
@@ -137,7 +145,7 @@ class DataLoaderFactory:
             params['files'] = [params['file']]
             del params['file']
         elif 'folder' in params:
-            folder = os.path.join(params['folder'], '') # Adds trailing slash if non-existent
+            folder = os.path.join(params['folder'], '')  # Adds trailing slash if non-existent
             params['files'] = sorted(glob(folder+'*'))
             del params['folder']
         return params

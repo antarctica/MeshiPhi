@@ -5,6 +5,7 @@ from datetime import datetime
 from datetime import timedelta
 
 from math import cos, sin, asin, sqrt, radians
+from shapely import wkt
 
 class Boundary:
     """
@@ -269,6 +270,25 @@ class Boundary:
         m = (6371 * c * 1000)
         # Divide by sqrt(2) to get 'square' side length
         return m / sqrt(2)
+    
+    def to_polygon(self):
+        """
+        Creates a shapely polygon from the extent of the boundary. Will be a 
+        rectangle in mercator projection.
+        
+        Returns:
+            (shapely.geometry.polygon.Polygon):
+                Shapely polygon with corners at the min/max lat/long 
+                values of this boundary
+        """
+        polygon = wkt.loads(
+                    f'POLYGON(({self.get_long_min()} {self.get_lat_min()},' + \
+                             f'{self.get_long_min()} {self.get_lat_max()},' + \
+                             f'{self.get_long_max()} {self.get_lat_max()},' + \
+                             f'{self.get_long_max()} {self.get_lat_min()},' + \
+                             f'{self.get_long_min()} {self.get_lat_min()}))'
+            )
+        return polygon
 
     def __str__(self):
 

@@ -12,6 +12,6 @@ From their website:
 Information on where to download their data products can be 
 found `here <https://modis.gsfc.nasa.gov/data/dataprod/mod29.php>`_
 
-.. automodule:: polar_route.dataloaders.scalar.modis
+.. automodule:: cartographi.dataloaders.scalar.modis
    :special-members: __init__
    :members:

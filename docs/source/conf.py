@@ -13,16 +13,16 @@
 import os
 import sys
 
-import polar_route
+import cartographi
 
 # -- Project information -----------------------------------------------------
 
-project = polar_route.__name__
-copyright = polar_route.__copyright__
-author = polar_route.__author__
+project = cartographi.__name__
+copyright = cartographi.__copyright__
+author = cartographi.__author__
 
 # The full version, including alpha/beta/rc tags
-release = polar_route.__version__
+release = cartographi.__version__
 
 
 # -- General configuration ---------------------------------------------------

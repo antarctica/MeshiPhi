@@ -4,6 +4,6 @@
 Abstract Scalar Dataloader
 **************************
 
-.. automodule:: polar_route.dataloaders.scalar.abstract_scalar
+.. automodule:: cartographi.dataloaders.scalar.abstract_scalar
    :special-members: __init__
    :members:
