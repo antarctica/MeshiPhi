@@ -7,8 +7,11 @@ import logging
 import numpy as np
 import xarray as xr
 import pandas as pd
+from rasterio.enums import Resampling
 
 from cartographi.utils import round_to_sigfig
+
+
 
 class ScalarDataLoader(DataLoaderInterface):
     '''
@@ -118,12 +121,9 @@ class ScalarDataLoader(DataLoaderInterface):
         overloaded to include any extra params for a specific dataloader
         
         Args:
-            name (str):
-                Name of dataloader entry in dataloader_requirements. Used to
-                specify default parameters for a specific dataloader.
             params (dict): 
                 Dictionary containing attributes that are required for each 
-                dataloader. 
+                dataloader.
             
         Returns:
             (dict): 
@@ -156,6 +156,9 @@ class ScalarDataLoader(DataLoaderInterface):
 
         if 'y_col' not in params:
             params['y_col'] = 'long'
+            
+        if 'fast_reprojection' not in params:
+            params['fast_reprojection'] = False
             
         return params
 
@@ -471,6 +474,8 @@ class ScalarDataLoader(DataLoaderInterface):
             # If no data
             elif len(dps) == 0:
                 return np.nan
+            elif np.isnan(dps).all():
+                return np.nan
             # Return float of aggregated value
             elif agg_type == 'MIN':
                 return dps.min(skipna=skipna)
@@ -731,14 +736,14 @@ class ScalarDataLoader(DataLoaderInterface):
                     .from_crs(CRS(in_proj), CRS(out_proj), always_xy=True)\
                     .transform(data[x_col].to_numpy(), data[y_col].to_numpy())
             # Replace columns with reprojected columns called 'lat'/'long'
-            if x_col != 'lat':  data = data.drop(x_col, axis=1)
-            if y_col != 'long': data = data.drop(y_col, axis=1)
+            if x_col != 'long':  data = data.drop(x_col, axis=1)
+            if y_col != 'lat': data = data.drop(y_col, axis=1)
             data['lat']  = y
             data['long'] = x
             
             return data
             
-        def reproject_xr(data, in_proj, out_proj, x_col, y_col):
+        def reproject_xr(data, in_proj, out_proj, x_col, y_col, fast=False):
             '''
             Reprojects a xr.Dataset
             
@@ -747,7 +752,7 @@ class ScalarDataLoader(DataLoaderInterface):
                     Data to reproject, with coordinates x_col, y_col
                 in_proj (str): 
                     Projection the original dataset is in, as a string 
-                    understandable by PyProj (e.g. 'EPSG:3031')
+                    understandable by rioxarray (e.g. 'EPSG:3031')
                 out_proj (str):
                     Projection desired as output format. Should be always be
                     Mercator, but doesn't have to be if you desire
@@ -764,10 +769,25 @@ class ScalarDataLoader(DataLoaderInterface):
                     Reprojected dataset, with columns 'lat', 'long', 
                     ('time' if in original dataset), and data_name
             '''
-            # Cast to dataframe, then reproject using reproject_df
-            # Cannot reproject directly as memory usage skyrockets
-            df = data.to_dataframe().reset_index().dropna()
-            return reproject_df(df, in_proj, out_proj, x_col, y_col)
+            if fast:
+            # If want fast results (uses interpolation)
+                max_size = sum(data.sizes.values())
+                # Set data CRS
+                data = data.rio.write_crs(in_proj)
+                # Reproject
+                data = data.rio.reproject(out_proj, resampling=Resampling.bilinear,
+                                                    shape=((max_size,max_size)), 
+                                                    nodata=np.nan)
+                # Rename coordinates
+                data = data.rename({x_col: 'long', y_col: 'lat'})
+                # Reorder coords in case they are wrong
+                data = data.sortby('lat', ascending=True)
+                data = data.sortby('long', ascending=True)
+                return data
+            # If want accurate results
+            else:
+                df = data.to_dataframe().reset_index().dropna()
+                return reproject_df(df, in_proj, out_proj, x_col, y_col)
 
         # If no reprojection to do
         if in_proj == out_proj:
@@ -779,7 +799,8 @@ class ScalarDataLoader(DataLoaderInterface):
         if type(self.data) == pd.core.frame.DataFrame:
             return reproject_df(self.data, in_proj, out_proj, x_col, y_col)
         elif type(self.data) == xr.core.dataset.Dataset:
-            return reproject_xr(self.data, in_proj, out_proj, x_col, y_col)
+            return reproject_xr(self.data, in_proj, out_proj, x_col, y_col, 
+                                fast=self.fast_reprojection)
     
     def downsample(self, agg_type=None):
         '''
