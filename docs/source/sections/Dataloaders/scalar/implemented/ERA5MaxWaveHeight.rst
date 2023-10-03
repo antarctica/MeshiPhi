@@ -1,6 +1,6 @@
-***************************
-ERA5 Wave Height Dataloader
-***************************
+***********************************
+ERA5 Maximum Wave Height Dataloader
+***********************************
 
 ERA5 is a family of data products produced by the European Centre for Medium-Range Weather Forecasts (ECMWF).
 It is the fifth generation ECMWF atmospheric reanalysis of the global climate covering the period from January 1950 to present.
@@ -17,6 +17,6 @@ Instructions for how to download their data products are
 available `here <https://confluence.ecmwf.int/display/CKB/How+to+download+ERA5>`_
 
 
-.. automodule:: cartographi.dataloaders.scalar.era5_wave_height
+.. automodule:: cartographi.dataloaders.scalar.era5_max_wave_height
    :special-members: __init__
    :members:
