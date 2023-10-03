@@ -20,7 +20,7 @@ class ERA5WindDirDataLoader(ScalarDataLoader):
         """
         # Open Dataset
         if len(self.files) == 1:    data = xr.open_dataset(self.files[0])
-        else:                       data = xr.open_mfdataset(self.files, chunks={'latitude': 10, 'longitude': 10})
+        else:                       data = xr.open_mfdataset(self.files)
         # Change column names
         data = data.rename({'latitude': 'lat',
                             'longitude': 'long'})
