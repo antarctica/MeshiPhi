@@ -108,7 +108,7 @@ def create_mesh_cli():
 def export_mesh_cli():
     """
         CLI entry point for exporting a mesh to standard formats.
-        Currently supported formats are JSON, GEOJSON, TIF
+        Currently supported formats are JSON, GEOJSON, TIF, PNG
     """
     # Default, used only by the Mesh Builder and CartograPhi
     args = get_args("mesh.json", 
@@ -124,6 +124,12 @@ def export_mesh_cli():
         
     elif args.format.upper() == "TIF":
         args = get_args("mesh.tif", 
+                    config_arg = False, 
+                    mesh_arg = True, 
+                    format_arg = True)
+
+    elif args.format.upper() == "PNG":
+        args = get_args("mesh.png", 
                     config_arg = False, 
                     mesh_arg = True, 
                     format_arg = True)

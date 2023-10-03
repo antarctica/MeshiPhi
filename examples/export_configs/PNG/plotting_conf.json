@@ -1,0 +1,18 @@
+{
+    "bools": [
+        {
+            "data_name": "ext_ice",
+            "colour": "red"
+        },
+        {
+            "data_name": "land",
+            "colour": "grey"
+        }
+    ],
+    "cmaps": [
+        {
+            "data_name": "SIC",
+            "cmap": "BuPu"
+        }
+    ]
+}
