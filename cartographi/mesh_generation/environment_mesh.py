@@ -132,6 +132,12 @@ class EnvironmentMesh:
         return json.loads(json.dumps(output, indent=4))
     
     def to_png(self, params_file, path):
+        """
+            exports a mesh and saves to a png file
+            Args:
+                params_file: A format configuration files as a json object
+                path: The path to save the png file
+        """
         from cartographi.mesh_plotting.mesh_plotter import MeshPlotter
 
         mesh_json = self.to_json()

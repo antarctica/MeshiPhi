@@ -67,4 +67,9 @@ class MeshPlotter:
             self.plot.add_geometries([polygon], ccrs.PlateCarree(), facecolor=cmap(normalized_value), alpha=1.0, edgecolor='darkslategrey')
    
     def save(self, filename):
+        """
+        Saves the plot to a file.
+        Args:
+            filename (str): The name of the file to save the plot to.
+        """
         plt.savefig(filename)
