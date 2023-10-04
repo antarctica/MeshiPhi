@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 __version__ = "1.1.2"
 __description__ = "CartograPhi: Earth's digital twin mapped on a non-uniform mesh"
 __license__ = "MIT"
