@@ -13,3 +13,5 @@ scipy
 tqdm
 xarray
 cartopy
+rasterio
+
