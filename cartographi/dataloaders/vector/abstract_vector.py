@@ -517,14 +517,14 @@ class VectorDataLoader(DataLoaderInterface):
             logging.debug(f"\t{data_count} datapoints found for attribute '{self.data_name}' within bounds '{bounds}'")
             # If no data, return np.nan for each variable
             if data_count == 0:
-                values = [np.nan, np.nan]
+                values = [np.nan for _ in variable_names]
             elif np.isnan(dps._magnitude).all():
-                return np.nan
+                values = [np.nan for _ in variable_names]
             # If want count
             elif agg_type == 'COUNT':
                 # If including nan's, just want size
                 if skipna:  
-                    values = [data_count, data_count]
+                    values = [data_count for _ in variable_names]
                 # Otherwise count non-nan values
                 else:       
                     values = [dps[name].count().item() for name in variable_names]
