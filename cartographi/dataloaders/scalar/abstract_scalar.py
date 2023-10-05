@@ -519,6 +519,9 @@ class ScalarDataLoader(DataLoaderInterface):
             # If no data
             elif dps.size == 0:
                 return np.nan
+            # If all NaN, avoid calculations
+            elif np.isnan(dps).all():
+                return np.nan
             # Return float of aggregated value
             elif agg_type == 'MIN':
                 if skipna:  return np.nanmin(dps)
