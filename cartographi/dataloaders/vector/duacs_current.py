@@ -5,6 +5,8 @@ import logging
 import xarray as xr
 
 from datetime import datetime
+from os.path import basename
+
 class DuacsCurrentDataLoader(VectorDataLoader):
     def import_data(self, bounds):
         """
@@ -25,7 +27,7 @@ class DuacsCurrentDataLoader(VectorDataLoader):
         # Reduce files to those within date range
         self.files = [file for file in self.files 
                       if time_range[0] \
-                      < datetime.strptime(file[10:-3], "%Y-%m-%d") \
+                      < datetime.strptime(basename(file)[10:-3], "%Y-%m-%d") \
                       < time_range[1]]
         
         # Open Dataset
