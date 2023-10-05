@@ -20,6 +20,6 @@ This dataloader takes the mean wave direction variable, which gives the directio
 from north in degrees, and converts it to a unit vector with u and v components.
 
 
-.. automodule:: cartographi.dataloaders.vector.era5_wave_direction
+.. automodule:: cartographi.dataloaders.vector.era5_wave_direction_vector
    :special-members: __init__
    :members:

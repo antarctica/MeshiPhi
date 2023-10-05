@@ -3,7 +3,7 @@ from cartographi.dataloaders.scalar.abstract_scalar import ScalarDataLoader
 import xarray as xr
 
 
-class ERA5WaveHeightDataLoader(ScalarDataLoader):
+class ERA5SigWaveHeightDataLoader(ScalarDataLoader):
     def import_data(self, bounds):
         """
         Reads in data from an ERA5 NetCDF file.

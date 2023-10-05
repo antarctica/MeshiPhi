@@ -60,7 +60,7 @@ To read more on how to implement these, follow instructions in :ref:`Adding Data
 Real data is always preferred to this method, however in the case where there is no data, the LUT
 can provide an alternative. Examples of this include ice density, exclusion zones, and marine-protected areas. For these examples,
 weather conditions dictate their values, and these weather conditions can be localised to specific areas.
-To read more on how to implement these, follow instructions in `Implementing New Dataloaders`_ and :ref:`abstract LUT dataloader page<abstract-lut-dataloader-index>`.
+To read more on how to implement these, follow instructions in :ref:`Adding Dataloaders page<adding-dataloaders>` and :ref:`abstract LUT dataloader page<abstract-lut-dataloader-index>`.
 
 
 
