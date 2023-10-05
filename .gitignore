@@ -29,3 +29,4 @@ testing.ipynb
 docs/build/*
 docs/html/*
 dev_venv/*
+*.ipynb

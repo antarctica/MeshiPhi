@@ -131,6 +131,30 @@ class EnvironmentMesh:
 
         return json.loads(json.dumps(output, indent=4))
     
+    def to_png(self, params_file, path):
+        """
+            exports a mesh and saves to a png file
+            Args:
+                params_file: A format configuration files as a json object
+                path: The path to save the png file
+        """
+        from cartographi.mesh_plotting.mesh_plotter import MeshPlotter
+
+        mesh_json = self.to_json()
+        plotter = MeshPlotter(mesh_json)
+
+        if (params_file != None):
+            with open(params_file) as f:
+                data = f.read()
+                format_params = json.loads(data)
+
+        for item in format_params['cmaps']:
+            plotter.plot_cmap(item['data_name'], item['cmap'])
+        for item in format_params['bools']:
+            plotter.plot_bool(item['data_name'], item['colour'])
+            
+        plotter.save(path)
+
 
     def to_geojson(self, params_file = None):
         """
@@ -475,6 +499,9 @@ class EnvironmentMesh:
         elif format.upper() == "GEOJSON":
             with open(path, 'w') as path:
                 json.dump(self.to_geojson(format_params), path, indent=4)
+
+        elif format.upper() == "PNG":
+            self.to_png(format_params, path)
 
         else:
             logging.warning(f"Cannot save mesh in a {format} format")
