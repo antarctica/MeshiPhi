@@ -4,7 +4,7 @@ import logging
 
 import xarray as xr
 
-
+from datetime import datetime
 class DuacsCurrentDataLoader(VectorDataLoader):
     def import_data(self, bounds):
         """
@@ -20,11 +20,17 @@ class DuacsCurrentDataLoader(VectorDataLoader):
                 Near real-time current dataset within limits of bounds.
                 Dataset has coordinates 'lat', 'long', and variable 'uC', 'vC'
         """
+        time_range = [datetime.strptime(time_str, "%Y-%m-%d") 
+                      for time_str in bounds.get_time_range()]
+        # Reduce files to those within date range
+        self.files = [file for file in self.files 
+                      if time_range[0] \
+                      < datetime.strptime(file[10:-3], "%Y-%m-%d") \
+                      < time_range[1]]
+        
         # Open Dataset
-        if len(self.files) == 1:
-            data = xr.open_dataset(self.files[0])
-        else:
-            data = xr.open_mfdataset(self.files)
+        if len(self.files) == 1:    data = xr.open_dataset(self.files[0])
+        else:                       data = xr.open_mfdataset(self.files).compute()
         # Change column names
         data = data.rename({'latitude': 'lat',
                             'longitude': 'long',
