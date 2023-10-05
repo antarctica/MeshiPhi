@@ -4,7 +4,7 @@ import xarray as xr
 
 from datetime import datetime
 from os.path import basename
-class ERA5WaveHeightDataLoader(ScalarDataLoader):
+class ERA5SigWaveHeightDataLoader(ScalarDataLoader):
     def import_data(self, bounds):
         """
         Reads in data from an ERA5 NetCDF file.
