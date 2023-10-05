@@ -9,6 +9,7 @@ import xarray as xr
 from datetime import datetime
 from os.path import basename
 
+
 class ERA5WaveDirectionLoader(VectorDataLoader):
     def import_data(self, bounds):
         """
