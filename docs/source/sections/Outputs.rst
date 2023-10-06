@@ -16,7 +16,7 @@ of mesh construction and json object generation are as follows:
 
 ::
 
-    from cartographi.mesh import Mesh
+    from meshiphi.mesh import Mesh
 
     with open('config.json', 'r') as f:
         config = json.load(f)
@@ -148,7 +148,7 @@ are then encoded into the mesh json object and passed down-stream to the route p
 ::
 
     import json
-    from cartographi.vessel_performance.vessel_performance_modeller import VesselPerformanceModeller
+    from meshiphi.vessel_performance.vessel_performance_modeller import VesselPerformanceModeller
 
     with open('vessel_config.json', 'r') as f:
         vessel_config = json.load(f)

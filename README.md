@@ -7,7 +7,7 @@
 <a href="https://github.com/antarctica/PolarRoute/issues"><img src="https://img.shields.io/github/issues/antarctica/PolarRoute" alt="Issues"></a>
 <a href="https://github.com/antarctica/PolarRoute/blob/main/LICENSE"><img src="https://img.shields.io/github/license/antarctica/PolarRoute" alt="License"></a> -->
 
-# Cartograφ (CartograPhi)
+# Cartograφ (MeshiPhi)
 
 Introducing Cartograφ, a versatile software package designed for comprehensive earth modeling and navigation planning. Cartograφ works by discretizing the Earth's surface into a non-uniform grid, allocating higher resolution in regions of geographic diversity, and conserving lower resolution in more uniform regions. The software also incorporates data-driven vehicle models, with the ability to calculate speed limits and fuel needs for specific vessels within each grid cell. These mesh objects can be output in standard formats, such as GeoJSON and GeoTIFF, enabling data-visualisation via GIS software such as ArcGIS. 
 
@@ -16,13 +16,13 @@ The Cartograφ package has an optional dependance on GDAL, which is required to 
 
 Github:
 ```
-git clone https://github.com/Antarctica/CartograPhi
+git clone https://github.com/Antarctica/MeshiPhi
 python setup.py install
 ```
 
  Pip: 
 ```
-pip install cartographi
+pip install meshiphi
 ```
 
 > NOTE: The installation process may vary slightly dependent on OS. Please consult the documentation for further installation guidance.

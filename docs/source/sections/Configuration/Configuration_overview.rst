@@ -30,5 +30,5 @@ These schema check that the correct keywords and datatypes are provided in the c
 JSON's, as well as the waypoints CSV file. They also perform rudimentary checks on the
 values to ensure that they make sense (e.g. startTime is before endTime).
 
-.. automodule:: cartographi.config_validation.config_validator
+.. automodule:: meshiphi.config_validation.config_validator
    :members:
