@@ -1,6 +1,6 @@
 import pandas as pd
 
-from cartographi.utils import round_to_sigfig
+from meshiphi.utils import round_to_sigfig
 
 SIG_FIG_TOLERANCE = 4
 
