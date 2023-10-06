@@ -1,8 +1,8 @@
 from setuptools import setup, find_packages
 
-import cartographi
-import cartographi.dataloaders
-import cartographi.mesh_generation
+import meshiphi
+import meshiphi.dataloaders
+import meshiphi.mesh_generation
 
 def get_content(filename):
     with open(filename, "r") as fh:
@@ -12,16 +12,16 @@ def get_content(filename):
 requirements = get_content("requirements.txt")
 
 setup(
-    name=cartographi.__name__,
-    version=cartographi.__version__,
-    description=cartographi.__description__,
-    license=cartographi.__license__,
+    name=meshiphi.__name__,
+    version=meshiphi.__version__,
+    description=meshiphi.__description__,
+    license=meshiphi.__license__,
     long_description=get_content("README.md"),
     long_description_content_type="text/markdown",
-    author=cartographi.__author__,
-    author_email=cartographi.__email__,
-    maintainer=cartographi.__author__,
-    maintainer_email=cartographi.__email__,
+    author=meshiphi.__author__,
+    author_email=meshiphi.__email__,
+    maintainer=meshiphi.__author__,
+    maintainer_email=meshiphi.__email__,
     url="https://www.github.com/antarctica",
     project_urls={
     },
@@ -39,9 +39,9 @@ setup(
     """.split('\n')],
     entry_points={
         'console_scripts': [
-            "create_mesh=cartographi.cli:create_mesh_cli",
-            "export_mesh=cartographi.cli:export_mesh_cli",
-            "rebuild_mesh=cartographi.cli:rebuild_mesh_cli"],
+            "create_mesh=meshiphi.cli:create_mesh_cli",
+            "export_mesh=meshiphi.cli:export_mesh_cli",
+            "rebuild_mesh=meshiphi.cli:rebuild_mesh_cli"],
     },
     keywords=[],
     packages=find_packages(),
