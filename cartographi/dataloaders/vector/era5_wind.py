@@ -26,9 +26,8 @@ class ERA5WindDataLoader(VectorDataLoader):
         # Reduce files to those within date range
         self.files = [file for file in self.files 
                       if time_range[0] \
-                      < datetime.strptime(basename(file)[10:-3], "%Y-%m-%d") \
-                      < time_range[1]]
-        
+                      <= datetime.strptime(basename(file)[10:-3], "%Y-%m-%d") \
+                      <= time_range[1]]
         # Open Dataset
         if len(self.files) == 1:    data = xr.open_dataset(self.files[0])
         else:                       data = xr.open_mfdataset(self.files).compute()
