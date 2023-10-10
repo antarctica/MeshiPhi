@@ -1,5 +1,5 @@
 from cartographi.dataloaders.scalar.abstract_scalar import ScalarDataLoader
-
+import xarray as xr
 from datetime import datetime
 from os.path import basename
 
