@@ -7,8 +7,8 @@ import json
 import pytest
 import time
 
-from cartographi import __version__ as pr_version
-from cartographi import MeshBuilder
+from meshiphi import __version__ as pr_version
+from meshiphi import MeshBuilder
 
 # Import tests, which are automatically run
 
