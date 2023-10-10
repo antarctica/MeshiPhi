@@ -17,6 +17,6 @@ Near real-time data can be downloaded from `here <https://data.marine.copernicus
 Reanalysis data can be downloaded from `here. <https://data.marine.copernicus.eu/product/SEALEVEL_GLO_PHY_L4_MY_008_047/description>`_
 
 
-.. automodule:: cartographi.dataloaders.vector.duacs_current
+.. automodule:: meshiphi.dataloaders.vector.duacs_current
    :special-members: __init__
    :members:

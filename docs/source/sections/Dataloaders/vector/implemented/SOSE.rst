@@ -15,6 +15,6 @@ Data can be downloaded from `here <http://sose.ucsd.edu/sose_stateestimation_dat
 Note: This dataloader may not work as is for new data downloaded, it has been internally collated into 
 a more easily ingestable format.
 
-.. automodule:: cartographi.dataloaders.vector.sose
+.. automodule:: meshiphi.dataloaders.vector.sose
    :special-members: __init__
    :members:

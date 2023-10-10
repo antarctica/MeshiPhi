@@ -33,6 +33,6 @@ For scalar fields, see  the :ref:`Vector GRF page<scalar-grf>`.
 
 The dataloader is implemented as follows:
 
-.. automodule:: cartographi.dataloaders.vector.vector_grf
+.. automodule:: meshiphi.dataloaders.vector.vector_grf
    :special-members: __init__
    :members:
