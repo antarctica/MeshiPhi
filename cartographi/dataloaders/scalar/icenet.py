@@ -24,20 +24,25 @@ class IceNetDataLoader(ScalarDataLoader):
                 IceNet dataset within limits of bounds. 
                 Dataset has coordinates 'lat', 'long', and variable 'SIC'
         '''
+        def filename_to_datetime(filename):
+            '''
+            Converts icenet filenames to datetime objects
+            Assumes file names are in the format 
+            <hemisphere>_daily_forecast.<YYYY-MM-DD>.nc
+            '''
+            return datetime.strptime(filename.split('.')[1], '%Y-%m-%d')
+        
         # Convert temporal boundary to datetime objects for comparison
         max_time = datetime.strptime(bounds.get_time_max(), '%Y-%m-%d')
         min_time = datetime.strptime(bounds.get_time_min(), '%Y-%m-%d')
         time_range = max_time - min_time
         # Retrieve list of dates from filenames
-        # assumes file names are in the format 
-        # <hemisphere>_daily_forecast.<YYYY-MM-DD>.nc
-        file_dates = {datetime.strptime(file.split('.')[1], '%Y-%m-%d'): file 
-                      for file in self.files}
-
+        file_dates = {filename_to_datetime(file): file 
+                      for file in self.files 
+                      if filename_to_datetime(file) < min_time}
         # Find closest date prior to min_time
-        closest_date = min(file_dates, 
-                           key=lambda x: (x>min_time, abs(x-min_time)))
-        
+        closest_date = max(k for k, v in file_dates.iteritems())
+
         # Open Dataset
         ds = xr.open_dataset(file_dates[closest_date])
         # Cast coordinates/variables to those understood by mesh
@@ -88,7 +93,7 @@ class IceNetDataLoader(ScalarDataLoader):
         # rather than date on which prediction made
         df.time = df.time + to_timedelta(df.leadtime, unit='d')
         # Remove unwanted columns
-        df = df.drop(columns=['yc','xc','leadtime', 'Lambert_Azimuthal_Grid', 'sic_stddev', 'forecast_date'])
+        df = df.drop(columns=['yc','xc','leadtime', 'Lambert_Azimuthal_Grid', 'sic_stddev', 'forecast_date','ensemble_members'])
         # Trim to initial datapoints
         df = self.trim_datapoints(bounds, data=df)
         

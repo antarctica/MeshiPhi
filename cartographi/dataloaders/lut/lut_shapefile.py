@@ -60,8 +60,11 @@ class LutShapefile(LutDataLoader):
         # Subtract out all regions with defined values
         defined_polygon = unary_union(shape_df.geometry)
         undefined_polygon = world_polygon - defined_polygon
-        # Set remainder to have value np.nan
-        shape_df.loc[len(shape_df.index)] = [undefined_polygon, np.nan]
+        # Set remainder to have value np.nan (or opposing bool value)
+        if self.value is True:      alt_val = False
+        elif self.value is False:   alt_val = True
+        else:                       alt_val = np.nan
+        shape_df.loc[len(shape_df.index)] = [undefined_polygon, alt_val]
         # Limit to boundary
         shape_df = self.trim_datapoints(bounds, data=shape_df)
 

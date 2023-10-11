@@ -60,8 +60,11 @@ class LutGeoJSON(LutDataLoader):
         # Subtract out all regions with defined values
         defined_polygon = unary_union(geojson_df.geometry)
         undefined_polygon = world_polygon - defined_polygon
-        # Set remainder to have value np.nan
-        geojson_df.loc[len(geojson_df.index)] = [undefined_polygon, np.nan]
+        # Set remainder to have value np.nan (or opposing bool value)
+        if self.value is True:      alt_val = False
+        elif self.value is False:   alt_val = True
+        else:                       alt_val = np.nan
+        geojson_df.loc[len(geojson_df.index)] = [undefined_polygon, alt_val]
         # Limit to boundary
         geojson_df = self.trim_datapoints(bounds, data=geojson_df)
 
