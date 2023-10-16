@@ -12,6 +12,6 @@ scikit-learn
 scipy
 tqdm
 xarray
-cartopy
+# cartopy
 rasterio
 
