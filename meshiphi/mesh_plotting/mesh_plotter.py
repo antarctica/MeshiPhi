@@ -1,5 +1,4 @@
-import cartopy
-import cartopy.crs as ccrs
+# import cartopy.crs as ccrs
 import shapely
 from shapely.geometry import Point, Polygon
 import matplotlib
@@ -28,7 +27,7 @@ class MeshPlotter:
 
         self.fig = plt.figure(figsize=(self.figscale * self.aspect_ratio, self.figscale))
 
-        self.plot = plt.axes(projection=ccrs.PlateCarree())
+        # self.plot = plt.axes(projection=ccrs.PlateCarree())
         self.plot.set_extent([self.long_min, self.long_max, self.lat_min, self.lat_max])
 
 
@@ -42,7 +41,7 @@ class MeshPlotter:
         for cellbox in self.mesh_json['cellboxes']:
             polygon = shapely.wkt.loads(cellbox['geometry'])
             if cellbox[value_name] == True:
-                self.plot.add_geometries([polygon], ccrs.PlateCarree(), facecolor=colour, alpha=1.0, edgecolor='darkslategrey')
+                # self.plot.add_geometries([polygon], ccrs.PlateCarree(), facecolor=colour, alpha=1.0, edgecolor='darkslategrey')
 
     def plot_cmap(self, value_name, colourmap):
         """
@@ -64,7 +63,7 @@ class MeshPlotter:
             # normalise value
             normalized_value = (cellbox[value_name] - value_min) / value_diff
             polygon = shapely.wkt.loads(cellbox['geometry'])
-            self.plot.add_geometries([polygon], ccrs.PlateCarree(), facecolor=cmap(normalized_value), alpha=1.0, edgecolor='darkslategrey')
+            # self.plot.add_geometries([polygon], ccrs.PlateCarree(), facecolor=cmap(normalized_value), alpha=1.0, edgecolor='darkslategrey')
    
     def save(self, filename):
         """
