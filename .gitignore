@@ -12,7 +12,6 @@ TestingNotebook.ipynb
 /build/
 /.idea/
 /venv/
-/.cartographi_venv/
 /data/
 /resources/
 *.output.*json
