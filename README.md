@@ -7,16 +7,16 @@
 <a href="https://github.com/antarctica/PolarRoute/issues"><img src="https://img.shields.io/github/issues/antarctica/PolarRoute" alt="Issues"></a>
 <a href="https://github.com/antarctica/PolarRoute/blob/main/LICENSE"><img src="https://img.shields.io/github/license/antarctica/PolarRoute" alt="License"></a> -->
 
-# Cartograφ (CartograPhi)
+# Meshiφ (MeshiPhi)
 
-Introducing Cartograφ, a versatile software package designed for comprehensive earth modeling and navigation planning. Cartograφ works by discretizing the Earth's surface into a non-uniform grid, allocating higher resolution in regions of geographic diversity, and conserving lower resolution in more uniform regions. The software also incorporates data-driven vehicle models, with the ability to calculate speed limits and fuel needs for specific vessels within each grid cell. These mesh objects can be output in standard formats, such as GeoJSON and GeoTIFF, enabling data-visualisation via GIS software such as ArcGIS. 
+Introducing Meshiφ, a versatile software package designed for comprehensive earth modeling and navigation planning. Meshiφ works by discretizing the Earth's surface into a non-uniform grid, allocating higher resolution in regions of geographic diversity, and conserving lower resolution in more uniform regions. The software also incorporates data-driven vehicle models, with the ability to calculate speed limits and fuel needs for specific vessels within each grid cell. These mesh objects can be output in standard formats, such as GeoJSON and GeoTIFF, enabling data-visualisation via GIS software such as ArcGIS. 
 
 ## Installation
-The Cartograφ package has an optional dependance on GDAL, which is required to produce outputs in GeoJSON or GeoTIFF formats. More information on setting up GDAL can be found in the manual pages linked above. Once these requirements are met then the software can be installed by:
+The Meshiφ package has an optional dependance on GDAL, which is required to produce outputs in GeoJSON or GeoTIFF formats. More information on setting up GDAL can be found in the manual pages linked above. Once these requirements are met then the software can be installed by:
 
 Github:
 ```
-git clone https://github.com/Antarctica/CartograPhi
+git clone https://github.com/Antarctica/MeshiPhi
 python setup.py install
 ```
 
@@ -28,7 +28,7 @@ pip install cartographi
 > NOTE: The installation process may vary slightly dependent on OS. Please consult the documentation for further installation guidance.
 
 ## Required Data sources
-Cartograφ has been built to work with a variety of open-source atmospheric and oceanographic data sources. 
+Meshiφ has been built to work with a variety of open-source atmospheric and oceanographic data sources. 
 A list of supported data sources and their associated data-loaders is given in the 
 'Data Loaders' section of the manual
 
@@ -37,11 +37,11 @@ Sphinx is used to generate documentation for this project. The dependencies can 
 ```
 pip install sphinx sphinx_markdown_builder sphinx_rtd_theme rinohtype
 ```
-When updating the docs, run the following command within the PolarRoute directory to recompile.
+When updating the docs, run the following command within the MeshiPhi directory to recompile.
 ```
 sphinx-build -b html ./docs/source ./docs/html
 ```
-Sometimes the cache needs to be cleared for internal links to update. If facing this problem, run this from the PolarRoute directory.
+Sometimes the cache needs to be cleared for internal links to update. If facing this problem, run this from the MeshiPhi directory.
 ```
 rm -r docs/build/.doctrees/
 ```

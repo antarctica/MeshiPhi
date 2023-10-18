@@ -13,16 +13,16 @@
 import os
 import sys
 
-import cartographi
+import meshiphi
 
 # -- Project information -----------------------------------------------------
 
-project = cartographi.__name__
-copyright = cartographi.__copyright__
-author = cartographi.__author__
+project = meshiphi.__name__
+copyright = meshiphi.__copyright__
+author = meshiphi.__author__
 
 # The full version, including alpha/beta/rc tags
-release = cartographi.__version__
+release = meshiphi.__version__
 
 
 # -- General configuration ---------------------------------------------------

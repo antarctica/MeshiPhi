@@ -41,6 +41,6 @@ the min and max are
 
 The dataloader is implemented as follows:
 
-.. automodule:: cartographi.dataloaders.scalar.scalar_grf
+.. automodule:: meshiphi.dataloaders.scalar.scalar_grf
    :special-members: __init__
    :members:

@@ -8,6 +8,6 @@ properties and strength of Antarctic sea ice' (Buynitskiy, V.K.).
 
 Data is generated using the values from this paper, and so no data file is available for download.
 
-.. automodule:: cartographi.dataloaders.lut.density
+.. automodule:: meshiphi.dataloaders.lut.density
    :special-members: __init__
    :members:

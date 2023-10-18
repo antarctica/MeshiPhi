@@ -17,6 +17,6 @@ Instructions for how to download their data products are
 available `here <https://confluence.ecmwf.int/display/CKB/How+to+download+ERA5>`_
 
 
-.. automodule:: cartographi.dataloaders.scalar.era5_sig_wave_height
+.. automodule:: meshiphi.dataloaders.scalar.era5_sig_wave_height
    :special-members: __init__
    :members:
