@@ -276,7 +276,12 @@ class EnvironmentMesh:
             for agg_cellbox in self.agg_cellboxes:
                 if agg_cellbox.contains_point(lat, long):
                     # get the agg_value
-                    value = agg_cellbox.agg_data[data_name]
+                    try:
+                        value = agg_cellbox.agg_data[data_name]
+                    except KeyError:
+                        logging.debug(f'{data_name} not found in cellbox!')
+                        value = np.nan
+                        
                     if isinstance(value, collections.abc.Sequence): # if it is a vector then take the mean
                         value = np.mean (value)
                         if value == float('inf') : # repalce inf with nan

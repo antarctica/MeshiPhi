@@ -5,6 +5,7 @@ import logging
 import xarray as xr
 
 from datetime import datetime
+from os.path import basename
 
 class ERA5WindDataLoader(VectorDataLoader):
     def import_data(self, bounds):
@@ -20,9 +21,16 @@ class ERA5WindDataLoader(VectorDataLoader):
                 ERA5 wind dataset within limits of bounds.
                 Dataset has coordinates 'lat', 'long', and variables 'u10', 'v10'
         """
+        time_range = [datetime.strptime(time_str, "%Y-%m-%d") 
+                      for time_str in bounds.get_time_range()]
+        # Reduce files to those within date range
+        self.files = [file for file in self.files 
+                      if time_range[0] \
+                      <= datetime.strptime(basename(file)[10:-3], "%Y-%m-%d") \
+                      <= time_range[1]]
         # Open Dataset
         if len(self.files) == 1:    data = xr.open_dataset(self.files[0])
-        else:                       data = xr.open_mfdataset(self.files)
+        else:                       data = xr.open_mfdataset(self.files).compute()
         # Change column names
         data = data.rename({'latitude': 'lat',
                             'longitude': 'long'})
