@@ -1,13 +1,14 @@
-Welcome to the PolarRoute Manual Pages
+Welcome to the MeshiPhi Manual Pages
 ======================================
 
-PolarRoute is a tool for the optimisation of routes for maritime vehicles travelling in polar waters.
-This software package has been developed by the **British Antarctic Survey** (BAS), primarily 
-for the optimisation of polar routes for the BAS research vessel RRS Sir David Attenborough, 
-though it is applicable to any vessel (e.g. AUVs). The software is written in Python and is open source.
+MeshiPhi is a tool for the discretisation of environmental data with a non uniform resolution based on the variance of
+the data. This software package has been developed by the **British Antarctic Survey** (BAS), initially as part of a
+route planning tool for the BAS research vessel RRS Sir David Attenborough, though it can be applied to any geospatial data.
+The software is written in Python and is open source. The package contains limited plotting functionality, which is
+described in the :ref:`Mesh Plotting <mesh_plotting>` section.
 
 For more information on the project, please visit the `PolarRoute website <https://www.bas.ac.uk/project/autonomous-marine-operations-planning/>`_
-and follow our `GitHub repository <https://github.com/antarctica/PolarRoute>`_.
+and follow our `GitHub repository <https://github.com/antarctica/meshiphi>`_.
 
 
 .. note:: The development of this codebase is ongoing and not yet complete. 
@@ -28,4 +29,4 @@ Contents:
    ./sections/Dataloaders/overview
    ./sections/Mesh_Construction/Mesh_construction_overview
    ./sections/Examples
-   
+   ./sections/Plotting
