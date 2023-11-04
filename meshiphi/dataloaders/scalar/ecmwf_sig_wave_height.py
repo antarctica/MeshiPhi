@@ -4,7 +4,7 @@ import logging
 import os
 import xarray as xr
 
-class ECMWFWaveDataLoader(ScalarDataLoader):
+class ECMWFSigWaveHeightDataLoader(ScalarDataLoader):
 
     def import_data(self, bounds):
         '''
