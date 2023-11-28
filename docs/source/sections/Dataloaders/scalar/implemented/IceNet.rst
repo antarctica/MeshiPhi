@@ -14,6 +14,6 @@ at the British Antarctic Survey. From the website:
 Data for IceNet V1 is available from `here <https://ramadda.data.bas.ac.uk/repository/entry/show>`_
 Data for IceNet V2 is not publicly available.
 
-.. automodule:: polar_route.dataloaders.scalar.icenet
+.. automodule:: meshiphi.dataloaders.scalar.icenet
    :special-members: __init__
    :members:

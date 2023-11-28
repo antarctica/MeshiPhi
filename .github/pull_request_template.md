@@ -1,7 +1,7 @@
-# CartograPhi Pull Request Template
+# MeshiPhi Pull Request Template
 
 Date: <!--- Include date PR was created -->   
-Version Number: <!--- Include version number of CartograPhi the PR will be included in (e.g. 1.1.0 -> 1.1.1) -->   
+Version Number: <!--- Include version number of MeshiPhi the PR will be included in (e.g. 1.1.0 -> 1.1.1) -->   
  
 ## Description of change
 <!--- Describe your changes in detail -->
@@ -10,7 +10,7 @@ Version Number: <!--- Include version number of CartograPhi the PR will be inclu
 <!--- If this PR adds functionality or resolves problems associated with an issue on GitHub, please include a link to the issue -->
 
 # Testing
-To ensure that the functionality of the CartograPhi codebase remains consistent throughout the development cycle a testing strategy has been developed, which can be viewed in the document `test/testing_strategy.md`. 
+To ensure that the functionality of the MeshiPhi codebase remains consistent throughout the development cycle a testing strategy has been developed, which can be viewed in the document `test/testing_strategy.md`. 
 This includes a collection of test files which should be run according to which part of the codebase has been altered in a pull request. Please consult the testing strategy to determine which tests need to be run. 
 
 - [ ] My changes have not altered any of the files listed in the testing strategy

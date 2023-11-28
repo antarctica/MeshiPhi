@@ -29,7 +29,7 @@ the :ref:`Methods - Mesh Construction` section of the documentation. The digital
 a json object and saved to a file. 
 ::
 
-    from polar_route.mesh import Mesh
+    from meshiphi.mesh import Mesh
 
     cg = Mesh(config)
     mesh = cg.to_json()

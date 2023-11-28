@@ -12,7 +12,6 @@ TestingNotebook.ipynb
 /build/
 /.idea/
 /venv/
-/.cartographi_venv/
 /data/
 /resources/
 *.output.*json
@@ -29,3 +28,6 @@ testing.ipynb
 docs/build/*
 docs/html/*
 dev_venv/*
+*.ipynb
+splitting_experiments/*
+GRF_Plots/*

@@ -27,14 +27,14 @@ a parameter the dataloader requires. The actions are:
 Example
 ^^^^^^^
 In this example, a new scalar dataloader `myScalarDataloader` has been created, and
-is located at :code:`polar_route/Dataloaders/Scalar/myScalarDataloader.py`.
+is located at :code:`meshiphi.Dataloaders/Scalar/myScalarDataloader.py`.
 
 The only parameter required by this dataloader is a file to read data from. 'files' 
 is passed as a mandatory parameter, as 'file' and 'folder' both get translated into 
 a list of files, and stored in params under the key 'files'::
 
    # Add new import statement for Factory to read
-   from polar_route.Dataloaders.Scalar.myScalarDataloader import myScalarDataloader
+   from meshiphi.Dataloaders.Scalar.myScalarDataloader import myScalarDataloader
 
    ...
 
@@ -72,5 +72,5 @@ individual files::
 Dataloader Factory Object
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. automodule:: polar_route.dataloaders.factory
+.. automodule:: meshiphi.dataloaders.factory
    :members:

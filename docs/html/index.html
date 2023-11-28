@@ -1,20 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to the PolarRoute Manual Pages &mdash; polar_route 0.3.0 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <title>Welcome to the MeshiPhi Manual Pages &mdash; meshiphi 1.1.5 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -30,7 +33,7 @@
           
           
           <a href="#" class="icon icon-home">
-            polar_route
+            meshiphi
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -49,10 +52,8 @@
 <li class="toctree-l1"><a class="reference internal" href="sections/Outputs.html">6. Outputs - Data Types</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sections/Dataloaders/overview.html">7. Dataloader Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sections/Mesh_Construction/Mesh_construction_overview.html">8. Methods - Mesh Construction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sections/Vehicle_specifics.html">9. Methods - Vessel Performance</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sections/Route_optimisation.html">10. Methods - Route Planner</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sections/Route_calculation.html">11. Methods - Route Calculation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sections/Examples.html">12. Examples of running code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sections/Examples.html">9. Examples of running code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sections/Plotting/mesh_plotting.html">10. Mesh Plotting</a></li>
 </ul>
 
         </div>
@@ -61,7 +62,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="#">polar_route</a>
+          <a href="#">meshiphi</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -69,7 +70,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Welcome to the PolarRoute Manual Pages</li>
+      <li class="breadcrumb-item active">Welcome to the MeshiPhi Manual Pages</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -79,14 +80,15 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="welcome-to-the-polarroute-manual-pages">
-<h1>Welcome to the PolarRoute Manual Pages<a class="headerlink" href="#welcome-to-the-polarroute-manual-pages" title="Permalink to this heading"></a></h1>
-<p>PolarRoute is a tool for the optimisation of routes for maritime vehicles travelling in polar waters.
-This software package has been developed by the <strong>British Antarctic Survey</strong> (BAS), primarily
-for the optimisation of polar routes for the BAS research vessel RRS Sir David Attenborough,
-though it is applicable to any vessel (e.g. AUVs). The software is written in Python and is open source.</p>
+  <section id="welcome-to-the-meshiphi-manual-pages">
+<h1>Welcome to the MeshiPhi Manual Pages<a class="headerlink" href="#welcome-to-the-meshiphi-manual-pages" title="Permalink to this heading"></a></h1>
+<p>MeshiPhi is a tool for the discretisation of environmental data with a non uniform resolution based on the variance of
+the data. This software package has been developed by the <strong>British Antarctic Survey</strong> (BAS), initially as part of a
+route planning tool for the BAS research vessel RRS Sir David Attenborough, though it can be applied to any geospatial data.
+The software is written in Python and is open source. The package contains limited plotting functionality, which is
+described in the <span class="xref std std-ref">Mesh Plotting</span> section.</p>
 <p>For more information on the project, please visit the <a class="reference external" href="https://www.bas.ac.uk/project/autonomous-marine-operations-planning/">PolarRoute website</a>
-and follow our <a class="reference external" href="https://github.com/antarctica/PolarRoute">GitHub repository</a>.</p>
+and follow our <a class="reference external" href="https://github.com/antarctica/meshiphi">GitHub repository</a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The development of this codebase is ongoing and not yet complete.
@@ -107,25 +109,18 @@ Please contact the developers for more information.</p>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="sections/ipython_notebooks.html">3. Python &amp; iPython Notebooks</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="sections/ipython_notebooks.html#creating-the-digital-environment">3.1. Creating the digital environment.</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sections/ipython_notebooks.html#simulating-a-vessel-in-a-digital-environment">3.2. Simulating a Vessel in a Digital Environment</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sections/ipython_notebooks.html#route-optimisation">3.3. Route Optimisation</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="sections/Command_line_interface.html">4. Command Line Interface</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="sections/Command_line_interface.html#create-mesh">4.1. create_mesh</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sections/Command_line_interface.html#add-vehicle">4.2. add_vehicle</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sections/Command_line_interface.html#optimise-routes">4.3. optimise_routes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sections/Command_line_interface.html#export-mesh">4.4. export_mesh</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sections/Command_line_interface.html#rebuild-mesh">4.5. rebuild_mesh</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sections/Command_line_interface.html#calculate-route">4.6. calculate_route</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sections/Command_line_interface.html#plotting">4.7. Plotting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sections/Command_line_interface.html#export-mesh">4.2. export_mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sections/Command_line_interface.html#rebuild-mesh">4.3. rebuild_mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sections/Command_line_interface.html#plotting">4.4. Plotting</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="sections/Configuration/Configuration_overview.html">5. Configuration Overview</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="sections/Configuration/Mesh_construction_config.html">5.1. Configuration - Mesh Construction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sections/Configuration/Vessel_performance_config.html">5.2. Configuration - Vessel Performance Modeller</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sections/Configuration/Route_planning_config.html">5.3. Configuration - Route Planning</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sections/Configuration/Configuration_overview.html#config-validation">5.4. Config Validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sections/Configuration/Configuration_overview.html#config-validation">5.2. Config Validation</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="sections/Outputs.html">6. Outputs - Data Types</a><ul>
@@ -139,8 +134,9 @@ Please contact the developers for more information.</p>
 <li class="toctree-l2"><a class="reference internal" href="sections/Dataloaders/Factory.html">7.2. Dataloader Factory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sections/Dataloaders/scalar/index.html">7.3. Scalar Dataloaders</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sections/Dataloaders/vector/index.html">7.4. Vector Dataloaders</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sections/Dataloaders/AddingDataloaders.html">7.5. Adding New Dataloaders</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sections/Dataloaders/overview.html#section-overview">7.6. Section Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sections/Dataloaders/lut/index.html">7.5. LUT Dataloaders</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sections/Dataloaders/AddingDataloaders.html">7.6. Adding New Dataloaders</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sections/Dataloaders/overview.html#section-overview">7.7. Section Overview</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="sections/Mesh_Construction/Mesh_construction_overview.html">8. Methods - Mesh Construction</a><ul>
@@ -150,31 +146,13 @@ Please contact the developers for more information.</p>
 <li class="toctree-l2"><a class="reference internal" href="sections/Mesh_Construction/Mesh_construction_overview.html#mesh-construction-additional">8.4. Mesh Construction - Additional</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="sections/Vehicle_specifics.html">9. Methods - Vessel Performance</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="sections/Vehicle_specifics.html#vessel-overview">9.1. Vessel Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sections/Vehicle_specifics.html#module-polar_route.vessel_performance.vessel_performance_modeller">9.2. Vessel Performance Modeller</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sections/Vehicle_specifics.html#module-polar_route.vessel_performance.vessel_factory">9.3. Vessel Factory</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sections/Vehicle_specifics.html#module-polar_route.vessel_performance.abstract_vessel">9.4. Abstract Vessel</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sections/Vehicle_specifics.html#module-polar_route.vessel_performance.vessels.abstract_ship">9.5. Abstract Ship</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sections/Vehicle_specifics.html#module-polar_route.vessel_performance.vessels.SDA">9.6. SDA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sections/Examples.html">9. Examples of running code</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sections/Examples.html#example-1-antarctica-processing-all-stages-of-route-planner">9.1. Example 1 - Antarctica Processing all stages of route planner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sections/Examples.html#example-2-dijkstra-vs-smooth-paths">9.2. Example 2 - Dijkstra vs smooth paths</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sections/Examples.html#example-2-variations-of-vehicle-properties-on-route-paths">9.3. Example 2 - Variations of Vehicle Properties on Route Paths</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="sections/Route_calculation.html">11. Methods - Route Calculation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="sections/Route_calculation.html#route-calculation-overview">11.1. Route Calculation Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sections/Route_calculation.html#module-polar_route.route_calc">11.2. Route Calculation</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="sections/Route_optimisation.html">10. Methods - Route Planner</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="sections/Route_optimisation.html#route-optimisation-overview">10.1. Route Optimisation Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sections/Route_optimisation.html#route-optimisation-modules">10.2. Route Optimisation Modules</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="sections/Examples.html">12. Examples of running code</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="sections/Examples.html#example-1-antarctica-processing-all-stages-of-route-planner">12.1. Example 1 - Antarctica Processing all stages of route planner</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sections/Examples.html#example-2-dijkstra-vs-smooth-paths">12.2. Example 2 - Dijkstra vs smooth paths</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sections/Examples.html#example-2-variations-of-vehicle-properties-on-route-paths">12.3. Example 2 - Variations of Vehicle Properties on Route Paths</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="sections/Plotting/mesh_plotting.html">10. Mesh Plotting</a></li>
 </ul>
 </div>
 </section>

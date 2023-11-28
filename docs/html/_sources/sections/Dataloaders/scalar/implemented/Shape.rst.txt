@@ -7,6 +7,6 @@ boundaries, and cast it into a data source for mesh construction. It was primari
 used in testing to debug cellbox generation. As such, there is no data source 
 for this dataloader.
 
-.. automodule:: polar_route.dataloaders.scalar.shape
+.. automodule:: meshiphi.dataloaders.scalar.shape
    :special-members: __init__
    :members:
