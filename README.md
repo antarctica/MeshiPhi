@@ -22,7 +22,7 @@ python setup.py install
 
  Pip: 
 ```
-pip install cartographi
+pip install meshiphi
 ```
 
 > NOTE: The installation process may vary slightly dependent on OS. Please consult the documentation for further installation guidance.
