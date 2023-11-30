@@ -1,5 +1,5 @@
 """
-Miscellaneous utility functions that may be of use throughout CartograPhi
+Miscellaneous utility functions that may be of use throughout MeshiPhi
 """
 
 import logging

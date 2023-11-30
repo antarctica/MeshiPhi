@@ -2,7 +2,7 @@
 import unittest
 import json
 
-from cartographi.mesh_generation.boundary import Boundary
+from meshiphi.mesh_generation.boundary import Boundary
 class TestBoundary (unittest.TestCase):
    def setUp(self):
          self.boundary = Boundary([-85,-84.9], [-135,-134.9], ['1970-01-01','2021-12-31'])

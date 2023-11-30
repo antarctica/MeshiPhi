@@ -2,10 +2,9 @@
 import unittest
 
 
-from cartographi.mesh_validation.sampler import Sampler
-from cartographi.mesh_validation.mesh_validator import MeshValidator
+from meshiphi.mesh_validation.sampler import Sampler
+from meshiphi.mesh_validation.mesh_validator import MeshValidator
 
-from cartographi.mesh_generation.boundary import Boundary
 class TestMeshValidator(unittest.TestCase):
    
 
