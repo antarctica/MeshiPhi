@@ -15,6 +15,6 @@ From their website:
 
 Data can be downloaded from `here <https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-oras5?tab=form>`_
 
-.. automodule:: polar_route.dataloaders.vector.oras5_current
+.. automodule:: meshiphi.dataloaders.vector.oras5_current
    :special-members: __init__
    :members:

@@ -35,7 +35,7 @@ Data must be imported and saved as an xarray.Dataset, or a
 pandas.DataFrame object. Below is a simple example of how to load in a 
 NetCDF file::
     
-    from polar_route.Dataloaders.Scalar.AbstractScalar import VectorDataLoader
+    from meshiphi.Dataloaders.Scalar.AbstractScalar import VectorDataLoader
     import xarray as xr
     import logging
 

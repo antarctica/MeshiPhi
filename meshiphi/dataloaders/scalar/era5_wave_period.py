@@ -27,7 +27,7 @@ class ERA5WavePeriodDataLoader(ScalarDataLoader):
                       <= time_range[1]]
         # Open Dataset
         if len(self.files) == 1:    data = xr.open_dataset(self.files[0])
-        else:                       data = xr.open_mfdataset(self.file).compute()
+        else:                       data = xr.open_mfdataset(self.files).compute()
         # Change column names
         data = data.rename({'latitude': 'lat',
                             'longitude': 'long'})
