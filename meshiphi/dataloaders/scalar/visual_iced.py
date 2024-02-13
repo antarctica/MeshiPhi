@@ -31,8 +31,8 @@ class VisualIcedDataLoader(ScalarDataLoader):
                 logging.error('File type not supported')
                 return None
         else:
-            visual_ice = xr.open_mfdataset(self.files)
-            visual_ice = self.import_from_nc(visual_ice)
+            logging.error('Multiple tiff files not supported. Only single tiff file supported')
+            
 
         return visual_ice
 
