@@ -5,7 +5,7 @@ import xarray as xr
 import pandas as pd
 
 
-class VisualIceDataLoader(ScalarDataLoader):
+class VisualIcedDataLoader(ScalarDataLoader):
     def import_data(self, bounds):
         """
         Reads in data from Visual_Ice NetCDF files. Renames coordinates to
