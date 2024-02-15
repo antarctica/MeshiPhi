@@ -1,6 +1,6 @@
-###############################
-Python & iPython Notebooks
-###############################
+#####################################
+Python & iPython Notebooks examples
+#####################################
 
 Route planning may also be done using a python terminal. This is case, the CLI is not required but the steps required for route planning 
 follow the same format - create a digital environment; simulated a vessel against it; optimise a route plan through the digital environment.

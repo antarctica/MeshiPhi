@@ -20,10 +20,10 @@ Contents:
    :maxdepth: 2
    :numbered:
 
-   ./sections/Code_overview
    ./sections/Installation
    ./sections/ipython_notebooks
    ./sections/Command_line_interface
+   ./sections/Code_overview
    ./sections/Configuration/Configuration_overview
    ./sections/Outputs
    ./sections/Dataloaders/overview
