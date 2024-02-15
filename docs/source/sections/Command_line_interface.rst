@@ -120,10 +120,21 @@ optional arguments:
     -o : output location
 
 
-^^^^^^^^
-Plotting
-^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
+plot_mesh (GeoPlot)
+^^^^^^^^^^^^^^^^^^^^^
 Meshes produced at any stage in the route planning process can be visualised using the GeoPlot 
 library found at the relevant `GitHub page <https://github.com/antarctica/GeoPlot>`_. Meshes and routes can also be
 plotted in other GIS software such as QGIS by exporting the mesh to a common format such as .geojson or .tif using
 the :ref:`export_mesh` command.
+
+::
+
+    plot_mesh <mesh.json>
+
+optional arguments:
+
+:: 
+    
+        -v : verbose logging
+        -o : output location
