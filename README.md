@@ -25,10 +25,11 @@ Meshiφ can be installed via pip or by cloning the repository from GitHub.
 pip install meshiphi
 ```
 
-Github:
+Github: (for local development)
 ```
 git clone https://github.com/Antarctica/MeshiPhi
-python setup.py install
+cd MeshiPhi
+pip install -e .
 ```
 
 The Meshiφ package has an optional dependance on GDAL, which is required to produce outputs in GeoJSON or GeoTIFF formats. More information on setting up GDAL can be found in the manual pages linked above. Once these requirements are met then the software can be installed by:

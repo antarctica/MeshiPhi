@@ -20,8 +20,9 @@ Pip:
 Github:
 ::
 
-    git clone https://https://github.com/antarctica/MeshiPhi.git
-    python setup.py install
+    git clone https://github.com/antarctica/MeshiPhi.git
+    cd MeshiPhi
+    pip install .
 
 
 Installing GDAL
