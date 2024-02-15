@@ -21,6 +21,7 @@ positional arguments:
     config : A configuration file detailing how to build the digital environment. JSON parsable
 
 The format of the required *<config.json>* file can be found in the :ref:`configuration - mesh construction` section of the documentation.
+There are also example configuration files available in the directory :code:`examples/environment_config/grf_example.config.json`
 
 optional arguments:
 
@@ -31,6 +32,7 @@ optional arguments:
 
 
 The format of the returned mesh.json file is explain in :ref:`the mesh.json file` section of the documentation.
+
 
 
 ^^^^^^^^^^^
@@ -56,6 +58,7 @@ supported output formats are:
   * .json (default) [JSON]
   * geo.json (collection of polygons for each cell in the mesh) [GEOJSON]
   * .tif (rasterised mesh) [TIF]
+  * .png [PNG]
 
 optional arguments:
 

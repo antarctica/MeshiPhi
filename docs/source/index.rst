@@ -28,5 +28,4 @@ Contents:
    ./sections/Outputs
    ./sections/Dataloaders/overview
    ./sections/Mesh_Construction/Mesh_construction_overview
-   ./sections/Examples
    ./sections/Plotting/mesh_plotting

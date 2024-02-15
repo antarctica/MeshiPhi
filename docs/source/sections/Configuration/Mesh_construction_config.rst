@@ -1,99 +1,217 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Configuration - Mesh Construction
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Below is a full configuration file for building an environmental mesh using 
+data generated from gaussian random fields. This configuration file generates 
+the feilds 'SIC', 'elevation', 'thickness', 'density', 'uC,vC' (currents) and 
+'u10,v10' (winds). The full configuration file is available in the file location 
+:code:`examples/environment_config/grf_example.config.json`. Other example 
+configuration files are also available at this location, including configuration files 
+which build meshes using real data-sets.
+
+
 .. code-block:: json
     
     {
-        "Mesh_info": {
-            "Region": {
-                "latMin": -65,
-                "latMax": -60,
-                "longMin": -70,
-                "longMax": -50,
-                "startTime": "2013-03-01",
-                "endTime": "2013-03-14",
-                "cellWidth": 5,
-                "cellHeight": 2.5
-            },
-            "Data_sources": [
-                {
-                    "loader": "GEBCO",
-                    "params": {
-                        "downsample_factors": [
-                            5,
-                            5
-                        ],
-                        "file": "../datastore/bathymetry/GEBCO/gebco_2022_n-40.0_s-90.0_w-140.0_e0.0.nc",
-                        "data_name": "elevation",
-                        "value_fill_types": "parent",
-                        "aggregate_type": "MAX",
-                        "splitting_conditions": [
-                            {
-                                "elevation": {
-                                    "threshold": -10,
-                                    "upper_bound": 1,
-                                    "lower_bound": 0
-                                }
+        "region": {
+            "lat_min": 0,
+            "lat_max": 10,
+            "long_min": 0,
+            "long_max": 10,
+            "start_time": "2017-02-01",
+            "end_time": "2017-02-04",
+            "cell_width": 10,
+            "cell_height": 10
+        },
+        "data_sources": [
+            {
+                "loader": "scalar_grf",
+                "params": {
+                    "data_name": "SIC",
+                    "min": 0,
+                    "max": 100,
+                    "seed": 16,
+                    "offset": 5,
+                    "splitting_conditions": [
+                        {
+                            "SIC": {
+                                "threshold": 75,
+                                "upper_bound": 1.0,
+                                "lower_bound": 0.0
                             }
-                        ]
-                    }
-                },
-                {
-                    "loader": "AMSR",
-                    "params": {
-                        "folder": "../datastore/sic/amsr_south/",
-                        "hemisphere": "south",
-                        "value_fill_types": "parent",
-                        "data_name": "SIC",
-                        "splitting_conditions": [
-                            {
-                                "SIC": {
-                                    "threshold": 35,
-                                    "upper_bound": 0.9,
-                                    "lower_bound": 0.1
-                                }
-                            }
-                        ]
-                    }
-                },
-                {
-                    "loader": "SOSE",
-                    "params": {
-                        "file": "../datastore/currents/sose_currents/SOSE_surface_velocity_6yearMean_2005-2010.nc",
-                        "value_fill_types": "parent",
-                        "data_name": "uC,vC",
-                        "splitting_conditions": [
-                            {
-                                "uC,vC": {
-                                    "curl": 0.04
-                                }
-                            }
-                        ]
-                    }
-                },
-                {
-                    "loader": "thickness",
-                    "params": {
-                        "data_name": "thickness",
-                        "file": "",
-                        "value_fill_types": "parent"
-                    }
-                },
-                {
-                    "loader": "density",
-                    "params": {
-                        "data_name": "density",
-                        "file": "",
-                        "value_fill_types": "parent"
-                    }
+                        }
+                    ],
+                    "dataloader_name": "scalar_grf",
+                    "downsample_factors": [
+                        1,
+                        1
+                    ],
+                    "aggregate_type": "MEAN",
+                    "min_dp": 5,
+                    "in_proj": "EPSG:4326",
+                    "out_proj": "EPSG:4326",
+                    "x_col": "lat",
+                    "y_col": "long",
+                    "size": 512,
+                    "alpha": 3,
+                    "binary": false,
+                    "threshold": [
+                        0,
+                        1
+                    ],
+                    "multiplier": 1
                 }
-            ],
-            "splitting": {
-                "split_depth": 4,
-                "minimum_datapoints": 5
+            },
+            {
+                "loader": "scalar_grf",
+                "params": {
+                    "data_name": "elevation",
+                    "min": -100,
+                    "max": 50,
+                    "seed": 30,
+                    "splitting_conditions": [
+                        {
+                            "elevation": {
+                                "threshold": -10,
+                                "upper_bound": 1.0,
+                                "lower_bound": 0.0
+                            }
+                        }
+                    ],
+                    "dataloader_name": "scalar_grf",
+                    "downsample_factors": [
+                        1,
+                        1
+                    ],
+                    "aggregate_type": "MEAN",
+                    "min_dp": 5,
+                    "in_proj": "EPSG:4326",
+                    "out_proj": "EPSG:4326",
+                    "x_col": "lat",
+                    "y_col": "long",
+                    "size": 512,
+                    "alpha": 3,
+                    "binary": false,
+                    "threshold": [
+                        0,
+                        1
+                    ],
+                    "multiplier": 1,
+                    "offset": 0
+                }
+            },
+            {
+                "loader": "scalar_grf",
+                "params": {
+                    "data_name": "thickness",
+                    "min": 0.65,
+                    "max": 1.4,
+                    "seed": 44,
+                    "dataloader_name": "scalar_grf",
+                    "downsample_factors": [
+                        1,
+                        1
+                    ],
+                    "aggregate_type": "MEAN",
+                    "min_dp": 5,
+                    "in_proj": "EPSG:4326",
+                    "out_proj": "EPSG:4326",
+                    "x_col": "lat",
+                    "y_col": "long",
+                    "size": 512,
+                    "alpha": 3,
+                    "binary": false,
+                    "threshold": [
+                        0,
+                        1
+                    ],
+                    "multiplier": 1,
+                    "offset": 0
+                }
+            },
+            {
+                "loader": "scalar_grf",
+                "params": {
+                    "data_name": "density",
+                    "min": 850,
+                    "max": 1000,
+                    "seed": 40,
+                    "dataloader_name": "scalar_grf",
+                    "downsample_factors": [
+                        1,
+                        1
+                    ],
+                    "aggregate_type": "MEAN",
+                    "min_dp": 5,
+                    "in_proj": "EPSG:4326",
+                    "out_proj": "EPSG:4326",
+                    "x_col": "lat",
+                    "y_col": "long",
+                    "size": 512,
+                    "alpha": 3,
+                    "binary": false,
+                    "threshold": [
+                        0,
+                        1
+                    ],
+                    "multiplier": 1,
+                    "offset": 0
+                }
+            },
+            {
+                "loader": "vector_grf",
+                "params": {
+                    "data_name": "uC,vC",
+                    "min": 0,
+                    "max": 1,
+                    "seed": 21,
+                    "dataloader_name": "vector_grf",
+                    "downsample_factors": [
+                        1,
+                        1
+                    ],
+                    "aggregate_type": "MEAN",
+                    "min_dp": 5,
+                    "in_proj": "EPSG:4326",
+                    "out_proj": "EPSG:4326",
+                    "x_col": "lat",
+                    "y_col": "long",
+                    "size": 512,
+                    "alpha": 3,
+                    "vec_x": "uC",
+                    "vec_y": "vC"
+                }
+            },
+            {
+                "loader": "vector_grf",
+                "params": {
+                    "data_name": "u10,v10",
+                    "min": 0,
+                    "max": 1,
+                    "seed": 21,
+                    "dataloader_name": "vector_grf",
+                    "downsample_factors": [
+                        1,
+                        1
+                    ],
+                    "aggregate_type": "MEAN",
+                    "min_dp": 5,
+                    "in_proj": "EPSG:4326",
+                    "out_proj": "EPSG:4326",
+                    "x_col": "lat",
+                    "y_col": "long",
+                    "size": 512,
+                    "alpha": 3,
+                    "vec_x": "uC",
+                    "vec_y": "vC"
+                }
             }
+        ],
+        "splitting": {
+            "split_depth": 6,
+            "minimum_datapoints": 5
         }
-
     }
 
 The configuration file used for mesh construction contains information required to build the discretised environment in which the route planner
@@ -109,30 +227,30 @@ The region section gives detailed information for the construction of the Discre
 
 ::
 
-   "Region": {
-      "latMin": -77.5,
-      "latMax": -55,
-      "longMin": -120,
-      "longMax": -10,
-      "startTime": "2017-02-01",
-      "endTime": "2017-02-14",
-      "cellWidth":5,
-      "cellHeight":2.5
-   }
+    "region": {
+            "lat_min": 0,
+            "lat_max": 10,
+            "long_min": 0,
+            "long_max": 10,
+            "start_time": "2017-02-01",
+            "end_time": "2017-02-04",
+            "cell_width": 10,
+            "cell_height": 10
+    }
     
 where the variables are as follows:
 
-* **longMin**      *(float, degrees)*      : Minimum Longitude Edge Mesh
-* **longMax**      *(float, degrees)*      : Maximum Longitude Edge Mesh
-* **latMin**       *(float, degrees)*      : Minimum Latitude Edge Mesh  
-* **latMax**       *(float, degrees)*      : Maximum Latitude Edge Mesh  
-* **startTime**    *(string, 'YYYY-mm-dd')*   : Start Datetime of Time averaging 
-* **endTime**      *(string, 'YYYY-mm-dd')*   : End Datetime of Time averaging   
-* **cellWidth**    *(float, degrees)*      : Initial Cell Box Width prior to splitting 
-* **cellHeight**   *(float, degrees)*      : Initial Cell Box Height prior to splitting 
+* **long_min**      *(float, degrees)*      : Minimum Longitude Edge Mesh
+* **long_max**      *(float, degrees)*      : Maximum Longitude Edge Mesh
+* **lat_min**       *(float, degrees)*      : Minimum Latitude Edge Mesh  
+* **lat_max**       *(float, degrees)*      : Maximum Latitude Edge Mesh  
+* **start_time**    *(string, 'YYYY-mm-dd')*   : Start Datetime of Time averaging 
+* **end_time**      *(string, 'YYYY-mm-dd')*   : End Datetime of Time averaging   
+* **cell_width**    *(float, degrees)*      : Initial Cell Box Width prior to splitting 
+* **cell_height**   *(float, degrees)*      : Initial Cell Box Height prior to splitting 
 
 .. note::
-    Variables **startTime** and **endTime** also support reference to system time using 
+    Variables **start_time** and **end_time** also support reference to system time using 
     the keyword **TODAY** *e.g.* 
 
     "startTime": "TODAY" ,  "endTime": "TODAY + 5"
@@ -149,79 +267,47 @@ to the mesh.
 
 ::
 
-   "Data_sources": [
-                {
-                    "loader": "GEBCO",
-                    "params": {
-                        "downsample_factors": [
-                            5,
-                            5
-                        ],
-                        "file": "../datastore/bathymetry/GEBCO/gebco_2022_n-40.0_s-90.0_w-140.0_e0.0.nc",
-                        "data_name": "elevation",
-                        "value_fill_types": "parent",
-                        "aggregate_type": "MAX",
-                        "splitting_conditions": [
-                            {
-                                "elevation": {
-                                    "threshold": -10,
-                                    "upper_bound": 1,
-                                    "lower_bound": 0
-                                }
-                            }
-                        ]
+   "data_sources": [
+        {
+            "loader": "scalar_grf",
+            "params": {
+                "data_name": "SIC",
+                "min": 0,
+                "max": 100,
+                "seed": 16,
+                "offset": 5,
+                "splitting_conditions": [
+                    {
+                        "SIC": {
+                            "threshold": 75,
+                            "upper_bound": 1.0,
+                            "lower_bound": 0.0
+                        }
                     }
-                },
-                {
-                    "loader": "AMSR",
-                    "params": {
-                        "folder": "../datastore/sic/amsr_south/",
-                        "hemisphere": "south",
-                        "value_fill_types": "parent",
-                        "data_name": "SIC",
-                        "splitting_conditions": [
-                            {
-                                "SIC": {
-                                    "threshold": 35,
-                                    "upper_bound": 0.9,
-                                    "lower_bound": 0.1
-                                }
-                            }
-                        ]
-                    }
-                },
-                {
-                    "loader": "SOSE",
-                    "params": {
-                        "file": "../datastore/currents/sose_currents/SOSE_surface_velocity_6yearMean_2005-2010.nc",
-                        "value_fill_types": "parent",
-                        "data_name": "uC,vC",
-                        "splitting_conditions": [
-                            {
-                                "uC,vC": {
-                                    "curl": 0.04
-                                }
-                            }
-                        ]
-                    }
-                },
-                {
-                    "loader": "thickness",
-                    "params": {
-                        "data_name": "thickness",
-                        "file": "",
-                        "value_fill_types": "parent"
-                    }
-                },
-                {
-                    "loader": "density",
-                    "params": {
-                        "data_name": "density",
-                        "file": "",
-                        "value_fill_types": "parent"
-                    }
-                }
-            ]
+                ],
+                "dataloader_name": "scalar_grf",
+                "downsample_factors": [
+                    1,
+                    1
+                ],
+                "aggregate_type": "MEAN",
+                "min_dp": 5,
+                "in_proj": "EPSG:4326",
+                "out_proj": "EPSG:4326",
+                "x_col": "lat",
+                "y_col": "long",
+                "size": 512,
+                "alpha": 3,
+                "binary": false,
+                "threshold": [
+                    0,
+                    1
+                ],
+                "multiplier": 1
+            }
+        },
+        ... other data_sources
+    ]
    
 
 where the variables are as follows:
@@ -298,7 +384,7 @@ of non-uniform spatial resolution.
 ::
 
    "splitting": {
-      "split_depth":4,
+      "split_depth":6,
       "minimum_datapoints":5
     }
 
