@@ -6,27 +6,29 @@ In this section we will outline the installation steps for installing the softwa
 
 The first stage is installing a version of Python 3.9, if you don't have a working version. We suggest installing a working Anaconda distribution from https://www.anaconda.com/products/distribution#macos following the instructions on that page.
 
-Installing PolarRoute
+Installing MeshiPhi
 #####################
 
-The PolarRoute software can be installed on Windows/Linux/MacOS by running one of the two following commands.
+The MeshiPhi software can be installed on Windows/Linux/MacOS by running one of the two following commands.
 
-Github:
-::
-
-    git clone https://https://github.com/antarctica/PolarRoute.git
-    python setup.py install
 
 Pip: 
 ::
 
-    pip install polar-route
+    pip install MeshiPhi
+
+Github:
+::
+
+    git clone https://github.com/antarctica/MeshiPhi.git
+    cd MeshiPhi
+    pip install .
 
 
 Installing GDAL
 ###############
 
-The PolarRoute software has GDAL as an optional requirement. It is only used when exporting TIFF images, 
+The MeshiPhi software has GDAL as an optional requirement. It is only used when exporting TIFF images, 
 so if this is not useful to you, we would recommend steering clear. It is not trivial and is a common source of problems.
 With that said, below are instructions for various operating systems.
 
@@ -35,7 +37,7 @@ Windows
 
 .. note:: 
     We assume a version of Windows 10 or higher, with a working version of Python 3.9 including pip installed. 
-    We recommend installing PolarRoute into a virtual environment.
+    We recommend installing MeshiPhi into a virtual environment.
 
 Windows:
 

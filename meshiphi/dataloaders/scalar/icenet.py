@@ -41,7 +41,7 @@ class IceNetDataLoader(ScalarDataLoader):
                       for file in self.files 
                       if filename_to_datetime(file) < min_time}
         # Find closest date prior to min_time
-        closest_date = max(k for k, v in file_dates.iteritems())
+        closest_date = max(k for k, v in file_dates.items())
 
         # Open Dataset
         ds = xr.open_dataset(file_dates[closest_date])

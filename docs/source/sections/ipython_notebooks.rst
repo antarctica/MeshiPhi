@@ -1,9 +1,10 @@
-###############################
-Python & iPython Notebooks
-###############################
+#####################################
+Examples
+#####################################
 
-Route planning may also be done using a python terminal. This is case, the CLI is not required but the steps required for route planning 
-follow the same format - create a digital environment; simulated a vessel against it; optimise a route plan through the digital environment.
+Digital environement files (meshes) can be created using the MeshiPhi package, either through the 
+command line interface (CLI) or through the python terminal. This section will provide examples of how to create a digital 
+environement file using the python terminal.
  
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -18,7 +19,7 @@ Loading configuration from *json* file:
 ::
 
     import json
-    with open('config.json', 'r') as f:
+    with open('examples/environment_config/grf_example.config.json', 'r') as f:
         config = json.load(f)    
 
 
@@ -29,9 +30,41 @@ the :ref:`Methods - Mesh Construction` section of the documentation. The digital
 a json object and saved to a file. 
 ::
 
-    from meshiphi.mesh import Mesh
+    from meshiphi.mesh_generation.mesh_builder import MeshBuilder
 
-    cg = Mesh(config)
+    cg = MeshBuilder(config).build_environmental_mesh()
+    
     mesh = cg.to_json()
-    with open('mesh.json') as f:
-        json.dumps(mesh)
+
+The **`Mesh`** object can be visualised using the **`GeoPlot`** package, also developed by BAS. This package is not included in the distribution 
+of MeshiPhi, but can be installed using the following command:
+
+:: 
+
+    pip install bas_geoplot
+
+**`GeoPlot`** can be used to visualise the **`Mesh`** object using the following code in an iPython notebook:
+
+::
+    
+    from bas_geoplot.interactive import Map
+
+    mesh = pd.DataFrame(mesh_json['cellboxes'])
+    mp = Map(title="GRF Example")
+
+    mp.Maps(mesh, 'MeshGrid', predefined='cx')
+    mp.Maps(mesh, 'SIC', predefined='SIC')
+    mp.Maps(mesh, 'Elevation', predefined='Elev', show=False)
+    mp.Vectors(mesh,'Currents - Mesh', show=False, predefined='Currents')
+    mp.Vectors(mesh, 'Winds', predefined='Winds', show=False)
+
+    mp.show()
+
+The prior should produce a plot which shows the digital environment, including sea ice concentration, elevation, currents and winds.
+
+.. _splitting_fig:
+.. figure:: ./Figures/grf_example_mesh.png
+   :align: center
+   :width: 700
+
+   *plot showing expected output of running bas_geoplot though a ipython notebook*
