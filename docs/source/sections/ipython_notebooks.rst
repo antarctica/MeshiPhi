@@ -1,5 +1,5 @@
 #####################################
-Python & iPython Notebooks examples
+Examples
 #####################################
 
 Digital environement files (meshes) can be created using the MeshiPhi package, either through the 
