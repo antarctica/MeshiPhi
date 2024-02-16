@@ -2,8 +2,9 @@
 Python & iPython Notebooks examples
 #####################################
 
-Route planning may also be done using a python terminal. This is case, the CLI is not required but the steps required for route planning 
-follow the same format - create a digital environment; simulated a vessel against it; optimise a route plan through the digital environment.
+Digital environement files (meshes) can be created using the MeshiPhi package, either through the 
+command line interface (CLI) or through the python terminal. This section will provide examples of how to create a digital 
+environement file using the python terminal.
  
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
