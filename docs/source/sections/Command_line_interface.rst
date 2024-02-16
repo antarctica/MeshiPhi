@@ -2,8 +2,9 @@
 Command Line Interface
 ###############################
 
-The CaartograPhi package provides CLI entry points, intended to be used in succession to plan a route through a digital environment.
-
+The MeshiPhi package provides CLI entry points, used to build a digital environment from a hetrogeneous collection of source data. 
+This digital environment file (mesh) may then be exported to a variety of file formats for use in other systems, such as GIS software. 
+The produced mesh file also interfaces directly with PolarRoute, BAS's route planning software to provide optinal routes through mesh.
 ^^^^^^^^^^^
 create_mesh
 ^^^^^^^^^^^
@@ -21,6 +22,7 @@ positional arguments:
     config : A configuration file detailing how to build the digital environment. JSON parsable
 
 The format of the required *<config.json>* file can be found in the :ref:`configuration - mesh construction` section of the documentation.
+There are also example configuration files available in the directory :code:`examples/environment_config/grf_example.config.json`
 
 optional arguments:
 
@@ -31,6 +33,7 @@ optional arguments:
 
 
 The format of the returned mesh.json file is explain in :ref:`the mesh.json file` section of the documentation.
+
 
 
 ^^^^^^^^^^^
@@ -56,6 +59,7 @@ supported output formats are:
   * .json (default) [JSON]
   * geo.json (collection of polygons for each cell in the mesh) [GEOJSON]
   * .tif (rasterised mesh) [TIF]
+  * .png [PNG]
 
 optional arguments:
 
@@ -117,10 +121,21 @@ optional arguments:
     -o : output location
 
 
-^^^^^^^^
-Plotting
-^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
+plot_mesh (GeoPlot)
+^^^^^^^^^^^^^^^^^^^^^
 Meshes produced at any stage in the route planning process can be visualised using the GeoPlot 
 library found at the relevant `GitHub page <https://github.com/antarctica/GeoPlot>`_. Meshes and routes can also be
 plotted in other GIS software such as QGIS by exporting the mesh to a common format such as .geojson or .tif using
 the :ref:`export_mesh` command.
+
+::
+
+    plot_mesh <mesh.json>
+
+optional arguments:
+
+:: 
+    
+        -v : verbose logging
+        -o : output location
