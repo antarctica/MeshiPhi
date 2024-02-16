@@ -2,9 +2,9 @@
 Examples
 #####################################
 
-Digital environement files (meshes) can be created using the MeshiPhi package, either through the 
+Digital environment files (meshes) can be created using the MeshiPhi package, either through the
 command line interface (CLI) or through the python terminal. This section will provide examples of how to create a digital 
-environement file using the python terminal.
+environment file using the python terminal.
  
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
