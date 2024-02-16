@@ -32,7 +32,7 @@ class VisualIcedDataLoader(ScalarDataLoader):
                 return None
         else:
             logging.error('Multiple tiff files not supported. Only single tiff file supported')
-            
+            raise ValueError('Multiple tiff files not supported. Only single tiff file supported')
 
         return visual_ice
 
