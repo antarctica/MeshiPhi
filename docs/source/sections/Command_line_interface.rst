@@ -5,9 +5,11 @@ Command Line Interface
 The MeshiPhi package provides CLI entry points, used to build a digital environment from a hetrogeneous collection of source data. 
 This digital environment file (mesh) may then be exported to a variety of file formats for use in other systems, such as GIS software. 
 The produced mesh file also interfaces directly with PolarRoute, BAS's route planning software to provide optinal routes through mesh.
+
 ^^^^^^^^^^^
 create_mesh
 ^^^^^^^^^^^
+
 The *create_mesh* entry point builds a digital environment file from a collection of source data, which can then be used
 by the vessel performance modeller and route planner. 
 
