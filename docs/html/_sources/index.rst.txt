@@ -20,13 +20,12 @@ Contents:
    :maxdepth: 2
    :numbered:
 
-   ./sections/Code_overview
    ./sections/Installation
    ./sections/ipython_notebooks
    ./sections/Command_line_interface
+   ./sections/Code_overview
    ./sections/Configuration/Configuration_overview
    ./sections/Outputs
    ./sections/Dataloaders/overview
    ./sections/Mesh_Construction/Mesh_construction_overview
-   ./sections/Examples
    ./sections/Plotting/mesh_plotting
