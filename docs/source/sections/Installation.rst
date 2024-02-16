@@ -4,7 +4,6 @@ Installation
 
 In this section we will outline the installation steps for installing the software package on a corresponding OS. 
 
-The first stage is installing a version of Python 3.9, if you don't have a working version. We suggest installing a working Anaconda distribution from https://www.anaconda.com/products/distribution#macos following the instructions on that page.
 
 Installing MeshiPhi
 #####################
