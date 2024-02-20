@@ -14,6 +14,9 @@ from meshiphi.dataloaders.scalar.era5_wave_period import ERA5WavePeriodDataLoade
 from meshiphi.dataloaders.scalar.era5_mean_wave_direction import ERA5MeanWaveDirDataLoader
 from meshiphi.dataloaders.scalar.era5_wind_mag import ERA5WindMagDataLoader
 from meshiphi.dataloaders.scalar.era5_wind_dir import ERA5WindDirDataLoader
+from meshiphi.dataloaders.scalar.visual_iced import VisualIcedDataLoader
+from meshiphi.dataloaders.scalar.ecmwf_sig_wave_height import ECMWFSigWaveHeightDataLoader
+
 
 from meshiphi.dataloaders.vector.baltic_current import BalticCurrentDataLoader
 from meshiphi.dataloaders.vector.era5_wind import ERA5WindDataLoader
@@ -87,12 +90,14 @@ class DataLoaderFactory:
             'gebco':        (GEBCODataLoader, ['files']),
             'icenet':       (IceNetDataLoader, ['files']),
             'modis':        (MODISDataLoader, ['files']),
+            'visual_iced': (VisualIcedDataLoader, ['files']),
             'era5_sig_wave_height': (ERA5SigWaveHeightDataLoader, ['files']),
             'era5_max_wave_height': (ERA5MaxWaveHeightDataLoader, ['files']),
             'era5_wave_dir': (ERA5MeanWaveDirDataLoader, ['files']),
             'era5_wave_period': (ERA5WavePeriodDataLoader, ['files']),
             'era5_wind_mag': (ERA5WindMagDataLoader, ['files']),
             'era5_wind_dir': (ERA5WindDirDataLoader, ['files']),
+            'ecmwf_sig_wave_height': (ECMWFSigWaveHeightDataLoader, ['files']),
             # Scalar - Abstract shapes
             'circle':       (ShapeDataLoader, []),
             'square':       (ShapeDataLoader, []),

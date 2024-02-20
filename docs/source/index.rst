@@ -4,8 +4,11 @@ Welcome to the MeshiPhi Manual Pages
 MeshiPhi is a tool for the discretisation of environmental data with a non uniform resolution based on the variance of
 the data. This software package has been developed by the **British Antarctic Survey** (BAS), initially as part of a
 route planning tool for the BAS research vessel RRS Sir David Attenborough, though it can be applied to any geospatial data.
-The software is written in Python and is open source. The package contains limited plotting functionality, which is
-described in the :ref:`Mesh Plotting <mesh_plotting>` section.
+The software is written in Python and is open source. 
+
+The package contains limited plotting functionality, which is described in the :ref:`Mesh Plotting` section. For 
+extended plotting functionality, we recommend using the GeoPlot package, which is also developed by BAS. This is available at 
+the following GitHub repository: `GeoPlot <https://github.com/antarctica/GeoPlot>`_
 
 For more information on the project, please visit the `PolarRoute website <https://www.bas.ac.uk/project/autonomous-marine-operations-planning/>`_
 and follow our `GitHub repository <https://github.com/antarctica/meshiphi>`_.
@@ -20,13 +23,12 @@ Contents:
    :maxdepth: 2
    :numbered:
 
-   ./sections/Code_overview
    ./sections/Installation
    ./sections/ipython_notebooks
    ./sections/Command_line_interface
+   ./sections/Code_overview
    ./sections/Configuration/Configuration_overview
    ./sections/Outputs
    ./sections/Dataloaders/overview
    ./sections/Mesh_Construction/Mesh_construction_overview
-   ./sections/Examples
    ./sections/Plotting/mesh_plotting
