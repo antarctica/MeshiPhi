@@ -3,7 +3,11 @@
 ![](logo.jpg)
 
 <!-- <a href="https://colab.research.google.com/drive/12D-CN10X7xAcXn_df0zNLHtdiiXxZVkz?usp=sharing"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab" alt="Colab"> -->
-<a href="https://antarctica.github.io/MeshiPhi/"><img src="https://img.shields.io/badge/Manual%20-github.io%2FMeshiPhi%2F-red" alt="Manual Page"></a><a href="https://pypi.org/project/meshiphi/"><img src="https://img.shields.io/pypi/v/meshiphi" alt="PyPi"></a><a href="https://github.com/antarctica/meshiphi/tags"><img src="https://img.shields.io/github/v/tag/antarctica/MeshiPhi" alt="Release Tag"></a><a href="https://github.com/antarctica/MeshiPhi/issues"><img src="https://img.shields.io/github/issues/antarctica/MeshiPhi" alt="Issues"></a><a href="https://github.com/antarctica/MeshiPhi/blob/main/LICENSE"><img src="https://img.shields.io/github/license/antarctica/MeshiPhi" alt="License"></a> 
+<a href="https://antarctica.github.io/MeshiPhi/"><img src="https://img.shields.io/badge/Manual%20-github.io%2FMeshiPhi%2F-red" alt="Manual Page"></a>
+<a href="https://pypi.org/project/meshiphi/"><img src="https://img.shields.io/pypi/v/meshiphi" alt="PyPi"></a>
+<a href="https://github.com/antarctica/meshiphi/tags"><img src="https://img.shields.io/github/v/tag/antarctica/MeshiPhi" alt="Release Tag"></a>
+<a href="https://github.com/antarctica/MeshiPhi/issues"><img src="https://img.shields.io/github/issues/antarctica/MeshiPhi" alt="Issues"></a>
+<a href="https://github.com/antarctica/MeshiPhi/blob/main/LICENSE"><img src="https://img.shields.io/github/license/antarctica/MeshiPhi" alt="License"></a> 
 
 
 
@@ -24,7 +28,7 @@ cd MeshiPhi
 pip install -e .
 ```
 
-The Meshiφ package has an optional dependance on GDAL, which is required to produce outputs in GeoJSON or GeoTIFF formats. More information on setting up GDAL can be found in the manual pages linked above. Once these requirements are met then the software can be installed by:
+The Meshiφ package has an optional dependency on GDAL, which is required to produce outputs in GeoJSON or GeoTIFF formats. More information on setting up GDAL can be found in the manual pages linked above. Once these requirements are met then the software can be installed by:
 
 > NOTE: The installation process may vary slightly dependent on OS. Please consult the documentation for further installation guidance.
 
