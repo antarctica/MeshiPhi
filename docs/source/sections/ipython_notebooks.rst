@@ -62,7 +62,7 @@ of MeshiPhi, but can be installed using the following command:
 
 The prior should produce a plot which shows the digital environment, including sea ice concentration, elevation, currents and winds.
 
-.. _splitting_fig:
+.. _splitting_figure:
 .. figure:: ./Figures/grf_example_mesh.png
    :align: center
    :width: 700

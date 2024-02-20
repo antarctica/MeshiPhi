@@ -2,9 +2,9 @@
 Examples
 #####################################
 
-Digital environement files (meshes) can be created using the MeshiPhi package, either through the 
+Digital environment files (meshes) can be created using the MeshiPhi package, either through the
 command line interface (CLI) or through the python terminal. This section will provide examples of how to create a digital 
-environement file using the python terminal.
+environment file using the python terminal.
  
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -62,7 +62,7 @@ of MeshiPhi, but can be installed using the following command:
 
 The prior should produce a plot which shows the digital environment, including sea ice concentration, elevation, currents and winds.
 
-.. _splitting_fig:
+.. _splitting_figure:
 .. figure:: ./Figures/grf_example_mesh.png
    :align: center
    :width: 700
