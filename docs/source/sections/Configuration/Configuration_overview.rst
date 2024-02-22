@@ -3,7 +3,7 @@ Configuration Overview
 ######################################
 
 In this section we will outline the standard structure for a configuration file used in 
-all portions of the PolarRoute software package.
+all portions of the MeshiPhi software package.
 
 Each stage of the route-planning process is configured by a separate configuration file. 
 The configuration files are written in JSON, and are passed to each stage of the 
@@ -27,8 +27,8 @@ Config Validation
 At each major stage of the code (mesh construction, vessel performance modelling, 
 and route planning), the configs supplied are validated using a template JSON Schema.
 These schema check that the correct keywords and datatypes are provided in the config 
-JSON's, as well as the waypoints CSV file. They also perform rudimentary checks on the
-values to ensure that they make sense (e.g. startTime is before endTime).
+JSONs, as well as the waypoints CSV file. They also perform rudimentary checks on the
+values to ensure that they make sense (e.g. start_time is before end_time).
 
 .. automodule:: meshiphi.config_validation.config_validator
    :members:

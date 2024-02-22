@@ -10,7 +10,7 @@ The package contains limited plotting functionality, which is described in the :
 extended plotting functionality, we recommend using the GeoPlot package, which is also developed by BAS. This is available at 
 the following GitHub repository: `GeoPlot <https://github.com/antarctica/GeoPlot>`_
 
-For more information on the project, please visit the `PolarRoute website <https://www.bas.ac.uk/project/autonomous-marine-operations-planning/>`_
+For more information on the project, please visit the `AMOP website <https://www.bas.ac.uk/project/autonomous-marine-operations-planning/>`_
 and follow our `GitHub repository <https://github.com/antarctica/meshiphi>`_.
 
 

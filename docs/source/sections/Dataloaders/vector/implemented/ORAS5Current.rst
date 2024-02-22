@@ -13,6 +13,8 @@ From their website:
    OCEAN5 ocean analysis-reanalysis system. This system comprises 5 ensemble 
    members from which one member is published in this catalogue entry.
 
+Name in config: :code:`'oras5_currents'`
+
 Data can be downloaded from `here <https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-oras5?tab=form>`_
 
 .. automodule:: meshiphi.dataloaders.vector.oras5_current

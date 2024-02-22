@@ -9,7 +9,9 @@ SOSE project led by Mazloff at the Scripps Institution of Oceanography.
 From their website:
    The Southern Ocean State Estimate (SOSE) is a model-generated best fit to Southern Ocean 
    observations. As such, it provides a quantitatively useful climatology of the mean-state 
-   of the Southern Ocean. 
+   of the Southern Ocean.
+
+Name in config: :code:`'bsose_sic'`
 
 Data can be downloaded from `here <http://sose.ucsd.edu/BSOSE_iter105_solution.html>`_
 
