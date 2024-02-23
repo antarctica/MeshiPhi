@@ -2,13 +2,11 @@
 Configuration - Mesh Construction
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Below is a full configuration file for building an environmental mesh using 
-data generated from gaussian random fields. This configuration file generates 
-the fields 'SIC', 'elevation', 'thickness', 'density', 'uC,vC' (currents) and
-'u10,v10' (winds). The full configuration file is available in the file location 
-:code:`examples/environment_config/grf_example.config.json`. Other example 
-configuration files are also available at this location, including configuration files 
-which build meshes using real datasets.
+Below is a full configuration file for building an environmental mesh using synthetic data generated from Gaussian
+Random Fields (GRFs). This configuration file generates the fields 'SIC', 'elevation', 'thickness', 'density', 'uC, vC'
+(currents) and 'u10, v10' (winds). The full configuration file is available in the file location
+:code:`examples/environment_config/grf_example.config.json` on GitHub. Other example configuration files are also
+available at this location, including configuration files which build meshes using real datasets.
 
 
 .. code-block:: json
@@ -226,7 +224,7 @@ Region
 ################
 The region section gives detailed information for the construction of the Discrete Mesh. The main definitions are the
 bounding region and temporal portion of interest (:code:`long_min`, :code:`lat_min`, :code:`long_max`, :code:`lat_max`, :code:`start_time`, :code:`end_time`), but
-also the starting shape of the spatial grid cell boxes (`cellWidth`, `cellHeight`) is defined before splitting is
+also the starting shape of the spatial grid cell boxes (:code:`cell_width`, :code:`cell_height`) is defined before splitting is
 applied. Further detail on each parameter is given below:
 
 ::
@@ -396,7 +394,3 @@ where the variables are as follows:
 
 * **split_depth** *(float)* : The number of times the MeshBuilder will sub-divide each initial cellbox (subject to satisfying the splitting conditions of each data source)
 * **minimum_datapoints** *(float)* : The minimum number of datapoints a cellbox must contain for each value type to be able to split
-
-
-
-

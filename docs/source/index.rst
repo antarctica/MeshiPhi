@@ -24,7 +24,7 @@ Contents:
    :numbered:
 
    ./sections/Installation
-   ./sections/ipython_notebooks
+   ./sections/Examples
    ./sections/Command_line_interface
    ./sections/Code_overview
    ./sections/Configuration/Configuration_overview
