@@ -12,6 +12,8 @@ From their webpage:
    and monthly means, are salinity, temperature, horizontal current components, 
    mixed layer depth, bottom salinity and bottom temperature.
 
+Name in config: :code:`'baltic_currents'`
+
 Data can be downloaded from `here <https://data.marine.copernicus.eu/product/BALTICSEA_REANALYSIS_PHY_003_011/description>`_
 
 

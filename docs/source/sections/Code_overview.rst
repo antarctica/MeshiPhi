@@ -22,6 +22,6 @@ to finer resolution in regions of spatially varying data.
 Each stage of this process makes use of a configuration file, found in the :ref:`Configuration Overview` section of the
 documentation and produces an output file, the form of which can be found in the :ref:`outputs` section.
 
-In addition to the main section of the codebase we have also developed a series of plotting classes that allows the user
-to generate interactive maps and static figures for the Mesh Features. These can be found in the :ref:`Mesh Plotting`
+In addition to the core functionality of the package we have also developed a set of plotting classes that allow the user
+to generate both interactive maps and static figures of the Mesh outputs. These can be found in the :ref:`Mesh Plotting`
 section later in the manual.

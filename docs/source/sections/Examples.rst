@@ -8,7 +8,7 @@ environment file using Python.
  
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Creating the digital environment.
+Creating the Digital Environment.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A configuration file is needed to initialise the **Mesh** object which forms the digital environment. This
@@ -68,4 +68,4 @@ The prior should produce a plot which shows the digital environment, including s
    :align: center
    :width: 700
 
-   *Plot showing the expected output of running bas_geoplot though a ipython notebook*
+   *Plot showing the expected output of running bas_geoplot on the GRF example mesh provided*

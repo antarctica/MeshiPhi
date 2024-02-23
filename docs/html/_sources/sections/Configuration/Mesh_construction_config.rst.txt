@@ -2,13 +2,11 @@
 Configuration - Mesh Construction
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Below is a full configuration file for building an environmental mesh using 
-data generated from gaussian random fields. This configuration file generates 
-the feilds 'SIC', 'elevation', 'thickness', 'density', 'uC,vC' (currents) and 
-'u10,v10' (winds). The full configuration file is available in the file location 
-:code:`examples/environment_config/grf_example.config.json`. Other example 
-configuration files are also available at this location, including configuration files 
-which build meshes using real data-sets.
+Below is a full configuration file for building an environmental mesh using synthetic data generated from Gaussian
+Random Fields (GRFs). This configuration file generates the fields 'SIC', 'elevation', 'thickness', 'density', 'uC, vC'
+(currents) and 'u10, v10' (winds). The full configuration file is available in the file location
+:code:`examples/environment_config/grf_example.config.json` on GitHub. Other example configuration files are also
+available at this location, including configuration files which build meshes using real datasets.
 
 
 .. code-block:: json
@@ -214,16 +212,20 @@ which build meshes using real data-sets.
         }
     }
 
-The configuration file used for mesh construction contains information required to build the discretised environment in which the route planner
-operates. Information here dictates the region in which the mesh is constructed, the data contained within
-the mesh and how the mesh is split to a non-uniform resolution. The configuration file used to generate a mesh is stored in a section titled 'Mesh_info'
+The configuration file used for mesh construction contains information required to build a discretised model of the environment.
+Information here dictates the region in which the mesh is constructed, the data contained within the mesh and how the
+mesh is split to a non-uniform resolution. The configuration file used to generate a mesh is stored in the output mesh json
+in a section titled 'mesh_info'.
 
-The 'Mesh_info' section of the configuration file contains three primary sections:
+The mesh configuration file contains three primary sections:
 
 ################
 Region
 ################
-The region section gives detailed information for the construction of the Discrete Mesh. The main definitions are the bounding region and temporal portion of interest (`longMin`, `latMin`, `longMax`, `latMax`, `startTime`, `endTime`), but also the starting shape of the spatial grid cell boxes (`cellWidth`, `cellHeight`) is defined before splitting is applied. Further detail on each parameter is given below:
+The region section gives detailed information for the construction of the Discrete Mesh. The main definitions are the
+bounding region and temporal portion of interest (:code:`long_min`, :code:`lat_min`, :code:`long_max`, :code:`lat_max`, :code:`start_time`, :code:`end_time`), but
+also the starting shape of the spatial grid cell boxes (:code:`cell_width`, :code:`cell_height`) is defined before splitting is
+applied. Further detail on each parameter is given below:
 
 ::
 
@@ -240,10 +242,10 @@ The region section gives detailed information for the construction of the Discre
     
 where the variables are as follows:
 
-* **long_min**      *(float, degrees)*      : Minimum Longitude Edge Mesh
-* **long_max**      *(float, degrees)*      : Maximum Longitude Edge Mesh
-* **lat_min**       *(float, degrees)*      : Minimum Latitude Edge Mesh  
-* **lat_max**       *(float, degrees)*      : Maximum Latitude Edge Mesh  
+* **long_min**      *(float, degrees)*      : Minimum Longitude Edge of the Mesh
+* **long_max**      *(float, degrees)*      : Maximum Longitude Edge of the Mesh
+* **lat_min**       *(float, degrees)*      : Minimum Latitude Edge of the Mesh
+* **lat_max**       *(float, degrees)*      : Maximum Latitude Edge of the Mesh
 * **start_time**    *(string, 'YYYY-mm-dd')*   : Start Datetime of Time averaging 
 * **end_time**      *(string, 'YYYY-mm-dd')*   : End Datetime of Time averaging   
 * **cell_width**    *(float, degrees)*      : Initial Cell Box Width prior to splitting 
@@ -261,8 +263,8 @@ where the variables are as follows:
 Data Sources
 ############
 
-The 'Data Sources' section of the configuration file dictates which information will be added to the
-mesh when constructed. Each item in the list of data sources represents a single data set to be added
+The 'data_sources' section of the configuration file defines which information will be added to the
+mesh when constructed. Each item in the list of data sources represents a single dataset to be added
 to the mesh.
 
 ::
@@ -392,7 +394,3 @@ where the variables are as follows:
 
 * **split_depth** *(float)* : The number of times the MeshBuilder will sub-divide each initial cellbox (subject to satisfying the splitting conditions of each data source)
 * **minimum_datapoints** *(float)* : The minimum number of datapoints a cellbox must contain for each value type to be able to split
-
-
-
-

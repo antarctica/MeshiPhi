@@ -2,15 +2,15 @@ Welcome to the MeshiPhi Manual Pages
 ======================================
 
 MeshiPhi is a tool for the discretisation of environmental data with a non uniform resolution based on the variance of
-the data. This software package has been developed by the **British Antarctic Survey** (BAS), initially as part of a
-route planning tool for the BAS research vessel RRS Sir David Attenborough, though it can be applied to any geospatial data.
-The software is written in Python and is open source. 
+the data. This software package has been developed by the **British Antarctic Survey** (BAS). It was initially designed
+as part of a `route planning tool <https://github.com/antarctica/PolarRoute>`_ for the BAS research vessel RRS Sir David
+Attenborough, although it can be applied to any geospatial data. The software is written in Python and is open source.
 
 The package contains limited plotting functionality, which is described in the :ref:`Mesh Plotting` section. For 
-extended plotting functionality, we recommend using the GeoPlot package, which is also developed by BAS. This is available at 
-the following GitHub repository: `GeoPlot <https://github.com/antarctica/GeoPlot>`_
+extended plotting functionality, we recommend using the GeoPlot package, which was also developed at BAS. This is
+available from the following GitHub repository: `GeoPlot <https://github.com/antarctica/GeoPlot>`_
 
-For more information on the project, please visit the `PolarRoute website <https://www.bas.ac.uk/project/autonomous-marine-operations-planning/>`_
+For more information on the project, please visit the `AMOP website <https://www.bas.ac.uk/project/autonomous-marine-operations-planning/>`_
 and follow our `GitHub repository <https://github.com/antarctica/meshiphi>`_.
 
 
@@ -24,7 +24,7 @@ Contents:
    :numbered:
 
    ./sections/Installation
-   ./sections/ipython_notebooks
+   ./sections/Examples
    ./sections/Command_line_interface
    ./sections/Code_overview
    ./sections/Configuration/Configuration_overview

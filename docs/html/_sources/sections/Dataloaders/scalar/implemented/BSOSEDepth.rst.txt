@@ -12,9 +12,11 @@ From their website:
    observations. As such, it provides a quantitatively useful climatology of the mean-state 
    of the Southern Ocean. 
 
+Name in config: :code:`'bsose_depth'`
+
 Data can be downloaded from `here <http://sose.ucsd.edu/BSOSE_iter105_solution.html>`_
 
-Note: This dataloader may not work as is for new data downloaded, it has been internally collated into 
+Note: This dataloader may not work "as is" for new data downloaded, it has been internally collated into
 a more easily ingestable format.
 
 .. automodule:: meshiphi.dataloaders.scalar.bsose_depth

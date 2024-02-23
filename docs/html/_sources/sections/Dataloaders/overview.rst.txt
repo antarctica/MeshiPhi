@@ -73,7 +73,7 @@ To look at specific abstract dataloaders, use the following links:
 - :ref:`abstract-vector-dataloader`
 - :ref:`abstract-lut-dataloader`
 
-These are the templates to be used when implementing new dataloaders into PolarRoute. 
+These are the templates to be used when implementing new dataloaders into MeshiPhi.
 They have been split into three separate categories: Scalar, Vector, and LUT, detailed in `Dataloader Types`_.
 The abstract classes generalise the methods used by each dataloader type to produce outputs
 that the Environmental Mesh can retrieve via the  :ref:`dataloader interface<dataloader-interface>`. 
