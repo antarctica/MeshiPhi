@@ -96,12 +96,19 @@ class ThicknessDataLoader(LutDataLoader):
         dates = pd.date_range(start=bounds.get_time_min(), 
                               end=bounds.get_time_max())
         
-        thickness_df = pd.concat([
-                pd.DataFrame({'time': dates,
-                              'geometry': region.geometry & bounds_polygon,
-                              'thickness': region.get_value(month)})
-                for region in regions for month  in dates.month
-            ])
+        thickness_df = pd.DataFrame()
+        
+        for region in regions:
+
+            if region.geometry & bounds_polygon:
+                region_df = pd.concat([
+                        pd.DataFrame({'time': dates,
+                                    'geometry': region.geometry & bounds_polygon,
+                                    'thickness': region.get_value(month)})
+                        for month  in dates.month
+                    ])
+                
+                thickness_df = pd.concat([region_df, thickness_df])
         
         thickness_df = thickness_df.set_index('time').sort_index()
         
