@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>9. Mesh Plotting &mdash; meshiphi 1.1.6 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
 
   
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=b108bffd"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -45,14 +45,23 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../Installation.html">1. Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ipython_notebooks.html">2. Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Examples.html">2. Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Command_line_interface.html">3. Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Code_overview.html">4. Background</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Configuration/Configuration_overview.html">5. Configuration Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Outputs.html">6. Outputs - Data Types</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Dataloaders/overview.html">7. Dataloader Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Mesh_Construction/Mesh_construction_overview.html">8. Methods - Mesh Construction</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">9. Mesh Plotting</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">9. Mesh Plotting</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#meshiphi.mesh_plotting.mesh_plotter.MeshPlotter"><code class="docutils literal notranslate"><span class="pre">MeshPlotter</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#meshiphi.mesh_plotting.mesh_plotter.MeshPlotter.__init__"><code class="docutils literal notranslate"><span class="pre">MeshPlotter.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#meshiphi.mesh_plotting.mesh_plotter.MeshPlotter.plot_bool"><code class="docutils literal notranslate"><span class="pre">MeshPlotter.plot_bool()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#meshiphi.mesh_plotting.mesh_plotter.MeshPlotter.plot_cmap"><code class="docutils literal notranslate"><span class="pre">MeshPlotter.plot_cmap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#meshiphi.mesh_plotting.mesh_plotter.MeshPlotter.save"><code class="docutils literal notranslate"><span class="pre">MeshPlotter.save()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -79,9 +88,12 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="module-meshiphi.mesh_plotting.mesh_plotter">
-<span id="mesh-plotting"></span><h1><span class="section-number">9. </span>Mesh Plotting<a class="headerlink" href="#module-meshiphi.mesh_plotting.mesh_plotter" title="Permalink to this heading"></a></h1>
-<dl class="py class">
+  <section id="mesh-plotting">
+<h1><span class="section-number">9. </span>Mesh Plotting<a class="headerlink" href="#mesh-plotting" title="Permalink to this heading"></a></h1>
+<p>As well as the interactive plotting functionality provided by <a class="reference external" href="https://github.com/antarctica/GeoPlot">GeoPlot</a>,
+Meshiphi also contains a built-in plotting class <code class="code docutils literal notranslate"><span class="pre">mesh_plotter</span></code> that allows the user to produce static plots of a
+given environmental mesh.</p>
+<span class="target" id="module-meshiphi.mesh_plotting.mesh_plotter"></span><dl class="py class">
 <dt class="sig sig-object py" id="meshiphi.mesh_plotting.mesh_plotter.MeshPlotter">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">meshiphi.mesh_plotting.mesh_plotter.</span></span><span class="sig-name descname"><span class="pre">MeshPlotter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh_json</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figscale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#meshiphi.mesh_plotting.mesh_plotter.MeshPlotter" title="Permalink to this definition"></a></dt>
 <dd><p>Object for plotting mesh json files using matplotlib and cartopy.</p>

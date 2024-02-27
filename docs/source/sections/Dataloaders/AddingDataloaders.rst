@@ -6,7 +6,7 @@ Adding New Dataloaders
 Adding to the repository
 ------------------------
 
-Each dataloader is to be implemented as a separate object for the Environmental mesh to interface with. 
+Each dataloader is to be implemented as a separate object for the environmental mesh to interface with.
 The general workflow for creating a new dataloader is as follows:
 
 #. Choose an appropriate dataloader type (see :ref:`Dataloader Types`).

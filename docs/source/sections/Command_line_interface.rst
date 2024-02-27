@@ -2,16 +2,17 @@
 Command Line Interface
 ###############################
 
-The MeshiPhi package provides CLI entry points, used to build a digital environment from a hetrogeneous collection of source data. 
-This digital environment file (mesh) may then be exported to a variety of file formats for use in other systems, such as GIS software. 
-The produced mesh file also interfaces directly with PolarRoute, BAS's route planning software to provide optinal routes through mesh.
+The MeshiPhi package provides CLI entry points, used to build a digital environment from a heterogeneous collection of
+source data. This digital environment file (mesh) can then be exported to a variety of file formats for use in other
+systems, such as GIS software. The produced mesh file also interfaces directly with `PolarRoute <https://github.com/antarctica/PolarRoute>`_,
+BAS's route planning software, to provide optimal routes for a vehicle travelling through the mesh.
 
 ^^^^^^^^^^^
 create_mesh
 ^^^^^^^^^^^
 
-The *create_mesh* entry point builds a digital environment file from a collection of source data, which can then be used
-by the vessel performance modeller and route planner. 
+The *create_mesh* entry point builds a digital environment file from a collection of source data, which can then be saved
+to a file for visualisation or use in other software.
 
 ::
 
@@ -24,7 +25,7 @@ positional arguments:
     config : A configuration file detailing how to build the digital environment. JSON parsable
 
 The format of the required *<config.json>* file can be found in the :ref:`configuration - mesh construction` section of the documentation.
-There are also example configuration files available in the directory :code:`examples/environment_config/grf_example.config.json`
+There are also example configuration files available in the directory :code:`examples/environment_config/grf_example.config.json` on GitHub.
 
 optional arguments:
 
@@ -71,7 +72,7 @@ optional arguments:
     -o : output location
     -format_conf: configuration file for output format (required for TIF export, optional for GEOJSON)
 
-the format of the *<format_conf.json>* file required for .tif export is as follows:
+an example of the format of the *<format_conf.json>* file required for .tif export is as follows:
 
 ::
 
@@ -101,7 +102,8 @@ where the variables are as follows:
 The color_conf.txt contains 4 columns per line: the data_name value and the 
 corresponding red, green, blue value between 0 and 255.
 
-When using the *-format_conf* option for GEOJSON output the only variable required is the **data_name**. This specifies which of the data layers you want to export as a single GEOJSON file.
+When using the *-format_conf* option for GEOJSON output the only variable required is the **data_name**. This specifies
+which of the data layers you want to export as a single GEOJSON file.
 
 ^^^^^^^^^^^^
 rebuild_mesh
@@ -109,7 +111,7 @@ rebuild_mesh
 
 Once a mesh has been built using the :ref:`create_mesh` command the *rebuild_mesh* command allows a user to rebuild it based on the
 original configs stored within the mesh file. This is primarily useful for debugging or to update old meshes produced with an older version
-of the package. Running this command will also reapply any vessel performance simulations, if these were run on the original mesh.
+of the package.
 
 ::
 
@@ -128,8 +130,8 @@ plot_mesh (GeoPlot)
 ^^^^^^^^^^^^^^^^^^^^^
 Meshes produced at any stage in the route planning process can be visualised using the GeoPlot 
 library found at the relevant `GitHub page <https://github.com/antarctica/GeoPlot>`_. Meshes and routes can also be
-plotted in other GIS software such as QGIS by exporting the mesh to a common format such as .geojson or .tif using
-the :ref:`export_mesh` command.
+plotted in other GIS software such as QGIS or ArcGIS by exporting the mesh to a common format such as .geojson or .tif
+using the :ref:`export_mesh` command.
 
 ::
 

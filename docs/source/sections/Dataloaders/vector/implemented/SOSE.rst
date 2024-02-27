@@ -8,7 +8,9 @@ ocean current vectors of the southern ocean. It is a project led by Mazloff at t
 From their website:
    The Southern Ocean State Estimate (SOSE) is a model-generated best fit to Southern Ocean 
    observations. As such, it provides a quantitatively useful climatology of the mean-state 
-   of the Southern Ocean. 
+   of the Southern Ocean.
+
+Name in config: :code:`'sose'`
 
 Data can be downloaded from `here <http://sose.ucsd.edu/sose_stateestimation_data_05to10.html>`_
 

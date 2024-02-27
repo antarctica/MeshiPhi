@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>5. Configuration Overview &mdash; meshiphi 1.1.6 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
 
   
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=b108bffd"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -46,12 +46,19 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../Installation.html">1. Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ipython_notebooks.html">2. Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Examples.html">2. Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Command_line_interface.html">3. Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Code_overview.html">4. Background</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">5. Configuration Overview</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="Mesh_construction_config.html">5.1. Configuration - Mesh Construction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#config-validation">5.2. Config Validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#config-validation">5.2. Config Validation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#meshiphi.config_validation.config_validator.flexi_json_input"><code class="docutils literal notranslate"><span class="pre">flexi_json_input()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#meshiphi.config_validation.config_validator.validate_mesh_config"><code class="docutils literal notranslate"><span class="pre">validate_mesh_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#meshiphi.config_validation.config_validator.validate_route_config"><code class="docutils literal notranslate"><span class="pre">validate_route_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#meshiphi.config_validation.config_validator.validate_vessel_config"><code class="docutils literal notranslate"><span class="pre">validate_vessel_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#meshiphi.config_validation.config_validator.validate_waypoints"><code class="docutils literal notranslate"><span class="pre">validate_waypoints()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../Outputs.html">6. Outputs - Data Types</a></li>
@@ -86,12 +93,10 @@
              
   <section id="configuration-overview">
 <h1><span class="section-number">5. </span>Configuration Overview<a class="headerlink" href="#configuration-overview" title="Permalink to this heading"></a></h1>
-<p>In this section we will outline the standard structure for a configuration file used in
-all portions of the PolarRoute software package.</p>
-<p>Each stage of the route-planning process is configured by a separate configuration file.
-The configuration files are written in JSON, and are passed to each stage of the
-route-planning process as command-line arguments or through a Python script.</p>
-<p>Example configuration files are provided in the <cite>config</cite> directory.</p>
+<p>In this section we outline the standard structure for the configuration file used as the starting point for generating
+an environmental mesh using the MeshiPhi software package. These configuration files are written in JSON, can be passed
+to MeshiPhi as command-line arguments or through a Python interpreter.</p>
+<p>Example configuration files are provided in the <code class="code docutils literal notranslate"><span class="pre">examples/environment_config/</span></code> directory on GitHub.</p>
 <p>Descriptions of the configuration options for the Mesh Construction can be found in
 the <a class="reference internal" href="Mesh_construction_config.html#configuration-mesh-construction"><span class="std std-ref">Configuration - Mesh Construction</span></a> section of the documentation.</p>
 <div class="toctree-wrapper compound">
@@ -101,11 +106,9 @@ the <a class="reference internal" href="Mesh_construction_config.html#configurat
 </div>
 <section id="config-validation">
 <h2><span class="section-number">5.2. </span>Config Validation<a class="headerlink" href="#config-validation" title="Permalink to this heading"></a></h2>
-<p>At each major stage of the code (mesh construction, vessel performance modelling,
-and route planning), the configs supplied are validated using a template JSON Schema.
-These schema check that the correct keywords and datatypes are provided in the config
-JSON’s, as well as the waypoints CSV file. They also perform rudimentary checks on the
-values to ensure that they make sense (e.g. startTime is before endTime).</p>
+<p>The configs supplied by the user are validated using a template JSON Schema. This schema checks that the correct
+keywords and datatypes are provided in the config JSON file. They also perform rudimentary checks on the values within
+the config to ensure that they make sense (e.g. start_time is before end_time).</p>
 <span class="target" id="module-meshiphi.config_validation.config_validator"></span><dl class="py function">
 <dt class="sig sig-object py" id="meshiphi.config_validation.config_validator.flexi_json_input">
 <span class="sig-prename descclassname"><span class="pre">meshiphi.config_validation.config_validator.</span></span><span class="sig-name descname"><span class="pre">flexi_json_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#meshiphi.config_validation.config_validator.flexi_json_input" title="Permalink to this definition"></a></dt>

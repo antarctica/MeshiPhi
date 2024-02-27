@@ -2,21 +2,21 @@
 Installation
 ************
 
-In this section we outline the necessary steps for installing the MeshiPhi software package. MeshiPhi requires a pre-existing installation of Python 3.8 or higher.
+In this section we outline the necessary steps for installing the MeshiPhi software package. MeshiPhi requires a
+pre-existing installation of Python 3.8 or higher.
 
 
 Installing MeshiPhi
 #####################
 
-The MeshiPhi software can be installed on Windows/Linux/MacOS by running one of the two following commands.
+MeshiPhi can be installed from one of the following two sources:
 
-
-Pip: 
+from PyPI:
 ::
 
     pip install MeshiPhi
 
-Github:
+from Github:
 ::
 
     git clone https://github.com/antarctica/MeshiPhi.git
@@ -27,8 +27,8 @@ Github:
 Installing GDAL (Optional)
 ##########################
 
-The MeshiPhi software has GDAL as an optional requirement. It is only used when exporting TIFF images, 
-so if this is not useful to you, we would recommend steering clear. It is not trivial and is a common source of problems.
+MeshiPhi has GDAL as an optional requirement. It is only used when exporting TIFF images, so if this is not useful to
+you, we would recommend steering clear. It is not trivial and is a common source of problems.
 With that said, below are instructions for various operating systems.
 
 Windows

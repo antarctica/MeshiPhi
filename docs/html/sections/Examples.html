@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>2. Examples &mdash; meshiphi 1.1.6 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
 
   
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=b108bffd"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -47,7 +47,7 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Installation.html">1. Installation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">2. Examples</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#creating-the-digital-environment">2.1. Creating the digital environment.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#creating-the-digital-environment">2.1. Creating the Digital Environment.</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="Command_line_interface.html">3. Command Line Interface</a></li>
@@ -75,7 +75,7 @@
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active"><span class="section-number">2. </span>Examples</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/sections/ipython_notebooks.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/sections/Examples.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -87,22 +87,22 @@
 <h1><span class="section-number">2. </span>Examples<a class="headerlink" href="#examples" title="Permalink to this heading"></a></h1>
 <p>Digital environment files (meshes) can be created using the MeshiPhi package, either through the
 command line interface (CLI) or through the python terminal. This section will provide examples of how to create a digital
-environment file using the python terminal.</p>
+environment file using Python.</p>
 <section id="creating-the-digital-environment">
-<h2><span class="section-number">2.1. </span>Creating the digital environment.<a class="headerlink" href="#creating-the-digital-environment" title="Permalink to this heading"></a></h2>
-<p>A configuration file is needed to initialise the <strong>`Mesh`</strong> object which forms the digital environment. This configuration file
-is of the same format used in the <a class="reference internal" href="Command_line_interface.html#create-mesh"><span class="std std-ref">create_mesh</span></a> CLI entry-point, and may either be loaded from a <em>json</em> file or constructed
-within the python terminal.</p>
-<p>Loading configuration from <em>json</em> file:</p>
+<h2><span class="section-number">2.1. </span>Creating the Digital Environment.<a class="headerlink" href="#creating-the-digital-environment" title="Permalink to this heading"></a></h2>
+<p>A configuration file is needed to initialise the <strong>Mesh</strong> object which forms the digital environment. This
+configuration file is of the same format used in the <a class="reference internal" href="Command_line_interface.html#create-mesh"><span class="std std-ref">create_mesh</span></a> CLI entry-point, and may either be loaded from a
+<em>json</em> file or constructed within a python interpreter.</p>
+<p>Loading configuration information from a <em>json</em> file:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;examples/environment_config/grf_example.config.json&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">config</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The digital environment <strong>`Mesh`</strong> object can then be initialised. This mesh object will be constructed using parameters in it
+<p>The digital environment <strong>Mesh</strong> object can then be initialised. This mesh object will be constructed using parameters in it
 configuration file. This mesh object can be manipulated further, such as increasing its resolution through further
 splitting, adding additional data sources or altering is configuration parameters using functions listed in
-the <a class="reference internal" href="Mesh_Construction/Mesh_construction_overview.html#methods-mesh-construction"><span class="std std-ref">Methods - Mesh Construction</span></a> section of the documentation. The digital environment <strong>`Mesh`</strong> object can then be cast to
+the <a class="reference internal" href="Mesh_Construction/Mesh_construction_overview.html#methods-mesh-construction"><span class="std std-ref">Methods - Mesh Construction</span></a> section of the documentation. The digital environment <strong>Mesh</strong> object can then be cast to
 a json object and saved to a file.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">meshiphi.mesh_generation.mesh_builder</span> <span class="kn">import</span> <span class="n">MeshBuilder</span>
 
@@ -111,12 +111,13 @@ a json object and saved to a file.</p>
 <span class="n">mesh</span> <span class="o">=</span> <span class="n">cg</span><span class="o">.</span><span class="n">to_json</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>The <strong>`Mesh`</strong> object can be visualised using the <strong>`GeoPlot`</strong> package, also developed by BAS. This package is not included in the distribution
-of MeshiPhi, but can be installed using the following command:</p>
+<p>The <strong>Mesh</strong> object can be visualised using the <a class="reference external" href="https://github.com/antarctica/GeoPlot">GeoPlot</a> package, also developed
+by BAS. This package is not included in the distribution of MeshiPhi, but can be installed using the following command:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">bas_geoplot</span>
 </pre></div>
 </div>
-<p><strong>`GeoPlot`</strong> can be used to visualise the <strong>`Mesh`</strong> object using the following code in an iPython notebook:</p>
+<p><strong>GeoPlot</strong> can be used to visualise the <strong>Mesh</strong> object using the following code in an iPython notebook or
+any python interpreter:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">bas_geoplot.interactive</span> <span class="kn">import</span> <span class="n">Map</span>
 
 <span class="n">mesh</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">mesh_json</span><span class="p">[</span><span class="s1">&#39;cellboxes&#39;</span><span class="p">])</span>
@@ -125,17 +126,17 @@ of MeshiPhi, but can be installed using the following command:</p>
 <span class="n">mp</span><span class="o">.</span><span class="n">Maps</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s1">&#39;MeshGrid&#39;</span><span class="p">,</span> <span class="n">predefined</span><span class="o">=</span><span class="s1">&#39;cx&#39;</span><span class="p">)</span>
 <span class="n">mp</span><span class="o">.</span><span class="n">Maps</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s1">&#39;SIC&#39;</span><span class="p">,</span> <span class="n">predefined</span><span class="o">=</span><span class="s1">&#39;SIC&#39;</span><span class="p">)</span>
 <span class="n">mp</span><span class="o">.</span><span class="n">Maps</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s1">&#39;Elevation&#39;</span><span class="p">,</span> <span class="n">predefined</span><span class="o">=</span><span class="s1">&#39;Elev&#39;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">mp</span><span class="o">.</span><span class="n">Vectors</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span><span class="s1">&#39;Currents - Mesh&#39;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">predefined</span><span class="o">=</span><span class="s1">&#39;Currents&#39;</span><span class="p">)</span>
+<span class="n">mp</span><span class="o">.</span><span class="n">Vectors</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span><span class="s1">&#39;Currents&#39;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">predefined</span><span class="o">=</span><span class="s1">&#39;Currents&#39;</span><span class="p">)</span>
 <span class="n">mp</span><span class="o">.</span><span class="n">Vectors</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s1">&#39;Winds&#39;</span><span class="p">,</span> <span class="n">predefined</span><span class="o">=</span><span class="s1">&#39;Winds&#39;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="n">mp</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>The prior should produce a plot which shows the digital environment, including sea ice concentration, elevation, currents and winds.</p>
+<p>The prior should produce a plot which shows the digital environment, including sea ice concentration, elevation, currents and wind.</p>
 <figure class="align-center" id="id1">
 <span id="splitting-figure"></span><a class="reference internal image-reference" href="../_images/grf_example_mesh.png"><img alt="../_images/grf_example_mesh.png" src="../_images/grf_example_mesh.png" style="width: 700px;" /></a>
 <figcaption>
-<p><span class="caption-text"><em>plot showing expected output of running bas_geoplot though a ipython notebook</em></span><a class="headerlink" href="#id1" title="Permalink to this image"></a></p>
+<p><span class="caption-text"><em>Plot showing the expected output of running bas_geoplot on the GRF example mesh provided</em></span><a class="headerlink" href="#id1" title="Permalink to this image"></a></p>
 </figcaption>
 </figure>
 </section>

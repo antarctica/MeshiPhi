@@ -4,18 +4,18 @@ Examples
 
 Digital environment files (meshes) can be created using the MeshiPhi package, either through the
 command line interface (CLI) or through the python terminal. This section will provide examples of how to create a digital 
-environment file using the python terminal.
+environment file using Python.
  
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Creating the digital environment.
+Creating the Digital Environment.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A configuration file is needed to initialise the **`Mesh`** object which forms the digital environment. This configuration file
-is of the same format used in the :ref:`create_mesh` CLI entry-point, and may either be loaded from a *json* file or constructed 
-within the python terminal.
+A configuration file is needed to initialise the **Mesh** object which forms the digital environment. This
+configuration file is of the same format used in the :ref:`create_mesh` CLI entry-point, and may either be loaded from a
+*json* file or constructed within a python interpreter.
 
-Loading configuration from *json* file:
+Loading configuration information from a *json* file:
 ::
 
     import json
@@ -23,10 +23,10 @@ Loading configuration from *json* file:
         config = json.load(f)    
 
 
-The digital environment **`Mesh`** object can then be initialised. This mesh object will be constructed using parameters in it
+The digital environment **Mesh** object can then be initialised. This mesh object will be constructed using parameters in it
 configuration file. This mesh object can be manipulated further, such as increasing its resolution through further 
 splitting, adding additional data sources or altering is configuration parameters using functions listed in 
-the :ref:`Methods - Mesh Construction` section of the documentation. The digital environment **`Mesh`** object can then be cast to 
+the :ref:`Methods - Mesh Construction` section of the documentation. The digital environment **Mesh** object can then be cast to
 a json object and saved to a file. 
 ::
 
@@ -36,14 +36,15 @@ a json object and saved to a file.
     
     mesh = cg.to_json()
 
-The **`Mesh`** object can be visualised using the **`GeoPlot`** package, also developed by BAS. This package is not included in the distribution 
-of MeshiPhi, but can be installed using the following command:
+The **Mesh** object can be visualised using the `GeoPlot <https://github.com/antarctica/GeoPlot>`_ package, also developed
+by BAS. This package is not included in the distribution of MeshiPhi, but can be installed using the following command:
 
 :: 
 
     pip install bas_geoplot
 
-**`GeoPlot`** can be used to visualise the **`Mesh`** object using the following code in an iPython notebook:
+**GeoPlot** can be used to visualise the **Mesh** object using the following code in an iPython notebook or
+any python interpreter:
 
 ::
     
@@ -55,16 +56,16 @@ of MeshiPhi, but can be installed using the following command:
     mp.Maps(mesh, 'MeshGrid', predefined='cx')
     mp.Maps(mesh, 'SIC', predefined='SIC')
     mp.Maps(mesh, 'Elevation', predefined='Elev', show=False)
-    mp.Vectors(mesh,'Currents - Mesh', show=False, predefined='Currents')
+    mp.Vectors(mesh,'Currents', show=False, predefined='Currents')
     mp.Vectors(mesh, 'Winds', predefined='Winds', show=False)
 
     mp.show()
 
-The prior should produce a plot which shows the digital environment, including sea ice concentration, elevation, currents and winds.
+The prior should produce a plot which shows the digital environment, including sea ice concentration, elevation, currents and wind.
 
 .. _splitting_figure:
 .. figure:: ./Figures/grf_example_mesh.png
    :align: center
    :width: 700
 
-   *plot showing expected output of running bas_geoplot though a ipython notebook*
+   *Plot showing the expected output of running bas_geoplot on the GRF example mesh provided*

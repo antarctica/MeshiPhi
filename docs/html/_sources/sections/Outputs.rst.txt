@@ -8,10 +8,7 @@ Outputs - Data Types
 The Mesh.json file
 ######################
 
-The first stage in the route planning pipeline is constructing a discrete 
-mesh of the environment in which the route planner can operate. Once this
-mesh is constructed, it can then be exported as a json object and passed 
-down-stream to the vehicle specifics and route planner. An example 
+Once a mesh has been constructed using MeshiPhi, it can then be exported as a json object and saved to a file. An example
 of mesh construction and json object generation are as follows:
 
 ::
@@ -64,7 +61,7 @@ where the parts of the json object can be understood as follows:
 cellboxes
 =========
 
-Each CellBox object within *cellboxes* in the outputted json object is of
+Each CellBox object within **cellboxes** in the outputted json object is of
 the following form:
 
 ::
@@ -99,14 +96,14 @@ Where the values within the CellBox represent the following:
 neighbour_graph
 ===============
 
-For each CellBox in the *cellboxes* section of the outputted json object, there will be a
-corresponding entry in the *neighbour_graph*.
+For each CellBox in the **cellboxes** section of the json object, there will be a
+corresponding entry in the **neighbour_graph**.
 
 .. note::
     Once the vehicle accessibility conditions have been applied to the json object, this may no longer be true
     as inaccessible CellBoxes will be removed from *neighbour_graph* but will remain in *cellboxes*
 
-Each entry in the *neighbour_graph* is of the following form:
+Each entry in the **neighbour_graph** is of the following form:
 
 :: 
 

@@ -7,6 +7,8 @@ Scalar GRF Dataloader
 Produces a gaussian random field of scalar values, useful for producing 
 artificial, yet somewhat realistic values for real-world variables.
 
+Name in config: :code:`'scalar_grf'`
+
 Can be used to generate :ref:`binary masks<binary-grf>`.
 
 For vector fields, see  the :ref:`Vector GRF page<vector-grf>`.

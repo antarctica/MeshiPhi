@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>6. Outputs - Data Types &mdash; meshiphi 1.1.6 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
 
   
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=b108bffd"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -46,7 +46,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Installation.html">1. Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ipython_notebooks.html">2. Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Examples.html">2. Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Command_line_interface.html">3. Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Code_overview.html">4. Background</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Configuration/Configuration_overview.html">5. Configuration Overview</a></li>
@@ -91,10 +91,7 @@
 <span id="outputs"></span><h1><span class="section-number">6. </span>Outputs - Data Types<a class="headerlink" href="#outputs-data-types" title="Permalink to this heading"></a></h1>
 <section id="the-mesh-json-file">
 <h2><span class="section-number">6.1. </span>The Mesh.json file<a class="headerlink" href="#the-mesh-json-file" title="Permalink to this heading"></a></h2>
-<p>The first stage in the route planning pipeline is constructing a discrete
-mesh of the environment in which the route planner can operate. Once this
-mesh is constructed, it can then be exported as a json object and passed
-down-stream to the vehicle specifics and route planner. An example
+<p>Once a mesh has been constructed using MeshiPhi, it can then be exported as a json object and saved to a file. An example
 of mesh construction and json object generation are as follows:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">meshiphi.mesh</span> <span class="kn">import</span> <span class="n">Mesh</span>
 
@@ -141,7 +138,7 @@ the <a class="reference internal" href="Configuration/Mesh_construction_config.h
 </ul>
 <section id="cellboxes">
 <h3><span class="section-number">6.1.1. </span>cellboxes<a class="headerlink" href="#cellboxes" title="Permalink to this heading"></a></h3>
-<p>Each CellBox object within <em>cellboxes</em> in the outputted json object is of
+<p>Each CellBox object within <strong>cellboxes</strong> in the outputted json object is of
 the following form:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;id&quot;</span> <span class="p">(</span><span class="n">string</span><span class="p">):</span> <span class="o">...</span><span class="p">,</span>
@@ -171,14 +168,14 @@ the following form:</p>
 </section>
 <section id="neighbour-graph">
 <h3><span class="section-number">6.1.2. </span>neighbour_graph<a class="headerlink" href="#neighbour-graph" title="Permalink to this heading"></a></h3>
-<p>For each CellBox in the <em>cellboxes</em> section of the outputted json object, there will be a
-corresponding entry in the <em>neighbour_graph</em>.</p>
+<p>For each CellBox in the <strong>cellboxes</strong> section of the json object, there will be a
+corresponding entry in the <strong>neighbour_graph</strong>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Once the vehicle accessibility conditions have been applied to the json object, this may no longer be true
 as inaccessible CellBoxes will be removed from <em>neighbour_graph</em> but will remain in <em>cellboxes</em></p>
 </div>
-<p>Each entry in the <em>neighbour_graph</em> is of the following form:</p>
+<p>Each entry in the <strong>neighbour_graph</strong> is of the following form:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;&lt;id&gt;&quot;</span><span class="p">:</span> <span class="p">{</span>
     <span class="s2">&quot;1&quot;</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">],</span>
     <span class="s2">&quot;2&quot;</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">],</span>

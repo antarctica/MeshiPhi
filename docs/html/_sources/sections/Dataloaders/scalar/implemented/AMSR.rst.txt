@@ -12,6 +12,8 @@ with :code:`pandas` calculating mean values differently depending on how the
 data is loaded. This caused issues with the regression tests passing. 
 This issue will be rectified soon by updating the regression tests.
 
+Name in config: :code:`'amsr'`
+
 Data can be downloaded from `here <https://seaice.uni-bremen.de/data-archive/>`_
 
 
