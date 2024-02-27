@@ -3,7 +3,7 @@ from meshiphi.mesh_generation.boundary import Boundary
 import logging
 
 import pandas as pd
-from shapely import wkt
+from shapely import wkt, Polygon
 
 
 # Mapping of month number to season per hemisphere
@@ -99,17 +99,21 @@ class ThicknessDataLoader(LutDataLoader):
         thickness_df = pd.DataFrame()
         
         for region in regions:
-
-            if region.geometry & bounds_polygon:
+            
+            intersection = region.geometry & bounds_polygon
+            if intersection.geom_type in ['Polygon', 'MultiPolygon'] and \
+                intersection != Polygon():
+                    
                 region_df = pd.concat([
                         pd.DataFrame({'time': dates,
                                     'geometry': region.geometry & bounds_polygon,
                                     'thickness': region.get_value(month)})
-                        for month  in dates.month
+                            for month  in dates.month
                     ])
                 
-                thickness_df = pd.concat([region_df, thickness_df])
-        
+                thickness_df = pd.concat([thickness_df, region_df])
+                
+        thickness_df = thickness_df.drop_duplicates()
         thickness_df = thickness_df.set_index('time').sort_index()
         
         return thickness_df
