@@ -43,7 +43,26 @@ class Boundary:
         obj = Boundary (lat_range , long_range , time_range)
         return obj
 
+    @classmethod
+    def from_poly_string(cls, poly_string):
+        """
+        Creates a Boundary object from a string representation of a polygon.
+        """
+        coords = poly_string.split("POLYGON ((")[1].split("))")[0].split(", ")
+        x = [float(coord.split(" ")[0]) for coord in coords]
+        y = [float(coord.split(" ")[1]) for coord in coords]
 
+        lat_min = min(x)
+        lat_max = max(x)
+        long_min = min(y)
+        long_max = max(y)
+
+        long_range = [long_min, long_max]
+        lat_range = [lat_min, lat_max]
+
+        bounds = Boundary(long_range, lat_range)
+
+        return bounds
 
     def __init__(self, lat_range , long_range , time_range=None):
         """
@@ -290,6 +309,44 @@ class Boundary:
             )
         return polygon
 
+    def to_poly_string(self):
+        """
+        Creates a string representation of the polygon from the extent of the boundary. 
+        Will be a rectangle in mercator projection.
+        
+        Returns:
+            (str):
+                String representation of the shapely polygon with corners at 
+                the min/max lat/long values of this boundary
+        """
+        return f'POLYGON (({self.get_long_min():g} {self.get_lat_min():g}, ' + \
+                        f'{self.get_long_min():g} {self.get_lat_max():g}, ' + \
+                        f'{self.get_long_max():g} {self.get_lat_max():g}, ' + \
+                        f'{self.get_long_max():g} {self.get_lat_min():g}, ' + \
+                        f'{self.get_long_min():g} {self.get_lat_min():g}))'
+
+    def split(self):
+        """
+        Splits the boundary into four equal parts.
+        
+        Returns:
+            (list<Boundary>): 
+                List of four new boundaries, each representing a quarter of the 
+                original boundary.
+        """
+        lat_mid = self.get_lat_min() + (self.get_height() / 2)
+        long_mid = self.get_long_min() + (self.get_width() / 2)
+
+        bounds = [
+            Boundary([self.get_lat_min(), lat_mid], [self.get_long_min(), long_mid]),
+            Boundary([lat_mid, self.get_lat_max()], [self.get_long_min(), long_mid]),
+            Boundary([self.get_lat_min(), lat_mid], [long_mid, self.get_long_max()]),
+            Boundary([lat_mid, self.get_lat_max()], [long_mid, self.get_long_max()])
+        ]
+
+        return bounds
+        
+    
     def __str__(self):
 
 
