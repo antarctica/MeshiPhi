@@ -337,6 +337,7 @@ class Boundary:
         lat_mid = self.get_lat_min() + (self.get_height() / 2)
         long_mid = self.get_long_min() + (self.get_width() / 2)
 
+        # 0 = south_west, 1 = north_west, 2 = south_east, 3 = north_east
         bounds = [
             Boundary([self.get_lat_min(), lat_mid], [self.get_long_min(), long_mid]),
             Boundary([lat_mid, self.get_lat_max()], [self.get_long_min(), long_mid]),
