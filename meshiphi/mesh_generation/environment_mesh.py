@@ -182,22 +182,24 @@ class EnvironmentMesh:
                 cellbox_id (string): the id of the cellbox to be split
         """
         
+        # Create new cellboxes and append to agg_cellboxes
         split_cellboxes = self.sim_split_cellbox(cellbox_id)
-
         for cellbox in split_cellboxes:
             self.agg_cellboxes.append(cellbox)
 
+        # get ID's of new cellboxes
         north_west_index = int(split_cellboxes[1].get_agg_data()['id'])
         north_east_index = int(split_cellboxes[3].get_agg_data()['id'])
         south_west_index = int(split_cellboxes[0].get_agg_data()['id'])
         south_east_index = int(split_cellboxes[2].get_agg_data()['id'])
 
+        # Get neighbours of original cellbox
         south_neighbour_index = self.neighbour_graph.get_neighbours(cellbox_id, "4")
         north_neighbour_indx = self.neighbour_graph.get_neighbours(cellbox_id, "-4")
         east_neighbour_indx = self.neighbour_graph.get_neighbours(cellbox_id, "2")
         west_neighbour_indx = self.neighbour_graph.get_neighbours(cellbox_id, "-2")
 
-
+        # ================== Create Neighbour Maps ==================
         # initialize the neighbour map of SW cellbox
         sw_neighbour_map = {
             "1": [north_east_index],
@@ -258,7 +260,7 @@ class EnvironmentMesh:
         se_neighbour_map = self.fill_se_neighbour_map(se_neighbour_map, south_east_index, south_neighbour_index, east_neighbour_indx)
         self.neighbour_graph.add_node(str(south_east_index), se_neighbour_map)
 
-
+        # ================== Update Neighbours of original cellbox ==================
 
         # update corner neighbours
         ne_corner_index = self.neighbour_graph.get_neighbours(cellbox_id, "1")
@@ -274,6 +276,7 @@ class EnvironmentMesh:
             self.neighbour_graph.update_neighbour(str(nw_corner_index[0]), "3", [north_west_index])
         if len(sw_corner_index) > 0:
             self.neighbour_graph.update_neighbour(str(sw_corner_index[0]), "1", [south_west_index])
+
 
         # update sides neighbours
         ne_bounds = self.get_cellbox(north_east_index).get_bounds()
@@ -295,6 +298,7 @@ class EnvironmentMesh:
             if crossing_case != 0:
                 self.neighbour_graph.add_neighbour(str(indx), str(crossing_case), north_west_index)
 
+
         # update south cellbox neighbours
         self.neighbour_graph.remove_node_from_neighbours(cellbox_id, 4)
         
@@ -308,6 +312,7 @@ class EnvironmentMesh:
             crossing_case = self.neighbour_graph.get_neighbour_case_bounds(cellbox_bounds, sw_bounds)
             if crossing_case != 0:
                 self.neighbour_graph.add_neighbour(str(indx), str(crossing_case), south_west_index)
+
 
         # update east cellbox neighbours
         self.neighbour_graph.remove_node_from_neighbours(cellbox_id, 2)
@@ -323,6 +328,7 @@ class EnvironmentMesh:
             if crossing_case != 0:
                 self.neighbour_graph.add_neighbour(str(indx), str(crossing_case), south_east_index)
 
+
         # update west cellbox neighbours
         self.neighbour_graph.remove_node_from_neighbours(cellbox_id, -2)
 
@@ -337,10 +343,10 @@ class EnvironmentMesh:
             if crossing_case != 0:
                 self.neighbour_graph.add_neighbour(str(indx), str(crossing_case), south_west_index)
 
+
         # remove original cellbox from mesh.
         cellbox = self.get_cellbox(cellbox_id)
         self.agg_cellboxes.remove(cellbox)
-
         self.neighbour_graph.remove_node(cellbox_id)
 
 
