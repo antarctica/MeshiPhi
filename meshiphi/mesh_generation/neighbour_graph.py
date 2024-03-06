@@ -160,7 +160,7 @@ class NeighbourGraph:
                 self.neighbour_graph[indx][-1*direction].remove(cellbox_indx)
             except KeyError:
                 self.neighbour_graph[str(indx)][str(-1*direction)].remove(int(cellbox_indx))
-
+                
     def update_corner_neighbours(self, cellbox_indx, north_west_indx, north_east_indx, south_west_indx, south_east_indx):
         '''
             method that updates the corner neighbours of cellbox_indx with the given indeces
@@ -181,6 +181,72 @@ class NeighbourGraph:
         if len(south_west_corner_indx) > 0:
             self.neighbour_graph[south_west_corner_indx[0]][Direction.north_east] = [south_west_indx]
     
+    def get_neighbour_case_bounds(self, bounds_a, bounds_b):
+        """
+            Given two bounds (bounds_a, bounds_b) returns a case number
+            representing where the two bounds are touching.
+
+            Args:
+                bounds_a (Bounds): starting Bounds
+                bounds_b (Bounds): destination Bounds
+
+            Returns:
+                int: an int representing the direction of the adjacency between input bounds_a and bounds_b. The meaning of each case is as follows -
+
+                        case 0 -> Bounds are not neighbours
+
+                        case 1 -> bounds_b is the North-East corner of bounds_a\n
+                        case 2 -> bounds_b is East of bounds_a\n
+                        case 3 -> bounds_b is the South-East corner of bounds_a\n
+                        case 4 -> bounds_b is South of bounds_a\n
+                        case -1 -> bounds_b is the South-West corner of bounds_a\n
+                        case -2 -> bounds_b is West of bounds_a\n
+                        case -3 -> bounds_b is the North-West corner of bounds_a\n
+                        case -4 -> bounds_b is North of bounds_a\n
+        """
+        long_a = bounds_a.get_long_min()
+        lat_a = bounds_a.get_lat_min()
+        long_b = bounds_b.get_long_min()
+        lat_b = bounds_b.get_lat_min()
+
+        if (long_a + bounds_a.get_width()) == long_b and (
+                lat_a + bounds_a.get_height()) == lat_b:
+            return Direction.north_east
+
+        if (long_a + bounds_a.get_width() == long_b) and (
+                lat_b < (lat_a + bounds_a.get_height())) and (
+                (lat_b + bounds_b.get_height()) > lat_a):
+            return Direction.east
+
+        if (long_a + bounds_a.get_width()) == long_b and (
+                lat_a == lat_b + bounds_b.get_height()):
+            return Direction.south_east
+
+        if ((lat_b + bounds_b.get_height()) == lat_a) and (
+                (long_b + bounds_b.get_width()) > long_a) and (
+                long_b < (long_a + bounds_a.get_width())):
+            return Direction.south
+
+        if long_a == (long_b + bounds_b.get_width()) and lat_a == (
+                lat_b + bounds_b.get_height()):
+            return Direction.south_west
+
+        if (long_b + bounds_b.get_width() == long_a) and (
+                lat_b < (lat_a + bounds_a.get_height())) and (
+                (lat_b + bounds_b.get_height()) > lat_a):
+            return Direction.west
+
+        if long_a == (long_b + bounds_b.get_width()) and (
+                lat_a + bounds_a.get_height() == lat_b):
+            return Direction.north_west
+
+        if (lat_b == (lat_a + bounds_a.get_height())) and (
+                (long_b + bounds_b.get_width()) > long_a) and (
+                long_b < (long_a + bounds_a.get_width())):
+            return Direction.north
+
+        return 0  # Cells are not neighbours.
+
     def get_neighbour_case(self, cellbox_a, cellbox_b):
         """
             Given two cellboxes (cellbox_a, cellbox_b) returns a case number
@@ -209,6 +275,7 @@ class NeighbourGraph:
         lat_a = cellbox_a.get_bounds().get_lat_min()
         long_b = cellbox_b.get_bounds().get_long_min()
         lat_b = cellbox_b.get_bounds().get_lat_min()
+
         def on_global_bound(cellbox_a , cellbox_b):
             """
             Given two cellboxes (cellbox_a, cellbox_b) returns a boolean
@@ -224,30 +291,38 @@ class NeighbourGraph:
             return long_a == -180  and cellbox_b.get_bounds().get_long_max() == 180 or long_b == -180 and cellbox_a.get_bounds().get_long_max() == 180 
         if self.is_global_mesh() and on_global_bound (cellbox_a , cellbox_b) :
             return self.get_global_mesh_neighbour_case(cellbox_a, cellbox_b)
+        
         if (long_a + cellbox_a.get_bounds().get_width()) == long_b and (
                 lat_a + cellbox_a.get_bounds().get_height()) == lat_b:
             return Direction.north_east
+
         if (long_a + cellbox_a.get_bounds().get_width() == long_b) and (
                 lat_b < (lat_a + cellbox_a.get_bounds().get_height())) and (
                 (lat_b + cellbox_b.get_bounds().get_height()) > lat_a):
             return Direction.east
+
         if (long_a + cellbox_a.get_bounds().get_width()) == long_b and (
                 lat_a == lat_b + cellbox_b.get_bounds().get_height()):
             return Direction.south_east
+
         if ((lat_b + cellbox_b.get_bounds().get_height()) == lat_a) and (
                 (long_b + cellbox_b.get_bounds().get_width()) > long_a) and (
                 long_b < (long_a + cellbox_a.get_bounds().get_width())):
             return Direction.south
+
         if long_a == (long_b + cellbox_b.get_bounds().get_width()) and lat_a == (
                 lat_b + cellbox_b.get_bounds().get_height()):
             return Direction.south_west
+
         if (long_b + cellbox_b.get_bounds().get_width() == long_a) and (
                 lat_b < (lat_a + cellbox_a.get_bounds().get_height())) and (
                 (lat_b + cellbox_b.get_bounds().get_height()) > lat_a):
             return Direction.west
+
         if long_a == (long_b + cellbox_b.get_bounds().get_width()) and (
                 lat_a + cellbox_a.get_bounds().get_height() == lat_b):
             return Direction.north_west
+
         if (lat_b == (lat_a + cellbox_a.get_bounds().get_height())) and (
                 (long_b + cellbox_b.get_bounds().get_width()) > long_a) and (
                 long_b < (long_a + cellbox_a.get_bounds().get_width())):
