@@ -110,6 +110,363 @@ class EnvironmentMesh:
         self.neighbour_graph = neighbour_graph
         self.config = config
 
+    def get_cellbox(self, cellbox_id):
+        """
+            returns the cellbox with the given id
+
+            Args:
+                cellbox_id (string): the id of the cellbox to be returned
+            Returns:
+                AggregatedCellBox: the cellbox with the given id
+        """
+        for cellbox in self.agg_cellboxes:
+            if str(cellbox.get_id()) == str(cellbox_id):
+                return cellbox
+        
+    def get_max_cellbox_id(self):
+        """
+            returns the maximum cellbox id in the mesh
+
+            Returns:
+                int: the maximum cellbox id
+        """
+        max_id = 0
+        for cellbox in self.agg_cellboxes:
+            if int(cellbox.get_id()) > max_id:
+                max_id = int(cellbox.get_id())
+        return max_id
+
+    # Splitting
+    def sim_split_cellbox(self, cellbox_id):
+        """
+            splits the cellbox with the given id
+
+            Args:
+                cellbox_id (string): the id of the cellbox to be split
+            Returns: 
+                split_cells (list<AggregatedCellBox>): a list of the new cellboxes created by the split
+        """
+        cellbox = self.get_cellbox(cellbox_id)
+
+        max_id = self.get_max_cellbox_id()
+
+        # Copy agg_data, update id's
+        agg_data = cellbox.get_agg_data()
+        agg_data1 = agg_data.copy()
+        agg_data1['id'] = str(max_id + 1)
+        agg_data2 = agg_data.copy()
+        agg_data2['id'] = str(max_id + 2)
+        agg_data3 = agg_data.copy()
+        agg_data3['id'] = str(max_id + 3)
+        agg_data4 = agg_data.copy()
+        agg_data4['id'] = str(max_id + 4)
+
+        bounds = cellbox.get_bounds()
+        split_bounds = bounds.split()
+
+        cellbox1 = AggregatedCellBox(split_bounds[0], agg_data1, max_id + 1)
+        cellbox2 = AggregatedCellBox(split_bounds[1], agg_data2, max_id + 2)
+        cellbox3 = AggregatedCellBox(split_bounds[2], agg_data3, max_id + 3)
+        cellbox4 = AggregatedCellBox(split_bounds[3], agg_data4, max_id + 4)
+
+        # Update neighbour graph
+
+        
+        return [cellbox1, cellbox2, cellbox3, cellbox4]
+
+    def split_and_replace(self, cellbox_id):
+        """
+            splits the cellbox with the given id and replaces it with the new cellboxes
+
+            Args:
+                cellbox_id (string): the id of the cellbox to be split
+        """
+        
+        # Create new cellboxes and append to agg_cellboxes
+        split_cellboxes = self.sim_split_cellbox(cellbox_id)
+        for cellbox in split_cellboxes:
+            self.agg_cellboxes.append(cellbox)
+
+        # get ID's of new cellboxes
+        north_west_index = int(split_cellboxes[1].get_agg_data()['id'])
+        north_east_index = int(split_cellboxes[3].get_agg_data()['id'])
+        south_west_index = int(split_cellboxes[0].get_agg_data()['id'])
+        south_east_index = int(split_cellboxes[2].get_agg_data()['id'])
+
+        # Get neighbours of original cellbox
+        south_neighbour_index = self.neighbour_graph.get_neighbours(cellbox_id, "4")
+        north_neighbour_indx = self.neighbour_graph.get_neighbours(cellbox_id, "-4")
+        east_neighbour_indx = self.neighbour_graph.get_neighbours(cellbox_id, "2")
+        west_neighbour_indx = self.neighbour_graph.get_neighbours(cellbox_id, "-2")
+
+        # ================== Create Neighbour Maps ==================
+        # initialize the neighbour map of SW cellbox
+        sw_neighbour_map = {
+            "1": [north_east_index],
+            "2": [south_east_index],
+            "3": [], 
+            "4": [],
+            "-1": self.neighbour_graph.get_neighbours(cellbox_id, "-1"),
+            "-2": [],
+            "-3": [],
+            "-4": [north_west_index]
+        }
+        # fill remaining neighbour map
+        sw_neighbour_map = self.fill_sw_neighbour_map(sw_neighbour_map, south_west_index, south_neighbour_index, west_neighbour_indx)
+        self.neighbour_graph.add_node(str(south_west_index), sw_neighbour_map)
+
+        # initialize the neighbour map of NW cellbox
+        nw_neighbour_map = {
+            "1": [],
+            "2": [north_east_index],
+            "3": [south_east_index],
+            "4": [south_west_index], 
+            "-1": [], 
+            "-2": [], 
+            "-3": self.neighbour_graph.get_neighbours(cellbox_id, "-3"),
+            "-4": []
+        }
+        # fill remaining neighbour map
+        nw_neighbour_map = self.fill_nw_neighbour_map(nw_neighbour_map, north_west_index, north_neighbour_indx, west_neighbour_indx)
+        self.neighbour_graph.add_node(str(north_west_index), nw_neighbour_map)
+
+        # initialize the neighbour map of NE cellbox
+        ne_neighbour_map = {
+            "1": self.neighbour_graph.get_neighbours(cellbox_id, "1"),
+            "2": [], 
+            "3": [],
+            "4": [south_east_index],
+            "-1": [south_west_index],
+            "-2": [north_west_index],
+            "-3": [],
+            "-4": []
+        }
+        # fill remaining neighbour map
+        ne_neighbour_map = self.fill_ne_neighbour_map(ne_neighbour_map, north_east_index, north_neighbour_indx, east_neighbour_indx)
+        self.neighbour_graph.add_node(str(north_east_index), ne_neighbour_map)
+
+        # initialize the neighbour map of SE cellbox
+        se_neighbour_map = {
+            "1": [],
+            "2": [],
+            "3": self.neighbour_graph.get_neighbours(cellbox_id, "3"),
+            "4": [],
+            "-1": [],
+            "-2": [south_west_index],
+            "-3": [north_west_index],
+            "-4": [north_east_index]
+        }
+        # fill remaining neighbour map
+        se_neighbour_map = self.fill_se_neighbour_map(se_neighbour_map, south_east_index, south_neighbour_index, east_neighbour_indx)
+        self.neighbour_graph.add_node(str(south_east_index), se_neighbour_map)
+
+        # ================== Update Neighbours of original cellbox ==================
+
+        # update corner neighbours
+        ne_corner_index = self.neighbour_graph.get_neighbours(cellbox_id, "1")
+        se_corner_index = self.neighbour_graph.get_neighbours(cellbox_id, "3")
+        nw_corner_index = self.neighbour_graph.get_neighbours(cellbox_id, "-3")
+        sw_corner_index = self.neighbour_graph.get_neighbours(cellbox_id, "-1")
+
+        if len(ne_corner_index) > 0:
+            self.neighbour_graph.update_neighbour(str(ne_corner_index[0]), "-1", [north_east_index])
+        if len(se_corner_index) > 0:
+            self.neighbour_graph.update_neighbour(str(se_corner_index[0]), "-3", [south_east_index])
+        if len(nw_corner_index) > 0:
+            self.neighbour_graph.update_neighbour(str(nw_corner_index[0]), "3", [north_west_index])
+        if len(sw_corner_index) > 0:
+            self.neighbour_graph.update_neighbour(str(sw_corner_index[0]), "1", [south_west_index])
+
+
+        # update sides neighbours
+        ne_bounds = self.get_cellbox(north_east_index).get_bounds()
+        nw_bounds = self.get_cellbox(north_west_index).get_bounds()
+        se_bounds = self.get_cellbox(south_east_index).get_bounds()
+        sw_bounds = self.get_cellbox(south_west_index).get_bounds()
+        
+        # update north cellbox neighbours
+        self.neighbour_graph.remove_node_from_neighbours(cellbox_id, -4)
+
+        for indx in north_neighbour_indx:
+            cellbox_bounds = self.get_cellbox(indx).get_bounds()
+
+            crossing_case = self.neighbour_graph.get_neighbour_case_bounds(cellbox_bounds, ne_bounds)
+            if crossing_case != 0:
+                self.neighbour_graph.add_neighbour(str(indx), str(crossing_case), north_east_index)
+            
+            crossing_case = self.neighbour_graph.get_neighbour_case_bounds(cellbox_bounds, nw_bounds)
+            if crossing_case != 0:
+                self.neighbour_graph.add_neighbour(str(indx), str(crossing_case), north_west_index)
+
+
+        # update south cellbox neighbours
+        self.neighbour_graph.remove_node_from_neighbours(cellbox_id, 4)
+        
+        for indx in south_neighbour_index:
+            cellbox_bounds = self.get_cellbox(indx).get_bounds()
+
+            crossing_case = self.neighbour_graph.get_neighbour_case_bounds(cellbox_bounds, se_bounds)
+            if crossing_case != 0:
+                self.neighbour_graph.add_neighbour(str(indx), str(crossing_case), south_east_index)
+            
+            crossing_case = self.neighbour_graph.get_neighbour_case_bounds(cellbox_bounds, sw_bounds)
+            if crossing_case != 0:
+                self.neighbour_graph.add_neighbour(str(indx), str(crossing_case), south_west_index)
+
+
+        # update east cellbox neighbours
+        self.neighbour_graph.remove_node_from_neighbours(cellbox_id, 2)
+
+        for indx in east_neighbour_indx:
+            cellbox_bounds = self.get_cellbox(indx).get_bounds()
+
+            crossing_case = self.neighbour_graph.get_neighbour_case_bounds(cellbox_bounds, ne_bounds)
+            if crossing_case != 0:
+                self.neighbour_graph.add_neighbour(str(indx), str(crossing_case), north_east_index)
+
+            crossing_case = self.neighbour_graph.get_neighbour_case_bounds(cellbox_bounds, se_bounds)
+            if crossing_case != 0:
+                self.neighbour_graph.add_neighbour(str(indx), str(crossing_case), south_east_index)
+
+
+        # update west cellbox neighbours
+        self.neighbour_graph.remove_node_from_neighbours(cellbox_id, -2)
+
+        for indx in west_neighbour_indx:
+            cellbox_bounds = self.get_cellbox(indx).get_bounds()
+
+            crossing_case = self.neighbour_graph.get_neighbour_case_bounds(cellbox_bounds, nw_bounds)
+            if crossing_case != 0:
+                self.neighbour_graph.add_neighbour(str(indx), str(crossing_case), north_west_index)
+
+            crossing_case = self.neighbour_graph.get_neighbour_case_bounds(cellbox_bounds, sw_bounds)
+            if crossing_case != 0:
+                self.neighbour_graph.add_neighbour(str(indx), str(crossing_case), south_west_index)
+
+
+        # remove original cellbox from mesh.
+        cellbox = self.get_cellbox(cellbox_id)
+        self.agg_cellboxes.remove(cellbox)
+        self.neighbour_graph.remove_node(cellbox_id)
+
+
+    def fill_se_neighbour_map(self, se_neighbour_map, se_neighbour_id, south_neighbour_index, east_neighbour_indx):
+        """
+            fills the south east neighbour map with the given values
+            Args: 
+                se_neighbour_map (dict): the map to be filled
+                se_neighbour_ID (string): the index of the south east cellbox
+                south_neighbour_index (List<String>): the index of the south neighbours of the parent cellbox
+                east_neighbour_indx (List<String>): the index of the east neighbour of the parent cellbox
+            Returns:
+                se_neighbour_map (dict): the filled map
+        """
+        se_bounds = self.get_cellbox(se_neighbour_id).get_bounds()
+
+        for indx in south_neighbour_index:
+            neighbour_bounds = self.get_cellbox(indx).get_bounds()
+            if self.neighbour_graph.get_neighbour_case_bounds(se_bounds, neighbour_bounds) == 4:
+                se_neighbour_map["4"].append(indx)
+            if self.neighbour_graph.get_neighbour_case_bounds(se_bounds, neighbour_bounds) == -1:
+                se_neighbour_map["-1"].append(indx)
+
+        for indx in east_neighbour_indx:
+            neighbour_bounds = self.get_cellbox(indx).get_bounds()
+            if self.neighbour_graph.get_neighbour_case_bounds(se_bounds, neighbour_bounds) == 2:
+                se_neighbour_map["2"].append(indx)
+            if self.neighbour_graph.get_neighbour_case_bounds(se_bounds, neighbour_bounds) == 1:
+                se_neighbour_map["1"].append(indx)
+
+        return se_neighbour_map
+
+    def fill_ne_neighbour_map(self, ne_neighbour_map, ne_neighbour_id, north_neighbour_indx, east_neighbour_indx):
+        """
+            fills the north east neighbour map with the given values
+            Args: 
+                ne_neighbour_map (dict): the map to be filled
+                ne_neighbour_ID (string): the index of the north east cellbox
+                north_neighbour_index (List<String>): the index of the north neighbours of the parent cellbox
+                east_neighbour_indx (List<String>): the index of the east neighbour of the parent cellbox
+            Returns:
+                ne_neighbour_map (dict): the filled map
+        """
+        ne_bounds = self.get_cellbox(ne_neighbour_id).get_bounds()
+
+        for indx in north_neighbour_indx:
+            neighbour_bounds = self.get_cellbox(indx).get_bounds()
+            if self.neighbour_graph.get_neighbour_case_bounds(ne_bounds, neighbour_bounds) == -4:
+                ne_neighbour_map["-4"].append(indx)
+            if self.neighbour_graph.get_neighbour_case_bounds(ne_bounds, neighbour_bounds) == -3:
+                ne_neighbour_map["-3"].append(indx)
+
+        for indx in east_neighbour_indx:
+            neighbour_bounds = self.get_cellbox(indx).get_bounds()
+            if self.neighbour_graph.get_neighbour_case_bounds(ne_bounds, neighbour_bounds) == 2:
+                ne_neighbour_map["2"].append(indx)
+            if self.neighbour_graph.get_neighbour_case_bounds(ne_bounds, neighbour_bounds) == 3:
+                ne_neighbour_map["3"].append(indx)
+
+        return ne_neighbour_map
+
+    def fill_sw_neighbour_map(self, sw_neighbour_map, sw_neighbour_id, south_neighbour_index, west_neighbour_indx):
+        """
+            fills the south west neighbour map with the given values
+            Args: 
+                sw_neighbour_map (dict): the map to be filled
+                sw_neighbour_ID (string): the index of the south west cellbox
+                south_neighbour_index (List<String>): the index of the south neighbours of the parent cellbox
+                west_neighbour_indx (List<String>): the index of the west neighbour of the parent cellbox
+            Returns:
+                sw_neighbour_map (dict): the filled map
+        """
+        sw_bounds = self.get_cellbox(sw_neighbour_id).get_bounds()
+
+        for indx in south_neighbour_index:
+            neighbour_bounds = self.get_cellbox(indx).get_bounds()
+            if self.neighbour_graph.get_neighbour_case_bounds(sw_bounds, neighbour_bounds) == 3:
+                sw_neighbour_map["3"].append(indx)
+            if self.neighbour_graph.get_neighbour_case_bounds(sw_bounds, neighbour_bounds) == 4:
+                sw_neighbour_map["4"].append(indx)
+
+        for indx in west_neighbour_indx:
+            neighbour_bounds = self.get_cellbox(indx).get_bounds()
+            if self.neighbour_graph.get_neighbour_case_bounds(sw_bounds, neighbour_bounds) == -2:
+                sw_neighbour_map["-2"].append(indx)
+            if self.neighbour_graph.get_neighbour_case_bounds(sw_bounds, neighbour_bounds) == -3:
+                sw_neighbour_map["-3"].append(indx)
+
+        return sw_neighbour_map
+
+    def fill_nw_neighbour_map(self, nw_neighbour_map, nw_neighbour_id, north_neighbour_indx, west_neighbour_indx):
+        """
+            fills the north west neighbour map with the given values
+            Args: 
+                nw_neighbour_map (dict): the map to be filled
+                nw_neighbour_ID (string): the index of the north west cellbox
+                north_neighbour_index (List<String>): the index of the north neighbours of the parent cellbox
+                west_neighbour_indx (List<String>): the index of the west neighbour of the parent cellbox
+            Returns:
+                nw_neighbour_map (dict): the filled map
+        """
+        nw_bounds = self.get_cellbox(nw_neighbour_id).get_bounds()
+
+        for indx in north_neighbour_indx:
+            neighbour_bounds = self.get_cellbox(indx).get_bounds()
+            if self.neighbour_graph.get_neighbour_case_bounds(nw_bounds, neighbour_bounds) == -4:
+                nw_neighbour_map["-4"].append(indx)
+            if self.neighbour_graph.get_neighbour_case_bounds(nw_bounds, neighbour_bounds) == 1:
+                nw_neighbour_map["1"].append(indx)
+
+        for indx in west_neighbour_indx:
+            neighbour_bounds = self.get_cellbox(indx).get_bounds()
+            if self.neighbour_graph.get_neighbour_case_bounds(nw_bounds, neighbour_bounds) == -2:
+                nw_neighbour_map["-2"].append(indx)
+            if self.neighbour_graph.get_neighbour_case_bounds(nw_bounds, neighbour_bounds) == -1:
+                nw_neighbour_map["-1"].append(indx)
+
+        return nw_neighbour_map
+
+
     def to_json(self):
         """
             Returns this Mesh converted to a JSON object.\n
@@ -154,7 +511,6 @@ class EnvironmentMesh:
             plotter.plot_bool(item['data_name'], item['colour'])
             
         plotter.save(path)
-
 
     def to_geojson(self, params_file = None):
         """
