@@ -52,6 +52,7 @@ class CellBox:
         self.split_depth = 0
         self.data_source = None
         self.id = id
+        self.data_subset = None
 
 ######## setters and getters ########
     def set_minimum_datapoints(self, minimum_datapoints):
@@ -97,6 +98,12 @@ class CellBox:
         """
         self.id = id
 
+    def set_data_subset(self, data_subset):
+        """
+        sets the cellboxes data subset
+        """
+        self.data_subset = data_subset
+
     def get_id(self):
         """
         method returns cellbox cell id
@@ -137,6 +144,13 @@ class CellBox:
               has been split to reach it's current size.
         """
         return self.split_depth
+    
+
+    def get_data_subset(self):
+        """
+        gets the cellboxes data subset
+        """
+        return self.data_subset
 
 ######################################################
 # methods used for splitting a cellbox

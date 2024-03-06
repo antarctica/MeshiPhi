@@ -37,6 +37,12 @@ class Metadata:
         """
         return self.data_loader
 
+    def set_data_loader(self , data_loader): 
+        """
+        sets the data loader
+        """
+        self.data_loader = data_loader
+
     def get_splitting_conditions(self):
         """
         returns a list of the splitting conditions
@@ -44,29 +50,20 @@ class Metadata:
         
         return self.splitting_conditions
 
-    def set_data_loader(self , data_loader): 
-        """
-        sets the data loader
-        """
-        self.data_loader = data_loader
- 
-
     def set_splitting_conditions(self ,  splitting_conditions):
         """
         sets the splitting conditions
         """
         self.splitting_conditions = splitting_conditions
 
-    def set_value_fill_type(self , value_fill_type): 
-        """
-        sets the value fill type
-        """
-        self.value_fill_type = value_fill_type
-
     def get_value_fill_type(self ):
         """
         returns thevalue fill type
         """
         return self.value_fill_type   
-  
 
+    def set_value_fill_type(self , value_fill_type): 
+        """
+        sets the value fill type
+        """
+        self.value_fill_type = value_fill_type
