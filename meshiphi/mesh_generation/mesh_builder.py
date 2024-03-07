@@ -113,10 +113,18 @@ class MeshBuilder:
         # checking to avoid any dummy cellboxes (the ones that was splitted and replaced)
         logging.info("Assigning data sources to cellboxes...")
         for cellbox in cellboxes:
+            # Initialise data to be area within bounds of cellbox
+            
+            # for i, source in enumerate(meta_data_list):
+            #     # Add this to the metadata of the cellbox
+            #     source.set_data_subset(data_subsets[i])
+                
             if isinstance(cellbox, CellBox):
                 cellbox.set_minimum_datapoints(min_datapoints)
                 # assign meta data to each cellbox
-                cellbox.set_data_source(meta_data_list)
+                updated_meta_data_list = self.initialize_meta_data_subsets(cellbox.bounds, meta_data_list)
+                cellbox.set_data_source(updated_meta_data_list)
+
 
         
         logging.info("Initialising neighbour graph...")
@@ -158,11 +166,24 @@ class MeshBuilder:
                     data_source['params']['files'] = loader.files
 
                 meta_data_obj = Metadata(
-                    loader, updated_splitting_cond,  value_fill_type)
+                    loader, updated_splitting_cond,  value_fill_type, loader.data)
                 meta_data_list.append(meta_data_obj)
 
         return meta_data_list
         
+    def initialize_meta_data_subsets(self, bounds, meta_data_list):
+        logging.debug(f'Initilizing data subset for {bounds}')
+        updated_meta_data_list = []
+        for source in meta_data_list:
+            data_subset = source.data_loader.trim_datapoints(bounds)
+            updated_meta_data_list += [Metadata(source.get_data_loader(),
+                                                source.get_splitting_conditions(),
+                                                source.get_value_fill_type(),
+                                                data_subset)]
+        return updated_meta_data_list
+            
+
+
     def check_value_fill_type(self, data_source):
         def is_float(element: any) -> bool:
             if element is None: 

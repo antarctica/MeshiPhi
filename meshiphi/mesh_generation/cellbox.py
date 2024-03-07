@@ -21,7 +21,9 @@ this includes and is not limited to: Ocean Currents, Sea Ice Concentration and B
 import numpy as np
 from meshiphi.mesh_generation.boundary import Boundary
 from meshiphi.mesh_generation.aggregated_cellbox import AggregatedCellBox
+from meshiphi.mesh_generation.metadata import Metadata
 import logging
+import time
 
 
 
@@ -52,7 +54,6 @@ class CellBox:
         self.split_depth = 0
         self.data_source = None
         self.id = id
-        self.data_subset = None
 
 ######## setters and getters ########
     def set_minimum_datapoints(self, minimum_datapoints):
@@ -98,12 +99,6 @@ class CellBox:
         """
         self.id = id
 
-    def set_data_subset(self, data_subset):
-        """
-        sets the cellboxes data subset
-        """
-        self.data_subset = data_subset
-
     def get_id(self):
         """
         method returns cellbox cell id
@@ -144,13 +139,6 @@ class CellBox:
               has been split to reach it's current size.
         """
         return self.split_depth
-    
-
-    def get_data_subset(self):
-        """
-        gets the cellboxes data subset
-        """
-        return self.data_subset
 
 ######################################################
 # methods used for splitting a cellbox
@@ -184,11 +172,11 @@ class CellBox:
         for index in range(0, stop_index):
             current_data_source = self.get_data_source()[index]
             data_loader = current_data_source.get_data_loader()
+            data_subset = current_data_source.get_data_subset()
             for splitting_cond in current_data_source.get_splitting_conditions():
                 hom_cond = data_loader.get_hom_condition(
-                    self.bounds, splitting_cond)
+                    self.bounds, splitting_cond, data=data_subset)
                 hom_conditions.append(hom_cond)
-
         if "HOM" in hom_conditions:
             return False
         if "MIN" in hom_conditions:
@@ -221,9 +209,10 @@ class CellBox:
         hom_conditions = []
         for current_data_source in self.data_source:
             data_loader = current_data_source.get_data_loader()
+            data_subset = current_data_source.get_data_subset()
             for splitting_cond in current_data_source.get_splitting_conditions():
                 hom_cond = data_loader.get_hom_condition(
-                    self.bounds, splitting_cond)
+                    self.bounds, splitting_cond, data=data_subset)
                 hom_conditions.append(hom_cond)
 
         if "HOM" in hom_conditions:
@@ -251,9 +240,19 @@ class CellBox:
         # set CellBox split_depth, data_source and parent
         for split_box in split_boxes:
             split_box.set_split_depth(self.get_split_depth() + 1)
-            split_box.set_data_source(self.get_data_source())
+            # Create metadata with data subset
+            split_box_data_sources = []
+            for source in self.get_data_source():
+                # Extract data for each new cellbox
+                data_subset = source.data_loader.trim_datapoints(split_box.bounds, data=source.data_subset)
+                # Update metadata with that (rest stays the same)             
+                split_box_data_source = Metadata(source.get_data_loader(), 
+                                                 source.get_splitting_conditions(),
+                                                 source.get_value_fill_type(),
+                                                 data_subset)
+                split_box_data_sources += [split_box_data_source]
+            split_box.set_data_source(split_box_data_sources)
             split_box.set_parent(self)
-
         return split_boxes
 
     def create_splitted_cell_boxes(self, index):
@@ -304,8 +303,10 @@ class CellBox:
         agg_dict = {}
         for source in self.get_data_source():
             loader = source.get_data_loader()
+            data_subset = source.get_data_subset()
+
             # get the aggregated value from the associated DataLoader
-            agg_value = loader.get_value(self.bounds)
+            agg_value = loader.get_value(self.bounds, data=data_subset)
             data_name = loader.data_name
             parent = self.get_parent()
             # check if the data name has many entries (ex. uC,uV)
@@ -317,7 +318,15 @@ class CellBox:
                 if source.get_value_fill_type() == 'parent':
                     # if the agg_value empty and get_value_fill_type is parent, then use the parent bounds
                     while parent is not None and np.isnan(agg_value[data_name]):
-                        agg_value = loader.get_value(parent.bounds)
+                        # Search through parent metadata to find match
+                        for parent_source in parent.get_data_source():
+                            if parent_source.get_data_loader() == source.get_data_loader():
+                                break
+                        # If no match found
+                        else:
+                            raise ValueError('Dataloader not found in parent')
+                        parent_data_subset = parent_source.get_data_subset()
+                        agg_value = loader.get_value(parent.bounds, data=parent_data_subset)
                         parent = parent.get_parent()
                 else:  # not parent, so either float or Nan so set the agg_Data to value_fill_type
                     agg_value[data_name] = source.get_value_fill_type()
@@ -346,7 +355,15 @@ class CellBox:
                 if source.get_value_fill_type() == 'parent':
                     # if the agg_value empty and get_value_fill_type is parent, then use the parent bounds
                     while parent is not None and np.isnan(agg_value[name]):
-                        agg_value[name] = loader.get_value(parent.bounds)[name]
+                        # Search through parent metadata to find match
+                        for parent_source in parent.get_data_source():
+                            if parent_source.get_data_loader() == source.get_data_loader():
+                                break
+                        # If no match found
+                        else:
+                            raise ValueError('Dataloader not found in parent')
+                        parent_data_subset = parent_source.get_data_subset()
+                        agg_value[name] = loader.get_value(parent.bounds, data=parent_data_subset)[name]
                         parent = parent.get_parent()
                 else:  # not parent, so either float or Nan so set the agg_Data to value_fill_type
                     agg_value[data_name] = source.get_value_fill_type()
