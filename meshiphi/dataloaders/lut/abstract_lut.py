@@ -257,7 +257,7 @@ class LutDataLoader(DataLoaderInterface):
             
         return data
     
-    def get_value(self, bounds, agg_type=None, skipna=False):
+    def get_value(self, bounds, agg_type=None, skipna=False, data=None):
         '''
         Retrieve aggregated value from within bounds
         
@@ -277,7 +277,7 @@ class LutDataLoader(DataLoaderInterface):
         Raises:
             ValueError: aggregation type not in list of available methods
         '''
-        polygons = self.trim_datapoints(bounds)
+        polygons = self.trim_datapoints(bounds, data=data)
         logging.debug(f"\t{len(polygons)} polygons found for attribute " + \
                       f"'{self.data_name}' within bounds '{bounds}'")
         
@@ -337,7 +337,7 @@ class LutDataLoader(DataLoaderInterface):
         
         return { self.data_name: ret_val}
 
-    def get_hom_condition(self, bounds, splitting_conds):
+    def get_hom_condition(self, bounds, splitting_conds, data=None):
         '''
         Retrieves homogeneity condition of data within
         boundary.
@@ -361,7 +361,7 @@ class LutDataLoader(DataLoaderInterface):
         '''
         bounds_polygon = bounds.to_polygon()
         # Extract polygons that overlap the boundary
-        polygons = self.trim_datapoints(bounds)['geometry'].tolist()
+        polygons = self.trim_datapoints(bounds, data=data)['geometry'].tolist()
         
     
         # If there's no polygon that overlaps with bounds        

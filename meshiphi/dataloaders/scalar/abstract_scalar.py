@@ -656,7 +656,6 @@ class ScalarDataLoader(DataLoaderInterface):
                 # Determine fraction of datapoints over threshold value
                 num_over_threshold = np.count_nonzero(dps > splitting_conds['threshold'])
                 frac_over_threshold = num_over_threshold/dps.size
-                       
                 # Return homogeneity condition
                 if   frac_over_threshold <= splitting_conds['lower_bound']: hom_type = "CLR"
                 elif frac_over_threshold >= splitting_conds['upper_bound']: 
@@ -673,8 +672,11 @@ class ScalarDataLoader(DataLoaderInterface):
         # Set default values for splitting_conds if not provided
         if 'split_lock' not in splitting_conds:
             splitting_conds['split_lock'] = False
+        if data is None:
+            dps = self.trim_datapoints(bounds)[self.data_name]
+        else:
+            dps = data[self.data_name]
 
-        dps = self.trim_datapoints(bounds, data=data)[self.data_name]
         # Retrieve datapoints to analyse
         if type(dps) == pd.core.series.Series:
             return get_hom_condition_from_df(dps, splitting_conds)
