@@ -429,7 +429,7 @@ class VectorDataLoader(DataLoaderInterface):
         elif type(self.data) == xr.core.dataset.Dataset:
             return get_dp_from_coord_xr(self.data, self.data_name_list, long, lat, return_coords)
     
-    def get_value(self, bounds, agg_type=None, skipna=True):
+    def get_value(self, bounds, agg_type=None, skipna=True, data=None):
         '''
         Retrieve aggregated value from within bounds
         
@@ -560,7 +560,10 @@ class VectorDataLoader(DataLoaderInterface):
             agg_type = self.aggregate_type
             
         # Limit data to boundary
-        dps = self.trim_datapoints(bounds)
+        if data is None:
+            dps = self.trim_datapoints(bounds, data=data)
+        else:
+            dps = data
         # Get list of values
         if type(self.data) == pd.core.frame.DataFrame:
             values = get_value_from_df(dps, self.data_name_list, bounds, agg_type, skipna)
@@ -570,7 +573,7 @@ class VectorDataLoader(DataLoaderInterface):
         # Put in dict to map variable to values
         return {self.data_name_list[i]: values[i] for i in range(len(self.data_name_list))}
 
-    def get_hom_condition(self, bounds, splitting_conds, agg_type='MEAN'):
+    def get_hom_condition(self, bounds, splitting_conds, agg_type='MEAN', data=None):
         '''
         Retrieves homogeneity condition of data within boundary. 
          
@@ -590,6 +593,9 @@ class VectorDataLoader(DataLoaderInterface):
                 'HET' = Threshold values defined in config are exceeded \n
                 'CLR' = None of the HET conditions were triggered \n
         '''
+        if data is None:
+            data = self.trim_datapoints(bounds)
+
         # Get length of dataset in bounds  
         if type(self.data) == pd.core.frame.DataFrame:
             num_dp = len(self.trim_datapoints(bounds))
