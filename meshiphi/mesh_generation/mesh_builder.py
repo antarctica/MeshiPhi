@@ -103,20 +103,27 @@ class MeshBuilder:
         grid_width = (bounds.get_long_max() -
                       bounds.get_long_min()) / cell_width
 
-  
-
         min_datapoints = 5
         if 'splitting' in self.config:
             min_datapoints = self.config['splitting']['minimum_datapoints']
         meta_data_list = self.initialize_meta_data(bounds, min_datapoints)
 
-        # checking to avoid any dummy cellboxes (the ones that was splitted and replaced)
-        logging.info("Assigning data sources to cellboxes...")
-        for cellbox in cellboxes:
+        # Initialise the metadata for each cellbox, including subsets of each
+        # dataloader's data set
+        logging.info("Initialising cellbox metadata...")
+        for cellbox in tqdm(cellboxes, 
+                            bar_format='{desc}{n_fmt}/{total_fmt} |{bar}| {percentage:3.0f}%, [{elapsed} elapsed] '):
+            # checking to avoid any dummy cellboxes 
+            # (the ones that were split and replaced)
             if isinstance(cellbox, CellBox):
                 cellbox.set_minimum_datapoints(min_datapoints)
+                # Update metadata with cellbox's data subset
+                updated_meta_data_list = self.initialize_meta_data_subsets(
+                                                    cellbox.bounds, 
+                                                    meta_data_list)
                 # assign meta data to each cellbox
-                cellbox.set_data_source(meta_data_list)
+                cellbox.set_data_source(updated_meta_data_list)
+
 
         
         logging.info("Initialising neighbour graph...")
@@ -134,6 +141,21 @@ class MeshBuilder:
 
 
     def initialize_meta_data(self, bounds, min_datapoints):
+        '''
+        Creates a metadata object which holds information about the data sources
+        within a cellbox. 
+
+        Args:
+            bounds (Boundary):
+                Outer boundary of the mesh being created
+                
+            min_datapoints (int):
+                Minimum number of datapoints each dataloader is allowed to 
+                aggregate 
+        Returns:
+            list(Metadata):
+                Array of metadata objects; one for each data source
+        '''
         meta_data_list = []
         splitting_conds = []
         if 'data_sources' in self.config.keys():
@@ -158,11 +180,45 @@ class MeshBuilder:
                     data_source['params']['files'] = loader.files
 
                 meta_data_obj = Metadata(
-                    loader, updated_splitting_cond,  value_fill_type)
+                    loader, updated_splitting_cond,  value_fill_type, loader.data)
                 meta_data_list.append(meta_data_obj)
 
         return meta_data_list
         
+    def initialize_meta_data_subsets(self, bounds, meta_data_list):
+        '''
+        Updates cellbox metadata objects to include data subsets which contain
+        datapoints from only within the cellbox boundaries (as opposed to the
+        entire mesh's boundary)
+
+        Args:
+            bounds (Boundary):
+                Outer boundary of the cellbox
+                
+            meta_data_list (list(Metadata)):
+                Cellbox's metadata that needs to be updated with data subsets
+
+        Returns:
+            list(Metadata):
+                Array of metadata objects; one for each data source. Includes
+                data_subsets
+        '''
+        logging.debug(f'Initilizing data subset for {bounds}')
+        updated_meta_data_list = []
+        # For each set of data within the cellbox
+        for source in meta_data_list:
+            # Limit data within dataloader to just that within cellbox boundary
+            data_subset = source.data_loader.trim_datapoints(bounds)
+            # Update metadata object with this data subset
+            updated_meta_data_list += [Metadata(source.get_data_loader(),
+                                                source.get_splitting_conditions(),
+                                                source.get_value_fill_type(),
+                                                data_subset)]
+            
+        return updated_meta_data_list
+            
+
+
     def check_value_fill_type(self, data_source):
         def is_float(element: any) -> bool:
             if element is None: 

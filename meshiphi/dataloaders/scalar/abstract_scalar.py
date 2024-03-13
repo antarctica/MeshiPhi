@@ -426,7 +426,7 @@ class ScalarDataLoader(DataLoaderInterface):
         elif type(self.data) == xr.core.dataset.Dataset:
             return get_dp_from_coord_xr(self.data, data_name, long, lat, return_coords)
     
-    def get_value(self, bounds, agg_type=None, skipna=True):
+    def get_value(self, bounds, data=None, agg_type=None, skipna=True):
         '''
         Retrieve aggregated value from within bounds
         
@@ -550,7 +550,7 @@ class ScalarDataLoader(DataLoaderInterface):
             agg_type = self.aggregate_type
             
         # Limit data series to just the data, excluding coords/index
-        dps = self.trim_datapoints(bounds)[self.data_name]
+        dps = self.trim_datapoints(bounds, data=data)[self.data_name]
 
         if type(self.data) == pd.core.frame.DataFrame:
             value = get_value_from_df(dps, bounds, agg_type, skipna)
@@ -560,7 +560,7 @@ class ScalarDataLoader(DataLoaderInterface):
         # Cast to regular float before returning so can be saved in JSON later
         return {self.data_name: float(value)}
 
-    def get_hom_condition(self, bounds, splitting_conds):
+    def get_hom_condition(self, bounds, splitting_conds, data=None):
         '''
         Retrieves homogeneity condition of data within
         boundary.
@@ -656,7 +656,6 @@ class ScalarDataLoader(DataLoaderInterface):
                 # Determine fraction of datapoints over threshold value
                 num_over_threshold = np.count_nonzero(dps > splitting_conds['threshold'])
                 frac_over_threshold = num_over_threshold/dps.size
-                       
                 # Return homogeneity condition
                 if   frac_over_threshold <= splitting_conds['lower_bound']: hom_type = "CLR"
                 elif frac_over_threshold >= splitting_conds['upper_bound']: 
@@ -673,8 +672,11 @@ class ScalarDataLoader(DataLoaderInterface):
         # Set default values for splitting_conds if not provided
         if 'split_lock' not in splitting_conds:
             splitting_conds['split_lock'] = False
+        if data is None:
+            dps = self.trim_datapoints(bounds)[self.data_name]
+        else:
+            dps = data[self.data_name]
 
-        dps = self.trim_datapoints(bounds)[self.data_name]
         # Retrieve datapoints to analyse
         if type(dps) == pd.core.series.Series:
             return get_hom_condition_from_df(dps, splitting_conds)
