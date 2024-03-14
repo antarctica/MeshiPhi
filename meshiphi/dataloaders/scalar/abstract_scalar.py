@@ -320,14 +320,6 @@ class ScalarDataLoader(DataLoaderInterface):
         if data is None:
             data = self.data
         
-        # Skip trimming if data already completely within bounds
-        if data.lat.min() >  bounds.get_lat_min() and \
-           data.lat.max() <= bounds.get_lat_max() and \
-           data.long.min() >  bounds.get_long_min() and \
-           data.long.max() <= bounds.get_long_max():
-            logging.debug('\tData is already trimmed to bounds!')
-            return data
-        
         if type(data) == pd.core.frame.DataFrame:
             return trim_datapoints_from_df(data, bounds)
         elif type(data) == xr.core.dataset.Dataset:
