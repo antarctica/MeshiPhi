@@ -20,6 +20,7 @@ southern_seasons = {
     9: 'sp', 10: 'sp', 11: 'sp',
     }
 
+
 class ThicknessDataLoader(LutDataLoader):
     
     class Region:
@@ -45,8 +46,7 @@ class ThicknessDataLoader(LutDataLoader):
                 float: Sea Ice Density in the specified season
             """
             return self.value_dict[self.month_to_season[month]]
-        
-    
+
     def import_data(self, bounds):
         """
         Creates a simulated dataset of sea ice thickness based on 
@@ -83,8 +83,15 @@ class ThicknessDataLoader(LutDataLoader):
             self.Region('Ross W', 
                         Boundary([-90, 0], [160,   180]).to_polygon(),
                         {'wi': 0.72, 'sp': 0.67, 'su': 1.32, 'au': 0.82, 'y': 1.07}),
+            # Baltic thickness to match example from arxiv paper
+            self.Region('Baltic',
+                        Boundary([54, 66], [12, 32]).to_polygon(),
+                        {'wi': 0.3, 'sp': 0.3, 'su': 0.3, 'au': 0.3, 'y': 0.3},
+                        seasons=northern_seasons),
+            # Keep previous defaults everywhere else
             self.Region('None',
-                        Boundary([0, 90], [-180, 180]).to_polygon(),
+                        Polygon([(-180, 0), (180, 0), (180, 90), (-180, 90)],
+                                holes=[[(12, 54), (32, 54), (32, 66), (12, 66)]]),
                         {'wi': 0.72, 'sp': 0.67, 'su': 1.32, 'au': 0.82, 'y': 1.07},
                         seasons=northern_seasons),
         ]
@@ -102,13 +109,13 @@ class ThicknessDataLoader(LutDataLoader):
             
             intersection = region.geometry & bounds_polygon
             if intersection.geom_type in ['Polygon', 'MultiPolygon'] and \
-                intersection != Polygon():
+               intersection != Polygon():
                     
                 region_df = pd.concat([
                         pd.DataFrame({'time': dates,
-                                    'geometry': region.geometry & bounds_polygon,
-                                    'thickness': region.get_value(month)})
-                            for month  in dates.month
+                                      'geometry': region.geometry & bounds_polygon,
+                                      'thickness': region.get_value(month)})
+                        for month in dates.month
                     ])
                 
                 thickness_df = pd.concat([thickness_df, region_df])
