@@ -122,7 +122,477 @@ class EnvironmentMesh:
         for cellbox in self.agg_cellboxes:
             if str(cellbox.get_id()) == str(cellbox_id):
                 return cellbox
+
+    # Merging meshes
+
+    def merge_mesh(self, mesh2):
+        """
+            merges the given mesh with this mesh. The given mesh is not modified.
+
+            Args:
+                mesh2 (EnvironmentMesh): the mesh to be merged with this mesh
+        """
+
+        # TODO check meshes are compatible with merging. 
+
+        # merge cellboxes
+        mesh2_bounds = mesh2.bounds
+
+        # remove cellboxes within bounds of mesh2 from this mesh
+        self.remove_cellboxes_within_bounds(mesh2_bounds)
+
+        # Appended cellboxes from mesh2 to this mesh
+        mesh1_max_id = self.get_max_cellbox_id()
+        mesh2.increment_ids(mesh1_max_id)
+        for cellbox in mesh2.agg_cellboxes:
+            self.add_cellbox(cellbox)
+
+        # Appened neighbour graph from mesh2 to this mesh
+        for index in mesh2.neighbour_graph.get_graph().keys():
+            neighbour_map = mesh2.neighbour_graph.neighbour_graph[index]
+
+            self.neighbour_graph.add_node(index, neighbour_map)
+
+        # Tie the neighbour graphs of the cellboxes on the boundary between the two meshes
+        north_ext_cellboxes = self.get_cellboxes_north_of_bounds(mesh2_bounds)
+        north_int_cellboxes = mesh2.get_top_edge_cellboxes()
+        self.tie_northern_cellbox_ng(north_ext_cellboxes, north_int_cellboxes)
+
+        south_ext_cellboxes = self.get_cellboxes_south_of_bounds(mesh2_bounds)
+        south_int_cellboxes = mesh2.get_bottom_edge_cellboxes()
+        self.tie_southern_cellbox_ng(south_ext_cellboxes, south_int_cellboxes)
+
+        east_ext_cellboxes = self.get_cellboxes_east_of_bounds(mesh2_bounds)
+        east_int_cellboxes = mesh2.get_right_edge_cellboxes()
+        self.tie_eastern_cellbox_ng(east_ext_cellboxes, east_int_cellboxes)
+
+        west_ext_cellboxes = self.get_cellboxes_west_of_bounds(mesh2_bounds)
+        west_int_cellboxes = mesh2.get_left_edge_cellboxes()
+        self.tie_western_cellbox_ng(west_ext_cellboxes, west_int_cellboxes)
+
+    
+    def tie_northern_cellbox_ng(self, north_ext_cellboxes, north_int_cellboxes):
+
+        """
+        Joins the neighbour graphs of sets of cellboxes on the northen edge of a boundary between two meshes.
+
+        Args:
+            north_ext_cellboxes (AggregatedCellBox[]): a list of cellboxes that are directly north of the northen edge of the boundary
+            north_int_cellboxes (AggregatedCellBox[]): a list of cellboxes that are directly south of the northen edge of the boundary
         
+        """
+
+        # Tie northen exterior cellboxes to northen interior cellboxes
+        for cellbox_l in north_ext_cellboxes:
+
+            south_neighbours = []
+            south_west_neighbours = []
+            south_east_neighbours = []
+
+            for cellbox_s in north_int_cellboxes:
+
+                cb_l_bounds = cellbox_l.get_bounds()
+                cb_s_bounds = cellbox_s.get_bounds()
+
+                neighbour_case = self.neighbour_graph.get_neighbour_case_bounds(cb_l_bounds, cb_s_bounds)
+
+                if (str(neighbour_case) == "4"):
+                    south_neighbours.append(int(cellbox_s.get_id()))
+                if (str(neighbour_case) == "-1"):
+                    south_west_neighbours.append(int(cellbox_s.get_id()))
+                if (str(neighbour_case) == "3"):
+                    south_east_neighbours.append(int(cellbox_s.get_id()))
+                
+            for neighbour in south_neighbours:
+                self.neighbour_graph.get_graph()[cellbox_l.get_id()]["4"].append(neighbour)
+            for neighbour in south_west_neighbours:
+                self.neighbour_graph.get_graph()[cellbox_l.get_id()]["-1"].append(neighbour)
+            for neighbour in south_east_neighbours:
+                self.neighbour_graph.get_graph()[cellbox_l.get_id()]["3"].append(neighbour)
+            
+        # Tie northen interior cellboxes to northen exterior cellboxes
+
+        for cellbox_s in north_int_cellboxes:
+
+            north_neighbours = []
+            north_west_neighbours = []
+            north_east_neighbours = []
+
+            for cellbox_l in north_ext_cellboxes:
+
+                cb_l_bounds = cellbox_l.get_bounds()
+                cb_s_bounds = cellbox_s.get_bounds()
+
+                neighbour_case = self.neighbour_graph.get_neighbour_case_bounds(cb_s_bounds, cb_l_bounds)
+
+                if (str(neighbour_case) == "-4"):
+                    north_neighbours.append(int(cellbox_l.get_id()))
+                if (str(neighbour_case) == "-3"):
+                    north_west_neighbours.append(int(cellbox_l.get_id()))
+                if (str(neighbour_case) == "1"):
+                    north_east_neighbours.append(int(cellbox_l.get_id()))
+                
+            for neighbour in north_neighbours:
+                self.neighbour_graph.get_graph()[cellbox_s.get_id()]["-4"].append(neighbour)#
+            for neighbour in north_west_neighbours:
+                self.neighbour_graph.get_graph()[cellbox_s.get_id()]["-3"].append(neighbour)
+            for neighbour in north_east_neighbours:
+                self.neighbour_graph.get_graph()[cellbox_s.get_id()]["1"].append(neighbour)
+
+    def tie_southern_cellbox_ng(self, south_ext_cellboxes, south_int_cellboxes):
+            
+            """
+            Joins the neighbour graphs of sets of cellboxes on the southern edge of a boundary between two meshes.
+    
+            Args:
+                south_ext_cellboxes (AggregatedCellBox[]): a list of cellboxes that are directly south of the southern edge of the boundary
+                south_int_cellboxes (AggregatedCellBox[]): a list of cellboxes that are directly north of the southern edge of the boundary
+            
+            """
+    
+            # Tie southern exterior cellboxes to southern interior cellboxes
+            for cellbox_l in south_ext_cellboxes:
+    
+                north_neighbours = []
+                north_west_neighbours = []
+                north_east_neighbours = []
+    
+                for cellbox_s in south_int_cellboxes:
+    
+                    cb_l_bounds = cellbox_l.get_bounds()
+                    cb_s_bounds = cellbox_s.get_bounds()
+    
+                    neighbour_case = self.neighbour_graph.get_neighbour_case_bounds(cb_l_bounds, cb_s_bounds)
+    
+                    if (str(neighbour_case) == "-4"):
+                        north_neighbours.append(int(cellbox_s.get_id()))
+                    if (str(neighbour_case) == "-3"):
+                        north_west_neighbours.append(int(cellbox_s.get_id()))
+                    if (str(neighbour_case) == "1"):
+                        north_east_neighbours.append(int(cellbox_s.get_id()))
+                    
+                for neighbour in north_neighbours:
+                    self.neighbour_graph.get_graph()[cellbox_l.get_id()]["-4"].append(neighbour)
+                for neighbour in north_west_neighbours:
+                    self.neighbour_graph.get_graph()[cellbox_l.get_id()]["-3"].append(neighbour)
+                for neighbour in north_east_neighbours:
+                    self.neighbour_graph.get_graph()[cellbox_l.get_id()]["1"].append(neighbour)
+                
+            # Tie southern interior cellboxes to southern exterior cellboxes
+    
+            for cellbox_s in south_int_cellboxes:
+                        
+                south_neighbours = []
+                south_west_neighbours = []
+                south_east_neighbours = []
+        
+                for cellbox_l in south_ext_cellboxes:
+        
+                    cb_l_bounds = cellbox_l.get_bounds()
+                    cb_s_bounds = cellbox_s.get_bounds()
+        
+                    neighbour_case = self.neighbour_graph.get_neighbour_case_bounds(cb_s_bounds, cb_l_bounds)
+        
+                    if (str(neighbour_case) == "4"):
+                        south_neighbours.append(int(cellbox_l.get_id()))
+                    if (str(neighbour_case) == "-1"):
+                        south_west_neighbours.append(int(cellbox_l.get_id()))
+                    if (str(neighbour_case) == "3"):
+                        south_east_neighbours.append(int(cellbox_l.get_id()))
+                        
+                for neighbour in south_neighbours:
+                    self.neighbour_graph.get_graph()[cellbox_s.get_id()]["4"].append(neighbour)
+                for neighbour in south_west_neighbours:
+                    self.neighbour_graph.get_graph()[cellbox_s.get_id()]["-1"].append(neighbour)
+                for neighbour in south_east_neighbours:
+                    self.neighbour_graph.get_graph()[cellbox_s.get_id()]["3"].append(neighbour)
+
+    def tie_eastern_cellbox_ng(self, east_ext_cellboxes, east_int_cellboxes):
+
+        """
+        Joins the neighbour graphs of sets of cellboxes on the eastern edge of a boundary between two meshes.
+
+        Args:
+            east_ext_cellboxes (AggregatedCellBox[]): a list of cellboxes that are directly east of the eastern edge of the boundary
+            east_int_cellboxes (AggregatedCellBox[]): a list of cellboxes that are directly west of the eastern edge of the boundary
+        
+        """
+
+        # Tie eastern exterior cellboxes to eastern interior cellboxes
+        for cellbox_l in east_ext_cellboxes:
+
+            west_neighbours = []
+            south_west_neighbours = []
+            north_west_neighbours = []
+
+            for cellbox_s in east_int_cellboxes:
+
+                cb_l_bounds = cellbox_l.get_bounds()
+                cb_s_bounds = cellbox_s.get_bounds()
+
+                neighbour_case = self.neighbour_graph.get_neighbour_case_bounds(cb_l_bounds, cb_s_bounds)
+
+                if (str(neighbour_case) == "-2"):
+                    west_neighbours.append(int(cellbox_s.get_id()))
+                if (str(neighbour_case) == "-1"):
+                    south_west_neighbours.append(int(cellbox_s.get_id()))
+                if (str(neighbour_case) == "-3"):
+                    north_west_neighbours.append(int(cellbox_s.get_id()))
+                
+            for neighbour in west_neighbours:
+                self.neighbour_graph.get_graph()[cellbox_l.get_id()]["-2"].append(neighbour)
+            for neighbour in south_west_neighbours:
+                self.neighbour_graph.get_graph()[cellbox_l.get_id()]["-1"].append(neighbour)
+            for neighbour in north_west_neighbours:
+                self.neighbour_graph.get_graph()[cellbox_l.get_id()]["-3"].append(neighbour)
+            
+        # Tie eastern interior cellboxes to eastern exterior cellboxes
+
+        for cellbox_s in east_int_cellboxes:
+                
+                east_neighbours = []
+                south_east_neighbours = []
+                north_east_neighbours = []
+    
+                for cellbox_l in east_ext_cellboxes:
+    
+                    cb_l_bounds = cellbox_l.get_bounds()
+                    cb_s_bounds = cellbox_s.get_bounds()
+    
+                    neighbour_case = self.neighbour_graph.get_neighbour_case_bounds(cb_s_bounds, cb_l_bounds)
+    
+                    if (str(neighbour_case) == "2"):
+                        east_neighbours.append(int(cellbox_l.get_id()))
+                    if (str(neighbour_case) == "3"):
+                        south_east_neighbours.append(int(cellbox_l.get_id()))
+                    if (str(neighbour_case) == "1"):
+                        north_east_neighbours.append(int(cellbox_l.get_id()))
+                    
+                for neighbour in east_neighbours:
+                    self.neighbour_graph.get_graph()[cellbox_s.get_id()]["2"].append(neighbour)
+                for neighbour in south_east_neighbours:
+                    self.neighbour_graph.get_graph()[cellbox_s.get_id()]["3"].append(neighbour)
+                for neighbour in north_east_neighbours:
+                    self.neighbour_graph.get_graph()[cellbox_s.get_id()]["1"].append(neighbour)
+
+    def tie_western_cellbox_ng(self, west_ext_cellboxes, west_int_cellboxes):
+            
+            """
+            Joins the neighbour graphs of sets of cellboxes on the western edge of a boundary between two meshes.
+    
+            Args:
+                west_ext_cellboxes (AggregatedCellBox[]): a list of cellboxes that are directly west of the western edge of the boundary
+                west_int_cellboxes (AggregatedCellBox[]): a list of cellboxes that are directly east of the western edge of the boundary
+            
+            """
+    
+            # Tie western exterior cellboxes to western interior cellboxes
+            for cellbox_l in west_ext_cellboxes:
+    
+                east_neighbours = []
+                south_east_neighbours = []
+                north_east_neighbours = []
+    
+                for cellbox_s in west_int_cellboxes:
+    
+                    cb_l_bounds = cellbox_l.get_bounds()
+                    cb_s_bounds = cellbox_s.get_bounds()
+    
+                    neighbour_case = self.neighbour_graph.get_neighbour_case_bounds(cb_l_bounds, cb_s_bounds)
+    
+                    if (str(neighbour_case) == "2"):
+                        east_neighbours.append(int(cellbox_s.get_id()))
+                    if (str(neighbour_case) == "3"):
+                        south_east_neighbours.append(int(cellbox_s.get_id()))
+                    if (str(neighbour_case) == "1"):
+                        north_east_neighbours.append(int(cellbox_s.get_id()))
+                    
+                for neighbour in east_neighbours:
+                    self.neighbour_graph.get_graph()[cellbox_l.get_id()]["2"].append(neighbour)
+                for neighbour in south_east_neighbours:
+                    self.neighbour_graph.get_graph()[cellbox_l.get_id()]["3"].append(neighbour)
+                for neighbour in north_east_neighbours:
+                    self.neighbour_graph.get_graph()[cellbox_l.get_id()]["1"].append(neighbour)
+                
+            # Tie western interior cellboxes to western exterior cellboxes
+    
+            for cellbox_s in west_int_cellboxes:
+                    
+                    west_neighbours = []
+                    south_west_neighbours = []
+                    north_west_neighbours = []
+        
+                    for cellbox_l in west_ext_cellboxes:
+        
+                        cb_l_bounds = cellbox_l.get_bounds()
+                        cb_s_bounds = cellbox_s.get_bounds()
+        
+                        neighbour_case = self.neighbour_graph.get_neighbour_case_bounds(cb_s_bounds, cb_l_bounds)
+        
+                        if (str(neighbour_case) == "-2"):
+                            west_neighbours.append(int(cellbox_l.get_id()))
+                        if (str(neighbour_case) == "-1"):
+                            south_west_neighbours.append(int(cellbox_l.get_id()))
+                        if (str(neighbour_case) == "-3"):
+                            north_west_neighbours.append(int(cellbox_l.get_id()))
+
+                    for neighbour in west_neighbours:
+                        self.neighbour_graph.get_graph()[cellbox_s.get_id()]["-2"].append(neighbour)
+                    for neighbour in south_west_neighbours:
+                        self.neighbour_graph.get_graph()[cellbox_s.get_id()]["-1"].append(neighbour)
+                    for neighbour in north_west_neighbours:
+                        self.neighbour_graph.get_graph()[cellbox_s.get_id()]["-3"].append(neighbour)
+
+    def get_cellboxes_within_bounds(self, bounds):
+        """
+            returns the cellboxes within the given bounds. 
+            Only cellboxes that are completely within the given bounds are returned.
+
+            Args:
+                bounds (Boundary): the bounds encapsulating the cellboxes to be returned
+            Returns:
+                AggregatedCellBox[]: the cellboxes within the given bounds
+        """
+        cells_within_bounds = []
+        
+        for cellbox in self.agg_cellboxes:
+            cb_bounds = cellbox.get_bounds()
+
+            if (cb_bounds.get_long_min() >= bounds.get_long_min() and 
+                cb_bounds.get_long_max() <= bounds.get_long_max() and 
+                cb_bounds.get_lat_min() >= bounds.get_lat_min() and 
+                cb_bounds.get_lat_max() <= bounds.get_lat_max()):
+            
+                cells_within_bounds.append(cellbox)
+
+        return cells_within_bounds
+
+    def get_cellboxes_north_of_bounds(self, bounds):
+        """
+            returns all cellboxes that are directly north of the given bounds.
+            Only cellboxes which are touching the north edge of the boundary, 
+            yet lie entirely outside of the boundary will be returned
+
+            Args:
+                bounds (Boundary): the bounds encapsulating the cellboxes to be returned
+            Returns: 
+                north_cellboxes (AggregatedCellBox[]): a list of cellboxes that are directly north of the given bounds
+        """
+
+        north_cellboxes = []
+
+        for cellbox in self.agg_cellboxes:
+            if (cellbox.get_bounds().get_lat_min() == bounds.get_lat_max() and
+                cellbox.get_bounds().get_long_max() >= bounds.get_long_min() and
+                cellbox.get_bounds().get_long_min() <= bounds.get_long_max()):
+            
+                north_cellboxes.append(cellbox)
+            
+        return north_cellboxes
+
+    def get_cellboxes_south_of_bounds(self, bounds):
+
+        south_cellboxes = []
+
+        for cellbox in self.agg_cellboxes:
+            if (cellbox.get_bounds().get_lat_max() == bounds.get_lat_min() and
+                cellbox.get_bounds().get_long_max() >= bounds.get_long_min() and
+                cellbox.get_bounds().get_long_min() <= bounds.get_long_max()):
+            
+                south_cellboxes.append(cellbox)
+            
+        return south_cellboxes
+
+    def get_cellboxes_east_of_bounds(self, bounds):
+
+        east_cellboxes = []
+
+        for cellbox in self.agg_cellboxes:
+            if (cellbox.get_bounds().get_long_min() == bounds.get_long_max() and
+                cellbox.get_bounds().get_lat_min() >= bounds.get_lat_min() and
+                cellbox.get_bounds().get_lat_max() <= bounds.get_lat_max()):
+            
+                east_cellboxes.append(cellbox)
+            
+        return east_cellboxes
+
+    def get_cellboxes_west_of_bounds(self, bounds):
+            
+            west_cellboxes = []
+    
+            for cellbox in self.agg_cellboxes:
+                if (cellbox.get_bounds().get_long_max() == bounds.get_long_min() and
+                    cellbox.get_bounds().get_lat_min() >= bounds.get_lat_min() and
+                    cellbox.get_bounds().get_lat_max() <= bounds.get_lat_max()):
+                
+                    west_cellboxes.append(cellbox)
+                
+            return west_cellboxes
+
+    def get_top_edge_cellboxes(self):
+
+        top_cellboxes = []
+        mesh_bounds = self.bounds
+
+        for cellbox in self.agg_cellboxes:
+            cb_bounds = cellbox.get_bounds()
+
+            if cb_bounds.get_lat_max() == mesh_bounds.get_lat_max():
+                top_cellboxes.append(cellbox)
+        
+        return top_cellboxes
+    
+    def get_bottom_edge_cellboxes(self):
+
+        bottom_cellboxes = []
+        mesh_bounds = self.bounds
+
+        for cellbox in self.agg_cellboxes:
+            cb_bounds = cellbox.get_bounds()
+
+            if cb_bounds.get_lat_min() == mesh_bounds.get_lat_min():
+                bottom_cellboxes.append(cellbox)
+
+        return bottom_cellboxes
+
+    def get_right_edge_cellboxes(self):
+
+        right_cellboxes = []
+        mesh_bounds = self.bounds
+
+        for cellbox in self.agg_cellboxes:
+            cb_bounds = cellbox.get_bounds()
+
+            if cb_bounds.get_long_max() == mesh_bounds.get_long_max():
+                right_cellboxes.append(cellbox)
+
+        return right_cellboxes
+
+    def get_left_edge_cellboxes(self):
+
+        left_cellboxes = []
+        mesh_bounds = self.bounds
+
+        for cellbox in self.agg_cellboxes:
+            cb_bounds = cellbox.get_bounds()
+
+            if cb_bounds.get_long_min() == mesh_bounds.get_long_min():
+                left_cellboxes.append(cellbox)
+
+        return left_cellboxes
+
+    def remove_cellboxes_within_bounds(self, bounds):
+        """
+            removes the cellboxes within the given bounds. 
+            Only cellboxes that are completely within the given bounds are removed.
+
+            Args:
+                bounds (Boundary): the bounds encapsulating the cellboxes to be removed
+        """
+        cells_within_bounds = self.get_cellboxes_within_bounds(bounds)
+        for cellbox in cells_within_bounds:
+            self.remove_cellbox(cellbox)
+  
     def get_max_cellbox_id(self):
         """
             returns the maximum cellbox id in the mesh
@@ -136,6 +606,33 @@ class EnvironmentMesh:
                 max_id = int(cellbox.get_id())
         return max_id
 
+    def remove_cellbox(self, cellbox):
+        """
+            removes the given cellbox from the mesh
+
+            Args:
+                cellbox (AggregatedCellBox): the cellbox to be removed
+        """
+        self.agg_cellboxes.remove(cellbox)
+
+        self.neighbour_graph.remove_node_and_update_neighbours(cellbox.get_id())
+
+    def add_cellbox(self, cellbox):
+        """
+            adds the given cellbox to the mesh
+        """
+        self.agg_cellboxes.append(cellbox)
+
+        # TODO: update neighbour graph
+
+    def increment_ids(self, increment):
+
+        for cellbox in self.agg_cellboxes:
+            cellbox.set_id(str(int(cellbox.get_id()) + increment))
+            cellbox.agg_data['id'] = str(int(cellbox.get_id()) + increment)
+
+        self.neighbour_graph.increment_ids(increment)
+        
     # Splitting
     def sim_split_cellbox(self, cellbox_id):
         """
@@ -348,7 +845,6 @@ class EnvironmentMesh:
         cellbox = self.get_cellbox(cellbox_id)
         self.agg_cellboxes.remove(cellbox)
         self.neighbour_graph.remove_node(cellbox_id)
-
 
     def fill_se_neighbour_map(self, se_neighbour_map, se_neighbour_id, south_neighbour_index, east_neighbour_indx):
         """
