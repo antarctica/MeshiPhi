@@ -1173,8 +1173,8 @@ class VectorDataLoader(DataLoaderInterface):
         
         def meshgrid_from_xr(data, data_name_list):
             # Extract out each variable and combine as tuple
-            data_arrays = (data[name].values 
-                           for name in data_name_list)
+            data_arrays = list(data[name].values 
+                                for name in data_name_list)
             # Zip them together to make 2D array of n-dimensional vectors
             return np.dstack(data_arrays)
         
