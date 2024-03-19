@@ -5,8 +5,8 @@ matplotlib
 netcdf4
 cfgrib
 ecmwflibs
-numpy>=1.21.6,<=1.24.1
-pandas>=1.3.5,<=1.4.4
+numpy>=1.21.6
+pandas>=1.3.5
 pytest
 rioxarray
 shapely>=2.0.1
