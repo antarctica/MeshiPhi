@@ -261,8 +261,13 @@ class VectorDataLoader(DataLoaderInterface):
                 bounds_lat_range = bounds.get_lat_max() - bounds.get_lat_min()
                 # Get range of longitude values
                 data_long_range = data.long.max() - data.long.min()
-                bounds_long_range = bounds.get_long_max() - bounds.get_long_min()
-                # Calcualte area of each region
+                # If not going over antimeridian
+                if bounds.get_long_max() > bounds.get_long_min():
+                    bounds_long_range = bounds.get_long_max() - bounds.get_long_min()
+                # If goes over antimeridian
+                else:
+                    bounds_long_range = (180 - bounds.get_long_min()) + \
+                                        (bounds.get_long_max() + 180)                # Calcualte area of each region
                 data_area = data_lat_range * data_long_range
                 bounds_area = bounds_lat_range * bounds_long_range
                 # If data area completely covers bounds, 100% coverage
@@ -289,7 +294,13 @@ class VectorDataLoader(DataLoaderInterface):
                 bounds_lat_range = bounds.get_lat_max() - bounds.get_lat_min()
                 # Get range of longitude values
                 data_long_range = data.long.max().item() - data.long.min().item()
-                bounds_long_range = bounds.get_long_max() - bounds.get_long_min()
+                # If not going over antimeridian
+                if bounds.get_long_max() > bounds.get_long_min():
+                    bounds_long_range = bounds.get_long_max() - bounds.get_long_min()
+                # If goes over antimeridian
+                else:
+                    bounds_long_range = (180 - bounds.get_long_min()) + \
+                                        (bounds.get_long_max() + 180)
                 # Calcualte area of each region
                 data_area = data_lat_range * data_long_range
                 bounds_area = bounds_lat_range * bounds_long_range
@@ -325,10 +336,17 @@ class VectorDataLoader(DataLoaderInterface):
             Extracts data from a pd.DataFrame
             '''
             # Mask off any positions not within spatial bounds
-            mask = (data['lat']  > bounds.get_lat_min())  & \
-                   (data['lat']  <= bounds.get_lat_max())  & \
-                   (data['long'] > bounds.get_long_min()) & \
-                   (data['long'] <= bounds.get_long_max())
+            # If not going through antimeridian
+            if bounds.get_long_min() < bounds.get_long_max():
+                mask = (data['lat']  > bounds.get_lat_min())  & \
+                    (data['lat']  <= bounds.get_lat_max())  & \
+                    (data['long'] > bounds.get_long_min()) & \
+                    (data['long'] <= bounds.get_long_max())
+            else:
+                mask = (data['lat']  > bounds.get_lat_min())  & \
+                    (data['lat']  <= bounds.get_lat_max())  & \
+                    (data['long'] <= bounds.get_long_min()) & \
+                    (data['long'] > bounds.get_long_max())
             # Mask with time if time column exists
             if 'time' in data.columns:
                 mask &= (data['time'] >= bounds.get_time_min()) & \
@@ -345,8 +363,14 @@ class VectorDataLoader(DataLoaderInterface):
             # Select data region within spatial bounds
             # NOTE slice in xarray is inclusive of bounds
             data = data.sel(lat=slice(bounds.get_lat_min(),  bounds.get_lat_max() ))
-            data = data.sel(long=slice(bounds.get_long_min(), bounds.get_long_max()))
-            # Select data region within temporal bounds if time exists as a coordinate
+            # If not going over antimeridian
+            if bounds.get_long_min() < bounds.get_long_max():
+                data = data.sel(long=(data.long > bounds.get_long_min()) & \
+                                     (data.long < bounds.get_long_max()))
+            else:
+                data = data.sel(long=(data.long < bounds.get_long_min()) | \
+                                     (data.long > bounds.get_long_max()))
+                            # Select data region within temporal bounds if time exists as a coordinate
             if 'time' in data.coords.keys():
                 data = data.sel(time=slice(bounds.get_time_min(),  bounds.get_time_max()))
 
