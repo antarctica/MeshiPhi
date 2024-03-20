@@ -154,8 +154,6 @@ class Boundary:
             raise ValueError('Boundary: range should contain two values')
         if lat_range[0] > lat_range [1]:
              raise ValueError('Boundary: Latitude start range should be smaller than range end')
-        if long_range[0] > long_range [1]:
-             raise ValueError('Boundary: Longtitude start range should be smaller than range end')
         if long_range[0] < -180 or long_range[1] > 180:
             raise ValueError('Boundary: Longtitude range should be within -180:180')
         if len (time_range) > 0:
