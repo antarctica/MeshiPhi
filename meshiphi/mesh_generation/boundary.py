@@ -5,7 +5,7 @@ from datetime import datetime
 from datetime import timedelta
 
 from math import cos, sin, asin, sqrt, radians
-from shapely import wkt
+from shapely import wkt, MultiPolygon
 
 class Boundary:
     """
@@ -298,13 +298,33 @@ class Boundary:
                 Shapely polygon with corners at the min/max lat/long 
                 values of this boundary
         """
-        polygon = wkt.loads(
-                    f'POLYGON(({self.get_long_min()} {self.get_lat_min()},' + \
-                             f'{self.get_long_min()} {self.get_lat_max()},' + \
-                             f'{self.get_long_max()} {self.get_lat_max()},' + \
-                             f'{self.get_long_max()} {self.get_lat_min()},' + \
-                             f'{self.get_long_min()} {self.get_lat_min()}))'
-            )
+        # If not going over the antimeridian
+        if self.get_long_min() < self.get_long_max():
+            # Create a polygon of boundary
+            polygon = wkt.loads(
+                        f'POLYGON(({self.get_long_min()} {self.get_lat_min()},' + \
+                                f'{self.get_long_min()} {self.get_lat_max()},' + \
+                                f'{self.get_long_max()} {self.get_lat_max()},' + \
+                                f'{self.get_long_max()} {self.get_lat_min()},' + \
+                                f'{self.get_long_min()} {self.get_lat_min()}))'
+                )
+        else:
+            # Create a multipolygon of boundary
+            polygon_1 = wkt.loads(
+                        f'POLYGON(({self.get_long_min()} {self.get_lat_min()},' + \
+                                f'{self.get_long_min()} {self.get_lat_max()},' + \
+                                f'180 {self.get_lat_max()},' + \
+                                f'180 {self.get_lat_min()},' + \
+                                f'{self.get_long_min()} {self.get_lat_min()}))'
+                )
+            polygon_2 = wkt.loads(
+                        f'POLYGON((-180 {self.get_lat_min()},' + \
+                                f'-180 {self.get_lat_max()},' + \
+                                f'{self.get_long_max()} {self.get_lat_max()},' + \
+                                f'{self.get_long_max()} {self.get_lat_min()},' + \
+                                f'-180 {self.get_lat_min()}))'
+                )
+            polygon = MultiPolygon([polygon_1, polygon_2])
         return polygon
 
     def to_poly_string(self):
@@ -317,11 +337,7 @@ class Boundary:
                 String representation of the shapely polygon with corners at 
                 the min/max lat/long values of this boundary
         """
-        return f'POLYGON (({self.get_long_min():g} {self.get_lat_min():g}, ' + \
-                        f'{self.get_long_min():g} {self.get_lat_max():g}, ' + \
-                        f'{self.get_long_max():g} {self.get_lat_max():g}, ' + \
-                        f'{self.get_long_max():g} {self.get_lat_min():g}, ' + \
-                        f'{self.get_long_min():g} {self.get_lat_min():g}))'
+        return self.to_polygon().wkt
 
     def split(self):
         """
