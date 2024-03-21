@@ -320,16 +320,14 @@ class ScalarDataLoader(DataLoaderInterface):
             '''
             # Select data region within spatial bounds
             # NOTE slice in xarray is inclusive of bounds
-            data = data.sel(lat=(data.lat > bounds.get_lat_min()) & \
-                                (data.lat < bounds.get_lat_max()))
+            data = data.sel(lat=slice(bounds.get_lat_min(), bounds.get_lat_max()))
             # If not going over antimeridian
             if bounds.get_long_min() < bounds.get_long_max():
-                data = data.sel(long=(data.long > bounds.get_long_min()) & \
-                                     (data.long < bounds.get_long_max()))
+                data = data.sel(long=slice(bounds.get_long_min(), bounds.get_long_max()))
             else:
-                data = data.sel(long=(data.long < bounds.get_long_min()) | \
-                                     (data.long > bounds.get_long_max()))
-                
+                # data = data.drop_sel(long=slice(bounds.get_long_max(), bounds.get_long_min()))
+                data = data.sel(long=(data.long > bounds.get_long_max()) | (data.long < bounds.get_long_min()))
+                # data = data.sel(long=slice(bounds.get_long_min(), 180) | slice(-180, bounds.get_long_max()))
             # Select data region within temporal bounds if time exists as a coordinate
             if 'time' in data.coords.keys():
                 data = data.sel(time=slice(bounds.get_time_min(),  bounds.get_time_max()))

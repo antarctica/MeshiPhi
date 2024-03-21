@@ -12,6 +12,22 @@ from functools import wraps
 from calendar import monthrange
 from scipy.fftpack import fftshift
 
+def longitude_domain(long):
+    """
+    Converts any longitude degree value into one between -180:180
+    """
+    return np.subtract(np.mod(np.add(long,180),360),180)
+
+def longitude_distance(long_a, long_b):
+    """
+    Calculates the angular distance between two longitude values
+    """
+
+    long_dist = longitude_domain(long_b) - longitude_domain(long_a)
+    if long_b >= long_a:
+        return long_dist
+    else:
+        return 360 - np.abs(long_dist)
     
 def frac_of_month(year, month, start_date=None, end_date=None):
     

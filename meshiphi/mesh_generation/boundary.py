@@ -169,7 +169,13 @@ class Boundary:
                 cx (float): the x-position of the top-left corner of the CellBox
                     given in degrees longitude.
         """
-        return self.long_range[0] + self.get_width()/2
+        cx = self.long_range[0] + self.get_width()/2
+        
+        if cx > 180:
+            cx -= 360
+        
+        return cx
+
     def getcy(self):
         """
             returns y-position of the centroid of the cellbox
@@ -197,7 +203,11 @@ class Boundary:
                 width (float): the width of the CellBox
                     given in degrees longtitude.
         """
-        width = self.long_range[1] - self.long_range[0]
+        # If not over the antimeridian
+        if self.long_range[1] > self.long_range[0]:
+            width = self.long_range[1] - self.long_range[0]
+        else:
+            width = (180 - self.long_range[0]) + (self.long_range[1] + 180)
         return width
     def get_time_range (self):
         """
