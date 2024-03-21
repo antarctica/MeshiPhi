@@ -325,9 +325,9 @@ class ScalarDataLoader(DataLoaderInterface):
             if bounds.get_long_min() < bounds.get_long_max():
                 data = data.sel(long=slice(bounds.get_long_min(), bounds.get_long_max()))
             else:
-                # data = data.drop_sel(long=slice(bounds.get_long_max(), bounds.get_long_min()))
-                data = data.sel(long=(data.long > bounds.get_long_max()) | (data.long < bounds.get_long_min()))
-                # data = data.sel(long=slice(bounds.get_long_min(), 180) | slice(-180, bounds.get_long_max()))
+                data_lhs = data.sel(long=slice(-180, bounds.get_long_max()))
+                data_rhs = data.sel(long=slice(bounds.get_long_min(), 180))
+                data = xr.concat([data_lhs, data_rhs], 'long')
             # Select data region within temporal bounds if time exists as a coordinate
             if 'time' in data.coords.keys():
                 data = data.sel(time=slice(bounds.get_time_min(),  bounds.get_time_max()))

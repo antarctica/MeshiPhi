@@ -16,7 +16,10 @@ def longitude_domain(long):
     """
     Converts any longitude degree value into one between -180:180
     """
-    return np.subtract(np.mod(np.add(long,180),360),180)
+    if long in [-180, 180]:
+        return long
+    else:    
+        return (long + 180) % 360 - 180
 
 def longitude_distance(long_a, long_b):
     """
