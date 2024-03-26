@@ -48,19 +48,22 @@ class Boundary:
         """
         Creates a Boundary object from a string representation of a polygon.
         """
-        coords = poly_string.split("POLYGON ((")[1].split("))")[0].split(", ")
-        x = [float(coord.split(" ")[0]) for coord in coords]
-        y = [float(coord.split(" ")[1]) for coord in coords]
+        if "MULTIPOLYGON" in poly_string:
+            pass
+        else:    
+            coords = poly_string.split("POLYGON ((")[1].split("))")[0].split(", ")
+            x = [float(coord.split(" ")[0]) for coord in coords]
+            y = [float(coord.split(" ")[1]) for coord in coords]
 
-        lat_min = min(x)
-        lat_max = max(x)
-        long_min = min(y)
-        long_max = max(y)
+            lat_min = min(x)
+            lat_max = max(x)
+            long_min = min(y)
+            long_max = max(y)
 
-        long_range = [long_min, long_max]
-        lat_range = [lat_min, lat_max]
+            long_range = [long_min, long_max]
+            lat_range = [lat_min, lat_max]
 
-        bounds = Boundary(long_range, lat_range)
+            bounds = Boundary(long_range, lat_range)
 
         return bounds
 

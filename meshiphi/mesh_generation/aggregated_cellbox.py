@@ -118,7 +118,7 @@ class AggregatedCellBox:
                 cell_json (dict): A JSON parsable dictionary representation of this AggregatedCellBox
         '''
         cell_json = {
-            "geometry": str(Polygon(self.get_bounds().get_bounds())),
+            "geometry": str(self.get_bounds().to_poly_string()),
             'cx': float(self.get_bounds().getcx()),
             'cy': float(self.get_bounds().getcy()),
             'dcx': float(self.get_bounds().getdcx()),
