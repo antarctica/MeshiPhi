@@ -145,8 +145,8 @@ class AggregatedCellBox:
                 contains_points (bool): True if this CellBox contains a point given by
                     parameters (lat, long)
         """
-        if (lat >= self.boundary.get_lat_min()) & (lat <= self.boundary.get_lat_max()):
-            if (long >= self.boundary.get_long_min()) & (long <= self.boundary.get_long_max()):
+        if (lat >= self.boundary.get_lat_min()) & (lat < self.boundary.get_lat_max()):
+            if (long >= self.boundary.get_long_min()) & (long < self.boundary.get_long_max()):
                 return True
         return False
     
