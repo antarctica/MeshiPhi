@@ -124,7 +124,6 @@ class EnvironmentMesh:
                 return cellbox
 
     # Merging meshes
-
     def merge_mesh(self, mesh2):
         """
             merges the given mesh with this mesh. The given mesh is not modified.
@@ -143,7 +142,7 @@ class EnvironmentMesh:
 
         # Appended cellboxes from mesh2 to this mesh
         mesh1_max_id = self.get_max_cellbox_id()
-        mesh2.increment_ids(mesh1_max_id)
+        mesh2.increment_ids(mesh1_max_id + 1)
         for cellbox in mesh2.agg_cellboxes:
             self.add_cellbox(cellbox)
 
@@ -169,6 +168,44 @@ class EnvironmentMesh:
         west_ext_cellboxes = self.get_cellboxes_west_of_bounds(mesh2_bounds)
         west_int_cellboxes = mesh2.get_left_edge_cellboxes()
         self.tie_western_cellbox_ng(west_ext_cellboxes, west_int_cellboxes)
+
+    def validate_merge_compatibility(self, mesh2):
+        """
+            checks if the given mesh is compatible with merging with this mesh
+
+            Args:
+                mesh2 (EnvironmentMesh): the mesh to be checked for compatibility
+            Returns:
+                bool: True if the given mesh is compatible with merging with this mesh, False otherwise
+        """
+
+        # check if the bounds of the mesh to be merged is divisible by the cell width and height of this mesh
+        l_cell_width = self.config['region']['cell_width']
+        l_cell_height = self.config['region']['cell_height']
+
+        m2_bounds_height = mesh2.bounds.get_height()
+        m2_bounds_width = mesh2.bounds.get_width()
+
+        if m2_bounds_height % l_cell_height != 0:
+            return False
+        if m2_bounds_width % l_cell_width != 0:
+            return False
+
+        # check if mesh2 is aligned with this mesh
+
+        l_bounds = self.bounds
+        s_bounds = mesh2.bounds
+
+        lat_diff = l_bounds.get_lat_min() - s_bounds.get_lat_min()
+        if lat_diff % l_cell_height != 0:
+            return False
+
+        long_diff = l_bounds.get_long_min() - s_bounds.get_long_min()
+        if long_diff % l_cell_width != 0:
+            return False 
+
+
+        return True
 
     
     def tie_northern_cellbox_ng(self, north_ext_cellboxes, north_int_cellboxes):
@@ -443,6 +480,7 @@ class EnvironmentMesh:
                     for neighbour in north_west_neighbours:
                         self.neighbour_graph.get_graph()[cellbox_s.get_id()]["-3"].append(neighbour)
 
+
     def get_cellboxes_within_bounds(self, bounds):
         """
             returns the cellboxes within the given bounds. 
@@ -466,6 +504,7 @@ class EnvironmentMesh:
                 cells_within_bounds.append(cellbox)
 
         return cells_within_bounds
+
 
     def get_cellboxes_north_of_bounds(self, bounds):
         """
@@ -529,6 +568,7 @@ class EnvironmentMesh:
                 
             return west_cellboxes
 
+
     def get_top_edge_cellboxes(self):
 
         top_cellboxes = []
@@ -580,6 +620,7 @@ class EnvironmentMesh:
                 left_cellboxes.append(cellbox)
 
         return left_cellboxes
+
 
     def remove_cellboxes_within_bounds(self, bounds):
         """
@@ -661,10 +702,10 @@ class EnvironmentMesh:
         bounds = cellbox.get_bounds()
         split_bounds = bounds.split()
 
-        cellbox1 = AggregatedCellBox(split_bounds[0], agg_data1, max_id + 1)
-        cellbox2 = AggregatedCellBox(split_bounds[1], agg_data2, max_id + 2)
-        cellbox3 = AggregatedCellBox(split_bounds[2], agg_data3, max_id + 3)
-        cellbox4 = AggregatedCellBox(split_bounds[3], agg_data4, max_id + 4)
+        cellbox1 = AggregatedCellBox(split_bounds[0], agg_data1, str(max_id + 1))
+        cellbox2 = AggregatedCellBox(split_bounds[1], agg_data2, str(max_id + 2))
+        cellbox3 = AggregatedCellBox(split_bounds[2], agg_data3, str(max_id + 3))
+        cellbox4 = AggregatedCellBox(split_bounds[3], agg_data4, str(max_id + 4))
 
         # Update neighbour graph
 
