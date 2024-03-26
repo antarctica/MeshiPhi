@@ -127,6 +127,29 @@ class EnvironmentMesh:
         else:
             return False
 
+    def query_index(self,point):
+        """
+            Returns a index of the aggregate cellbox that contains the point
+
+            Args:
+                point (tuple) - (lat,long) of point to query
+            Returns:
+                cellbox_index (str) - Cellbox index containing the point
+        """
+        inside_cell = [agg_cell.contains_point(point[0],point[1]) for agg_cell in self.agg_cellboxes]
+
+        if any(inside_cell):
+            indices = np.where(inside_cell)[0]
+            if len(indices) > 1:
+                raise Exception('Point within more than one cellbox')    
+            else:
+                indx = indices[0]
+                return self.agg_cellboxes[indx].id
+        else:
+            raise Exception('Point not within the mesh')
+
+
+
     def _split_loc(self,point):
         """
             Given a point determine if agg_cellboxes should be split or if at maximum split depth
@@ -138,8 +161,8 @@ class EnvironmentMesh:
         """
     
         # Defining cellbox containing point
-        agg_cellbox_index = np.where([agg_cell.contains_point(point[0],point[1]) for agg_cell in self.agg_cellboxes])[0][0]
-        agg_cellbox_wp = self.agg_cellboxes[agg_cellbox_index]
+        agg_cellbox_index = self.query_index(point)
+        agg_cellbox_wp = self.get_cellbox(agg_cellbox_index)
 
         # Determing the mesh maximum split depth
         min_dcx = self.config['region']['cell_width']/(2**(self.config['splitting']['split_depth']))
