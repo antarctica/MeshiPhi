@@ -8,6 +8,7 @@ import subprocess
 import sys
 import os
 import tempfile
+from shapely import wkt
 
 from meshiphi.mesh_generation.jgrid_aggregated_cellbox import JGridAggregatedCellBox
 from meshiphi.mesh_generation.boundary import Boundary
@@ -110,6 +111,90 @@ class EnvironmentMesh:
         self.neighbour_graph = neighbour_graph
         self.config = config
 
+
+    def query_inside_mesh(self,point):
+        """
+            Returns a bool whether the given point is within the cell 
+
+            Args:
+                point (tuple) - (lat,long) of point to query
+            Returns:
+                inside_mesh (bool) - Boolean stating if point inside mesh
+        """
+        inside_cell = [agg_cell.contains_point(point[0],point[1]) for agg_cell in self.agg_cellboxes]
+        if any(inside_cell):
+            return True
+        else:
+            return False
+
+    def query_index(self,point):
+        """
+            Returns a index of the aggregate cellbox that contains the point
+
+            Args:
+                point (tuple) - (lat,long) of point to query
+            Returns:
+                cellbox_index (str) - Cellbox index containing the point
+        """
+        inside_cell = [agg_cell.contains_point(point[0],point[1]) for agg_cell in self.agg_cellboxes]
+
+        if any(inside_cell):
+            indices = np.where(inside_cell)[0]
+            if len(indices) > 1:
+                raise Exception('Point within more than one cellbox')    
+            else:
+                indx = indices[0]
+                return self.agg_cellboxes[indx].id
+        else:
+            raise Exception('Point not within the mesh')
+
+
+
+    def _split_loc(self,point):
+        """
+            Given a point determine if agg_cellboxes should be split or if at maximum split depth
+
+            Args:
+                point (tuple) - (lat,long) of point location used for splitting
+            Returns:
+                further_splittined (bool) - A boolean describing if further splitting is possible
+        """
+    
+        # Defining cellbox containing point
+        agg_cellbox_index = self.query_index(point)
+        agg_cellbox_wp = self.get_cellbox(agg_cellbox_index)
+
+        # Determing the mesh maximum split depth
+        min_dcx = self.config['region']['cell_width']/(2**(self.config['splitting']['split_depth']))
+        min_dcy = self.config['region']['cell_height']/(2**(self.config['splitting']['split_depth']))
+
+        # Finding the split depth which contains waypoint
+        cb_width  = agg_cellbox_wp.boundary.get_width()
+        cb_height = agg_cellbox_wp.boundary.get_height()
+
+        if (cb_width < min_dcx) or (cb_height < min_dcy):
+            # Continue if cellbox is at max split depth
+            return False
+        else:
+            # Split mesh if at maximum split depth
+            self.split_and_replace(agg_cellbox_wp.id)
+            return True
+
+
+    def split_points(self,points):
+        """
+            Splitting the mesh to maximum split depth around a series of point locations
+
+            Args:
+                points ([tuple,tuple]) - List of tuples (lat,lon) for the different point locations to split about
+
+        """
+        for point in points:
+            splitting_waypoint = True
+            if self.query_inside_mesh(point):
+                while splitting_waypoint:
+                    splitting_waypoint = self._split_loc(point)
+
     def get_cellbox(self, cellbox_id):
         """
             returns the cellbox with the given id
@@ -164,10 +249,10 @@ class EnvironmentMesh:
         bounds = cellbox.get_bounds()
         split_bounds = bounds.split()
 
-        cellbox1 = AggregatedCellBox(split_bounds[0], agg_data1, max_id + 1)
-        cellbox2 = AggregatedCellBox(split_bounds[1], agg_data2, max_id + 2)
-        cellbox3 = AggregatedCellBox(split_bounds[2], agg_data3, max_id + 3)
-        cellbox4 = AggregatedCellBox(split_bounds[3], agg_data4, max_id + 4)
+        cellbox1 = AggregatedCellBox(split_bounds[0], agg_data1, str(max_id + 1))
+        cellbox2 = AggregatedCellBox(split_bounds[1], agg_data2, str(max_id + 2))
+        cellbox3 = AggregatedCellBox(split_bounds[2], agg_data3, str(max_id + 3))
+        cellbox4 = AggregatedCellBox(split_bounds[3], agg_data4, str(max_id + 4))
 
         # Update neighbour graph
 
@@ -488,6 +573,14 @@ class EnvironmentMesh:
 
         return json.loads(json.dumps(output, indent=4))
     
+    def to_shapely(self):
+
+        msh_shapely =  gpd.GeoDataFrame(pd.DataFrame(self.cellboxes_to_json())).set_index('id')
+        msh_shapely['geometry'] = msh_shapely['geometry'].apply(wkt.loads)
+        msh_shapely = gpd.GeoDataFrame(msh_shapely, crs='EPSG:4326', geometry='geometry')
+        return msh_shapely
+
+
     def to_png(self, params_file, path):
         """
             exports a mesh and saves to a png file
