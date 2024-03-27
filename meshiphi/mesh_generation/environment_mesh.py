@@ -219,6 +219,12 @@ class EnvironmentMesh:
 
         assert self.validate_merge_compatibility(mesh2), "The given mesh is not compatible with merging with this mesh" 
 
+        # append config files
+        if "merged" not in self.config.keys():
+            self.config["merged"] = []
+
+        self.config["merged"].append(mesh2.config)
+
         # merge cellboxes
         mesh2_bounds = mesh2.bounds
 
