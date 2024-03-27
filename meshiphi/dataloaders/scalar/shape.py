@@ -127,12 +127,14 @@ class ShapeDataLoader(ScalarDataLoader):
                 row = pd.DataFrame(data={'lat':self.lat[i], 
                                          'long':self.long[j], 
                                          'dummy_data':mask[i][j]}, index=[0])
-                dummy_df = pd.concat([dummy_df, row], ignore_index=True)
+                # Avoid concat with empty df
+                if dummy_df.empty: dummy_df = row
+                else:              dummy_df = pd.concat([dummy_df, row], 
+                                                        ignore_index=True)
                 
         # Change boolean values to int
-        dummy_df = dummy_df.replace(False, 0)
-        dummy_df = dummy_df.replace(True, 1)
-
+        dummy_df['dummy_data'] = dummy_df['dummy_data'].astype(int)
+        
         return dummy_df
 
     def gen_gradient(self, bounds):
@@ -169,7 +171,10 @@ class ShapeDataLoader(ScalarDataLoader):
                 row = pd.DataFrame(data={'lat':self.lat[i], 
                                          'long':self.long[j], 
                                          'dummy_data':datum}, index=[0])
-                dummy_df = pd.concat([dummy_df, row], ignore_index=True)  
+                # Avoid concat with empty df
+                if dummy_df.empty:  dummy_df = row
+                else:               dummy_df = pd.concat([dummy_df, row], 
+                                                         ignore_index=True)  
         
         return dummy_df
 
@@ -210,7 +215,10 @@ class ShapeDataLoader(ScalarDataLoader):
                 row = pd.DataFrame(data={'lat':self.lat[i], 
                                          'long':self.long[j], 
                                          'dummy_data':datum}, index=[0])
-                dummy_df = pd.concat([dummy_df, row], ignore_index=True)
+                # Avoid concat with empty df
+                if dummy_df.empty:  dummy_df = row
+                else:               dummy_df = pd.concat([dummy_df, row], 
+                                                         ignore_index=True)
         
         return dummy_df    
 
