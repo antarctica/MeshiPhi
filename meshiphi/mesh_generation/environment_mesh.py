@@ -755,8 +755,6 @@ class EnvironmentMesh:
         """
         self.agg_cellboxes.append(cellbox)
 
-        # TODO: update neighbour graph
-
     def increment_ids(self, increment):
 
         for cellbox in self.agg_cellboxes:
@@ -798,9 +796,6 @@ class EnvironmentMesh:
         cellbox3 = AggregatedCellBox(split_bounds[2], agg_data3, str(max_id + 3))
         cellbox4 = AggregatedCellBox(split_bounds[3], agg_data4, str(max_id + 4))
 
-        # Update neighbour graph
-
-        
         return [cellbox1, cellbox2, cellbox3, cellbox4]
 
     def split_and_replace(self, cellbox_id):
