@@ -1,4 +1,4 @@
-__version__ = "2.0.4"
+__version__ = "2.0.6"
 
 __description__ = "meshiphi: Earth's digital twin mapped on a non-uniform mesh"
 __license__ = "MIT"

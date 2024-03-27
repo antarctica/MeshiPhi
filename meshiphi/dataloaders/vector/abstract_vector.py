@@ -391,59 +391,6 @@ class VectorDataLoader(DataLoaderInterface):
             return trim_datapoints_from_df(data, bounds)
         elif type(data) == xr.core.dataset.Dataset:
             return trim_datapoints_from_xr(data, bounds)
-
-    def get_dp_from_coord(self, long=None, lat=None, return_coords=False):
-        '''
-        Extracts datapoint from self.data with lat and long specified in kwargs.
-        self.data can be pd.DataFrame or xr.Dataset. Will return multiple values
-        if one set of coordinates have multiple entries (e.g. time series data)
-        
-        Args:
-            long (float): Longitude coordinate to search for
-            lat (float) : Latitude coordinate to search for
-            
-        Returns:
-            pd.Dataframe:  
-                Column of data values with chosen lat/long. Could be many 
-                datapoints because either bad data or multiple time steps 
-        '''
-        def get_dp_from_coord_df(data, names, long, lat, return_coords):
-            '''
-            Extracts data from a pd.DataFrame
-            '''
-            # Mask off any positions not within spatial bounds
-            mask = (data['lat']  == lat)  & \
-                   (data['long'] == long) 
-
-            # Include lat/long/time if requested
-            if return_coords: columns = list(data.columns)
-            else:             columns = names
-            # Return column of data from within bounds
-            return data.loc[mask][columns]
-        
-        def get_dp_from_coord_xr(data, names, long, lat, return_coords):
-            '''
-            Extracts data from a xr.Dataset
-            '''
-            # Select data region within spatial bounds
-            data = data.sel(lat=lat, long=long)
-            # Cast as a pd.DataFrame
-            data = data.to_dataframe().reset_index()
-            # Include lat/long/time if requested
-            if return_coords: columns = list(data.columns)
-            else:             columns = names
-            # Return column of data from within bounds
-            return data[columns]
-        
-        # Ensure that lat and long provided
-        assert (lat is not None) and (long) is not None, \
-            'Must provide lat and long to this method!'
-            
-        # Choose which method to retrieve data based on input type
-        if type(self.data) == pd.core.frame.DataFrame:
-            return get_dp_from_coord_df(self.data, self.data_name_list, long, lat, return_coords)
-        elif type(self.data) == xr.core.dataset.Dataset:
-            return get_dp_from_coord_xr(self.data, self.data_name_list, long, lat, return_coords)
     
     def get_value(self, bounds, agg_type=None, skipna=True, data=None):
         '''
@@ -1197,8 +1144,8 @@ class VectorDataLoader(DataLoaderInterface):
         
         def meshgrid_from_xr(data, data_name_list):
             # Extract out each variable and combine as tuple
-            data_arrays = list(data[name].values 
-                                for name in data_name_list)
+            data_arrays = [data[name].values 
+                                for name in data_name_list]
             # Zip them together to make 2D array of n-dimensional vectors
             return np.dstack(data_arrays)
         

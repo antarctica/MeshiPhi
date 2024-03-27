@@ -227,35 +227,6 @@ class LutDataLoader(DataLoaderInterface):
         intersections = lut_polys.query(bounds_polygon, predicate='intersects').tolist()
         # Return only rows intersecting with cellbox boundary
         return data.iloc[intersections]
-
-    def get_val_from_coord(self, long=None, lat=None, return_coords=False):
-        '''
-        Extracts value from self.data with lat and long specified in kwargs.
-        
-        Args:
-            long (float): Longitude coordinate to search for
-            lat (float) : Latitude coordinate to search for
-            return_coords (boolean): 
-                Flag for whether to return coordinates with the value or not
-            
-        Returns:
-            pd.DataFrame: 
-                Either with one entry (the value at the coords), 
-                Optionaly with coordinates associated with it if 
-                return_coords = True
-        '''
-        # Check if lat/long point is within any of the data polygons
-        point = Point(long, lat)
-        values = self.data[point.within(self.data['geometry'])][self.data_name]
-        # Add lat/long coords to df if return_coords True
-        if return_coords:
-            data = pd.DataFrame({'lat': lat,
-                                 'long': long,
-                                 self.data_name: values})
-        else:
-            data = values
-            
-        return data
     
     def get_value(self, bounds, agg_type=None, skipna=False, data=None):
         '''
