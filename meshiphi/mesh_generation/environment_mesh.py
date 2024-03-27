@@ -217,7 +217,7 @@ class EnvironmentMesh:
                 mesh2 (EnvironmentMesh): the mesh to be merged with this mesh
         """
 
-        # TODO check meshes are compatible with merging. 
+        assert self.validate_merge_compatibility(mesh2), "The given mesh is not compatible with merging with this mesh" 
 
         # merge cellboxes
         mesh2_bounds = mesh2.bounds
