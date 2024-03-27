@@ -54,6 +54,27 @@ class NeighbourGraph:
         obj.neighbour_graph = neighbour_graph
         return obj
 
+    def increment_ids(self, inc):
+        """
+        Increments all ID's within the neighbour_graph by a given int inc
+
+            Args: 
+                inc (int): The number to increment all ID's in the neighbour_graph by
+        """
+
+        ng = self.get_graph()
+        new_ng = {}
+
+        for node in ng:
+            for direction in ng[node]:
+                inc_neighbours = [x + inc for x in ng[node][direction]]
+                ng[node][direction] = inc_neighbours
+
+            new_ng[str( int(node) + inc)] = ng[node]
+
+        self.neighbour_graph = new_ng
+
+
     def get_graph(self):
         """
         returns the graph dict
@@ -115,7 +136,8 @@ class NeighbourGraph:
 
     def update_neighbours(self, cellbox_indx, new_neighbours_indx, direction, cellboxes):
         '''
-            method that updates the neighbour of a certain cellbox in a specific direction. It removes cellbox_indx from the neighbour_map of its neighbours in a specific direction and add new_neighbour_indx
+            method that updates the neighbour of a certain cellbox in a specific direction. 
+            It removes cellbox_indx from the neighbour_map of its neighbours in a specific direction and add new_neighbour_indx
 
             Args: 
                 cellbox_index (int): index of the cellbox that its neighbour will be updated
