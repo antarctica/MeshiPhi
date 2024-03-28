@@ -24,6 +24,7 @@ from meshiphi.mesh_generation.aggregated_cellbox import AggregatedCellBox
 from meshiphi.mesh_generation.metadata import Metadata
 import logging
 import time
+from meshiphi.utils import longitude_domain
 
 
 
@@ -267,24 +268,28 @@ class CellBox:
         lat = self.bounds.get_lat_min()
         lat_range = [lat + half_height, lat + self.bounds.get_height()]
         long = self.bounds.get_long_min()
-        long_range = [long, long + half_width]
+        long_range = [long, 
+                      longitude_domain(long + half_width)]
         boundary = Boundary(lat_range, long_range, time_range)
         north_west = CellBox(boundary, str(index))
 
         lat_range = [lat + half_height, lat + self.bounds.get_height()]
-        long_range = [long + half_width, long + self.bounds.get_width()]
+        long_range = [longitude_domain(long + half_width), 
+                      longitude_domain(long + self.bounds.get_width())]
         boundary = Boundary(lat_range, long_range, time_range)
         index += 1
         north_east = CellBox(boundary, str(index))
 
         lat_range = [lat, lat + half_height]
-        long_range = [long, long + half_width]
+        long_range = [long, 
+                      longitude_domain(long + half_width)]
         boundary = Boundary(lat_range, long_range, time_range)
         index += 1
         south_west = CellBox(boundary, str(index))
 
         lat_range = [lat, lat + half_height]
-        long_range = [long + half_width, long + self.bounds.get_width()]
+        long_range = [longitude_domain(long + half_width), 
+                      longitude_domain(long + self.bounds.get_width())]
         boundary = Boundary(lat_range, long_range, time_range)
         index += 1
         south_east = CellBox(boundary, str(index))

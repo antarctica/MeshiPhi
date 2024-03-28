@@ -33,6 +33,8 @@ from meshiphi.mesh_generation.mesh import Mesh
 from meshiphi.dataloaders.factory import DataLoaderFactory
 from meshiphi.config_validation.config_validator import validate_mesh_config
 
+from meshiphi.utils import longitude_distance, longitude_domain
+
 
 class MeshBuilder:
     """
@@ -99,10 +101,10 @@ class MeshBuilder:
      
         cellboxes = []
         cellboxes = self.initialize_cellboxes(bounds, cell_width, cell_height)
-
-        grid_width = (bounds.get_long_max() -
-                      bounds.get_long_min()) / cell_width
-
+        # Account for going over the antimeridian with longitude_distance
+        grid_width = longitude_distance(bounds.get_long_min(), 
+                                        bounds.get_long_max()) / cell_width
+        
         min_datapoints = 5
         if 'splitting' in self.config:
             min_datapoints = self.config['splitting']['minimum_datapoints']
@@ -244,14 +246,33 @@ class MeshBuilder:
 
     def initialize_cellboxes(self, bounds, cell_width, cell_height):
         cellboxes = []
-        grid_width = (bounds.get_long_max() -
-                      bounds.get_long_min()) / cell_width
         grid_height = (bounds.get_lat_max() -
                        bounds.get_lat_min()) / cell_height
-        for lat in np.arange(bounds.get_lat_min(), bounds.get_lat_max(), cell_height):
-            for long in np.arange(bounds.get_long_min(), bounds.get_long_max(), cell_width):
+        
+        lat_range = np.arange(bounds.get_lat_min(), bounds.get_lat_max(), cell_height)
+
+
+        # Account for going over the antimeridian with longitude_distance
+        grid_width = longitude_distance(bounds.get_long_min(), 
+                                        bounds.get_long_max()) / cell_width
+        
+        if bounds.get_long_min() < bounds.get_long_max():
+            long_range = np.arange(bounds.get_long_min(),
+                                   bounds.get_long_max(), 
+                                   cell_width)
+        else:
+            long_range = np.arange(bounds.get_long_min(),
+                                   bounds.get_long_max() + 360, 
+                                   cell_width)
+        # Cast to within -180:180
+        long_range = longitude_domain(long_range)
+
+        for lat in lat_range:
+            for long in long_range:
                 cell_lat_range = [lat, lat+cell_height]
-                cell_long_range = [long, long+cell_width]
+                # If doesn't go over anti-meridian
+                if long + cell_width <= 180: cell_long_range = [long, long+cell_width]
+                else:                        cell_long_range = [long, long+cell_width-360]
                 cell_bounds = Boundary(
                     cell_lat_range, cell_long_range, bounds.get_time_range())
                 cell_id = str(len(cellboxes))

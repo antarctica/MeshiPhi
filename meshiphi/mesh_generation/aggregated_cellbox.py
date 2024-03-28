@@ -23,11 +23,31 @@ class AggregatedCellBox:
         """
         cellbox_id = cellbox_json ['id']
         def load_boundary (cellbox_json):
-        
             shape = shapely.wkt.loads (cellbox_json ["geometry"])
-            bounds = shape.bounds
-            lat_range = [bounds[1] , bounds[3]]
-            long_range = [bounds [0], bounds [2]]
+            # Take case where crossing antimeridian
+            if shape.geom_type == 'MultiPolygon':
+                shapes = list(shape.geoms)
+                assert (len(shapes) == 2), 'Too many polygons in MultiPolygon boundary!'
+                bounds_a = shapes[0].bounds
+                bounds_b = shapes[1].bounds
+
+                # Bottom left should be origin from which all polygons are defined
+                # They should have the same lat range
+                lat_range = [bounds_a[1] , bounds_a[3]]
+                # Left most boundary and right most boundary are from two different polygons
+                # Right boundary of bounds_a should be 180, 
+                # and left boundary of bounds_b should be -180
+                long_range = [bounds_a [0], bounds_b [2]]
+
+            # Otherwise it's just a normal cellbox
+            elif shape.geom_type == 'Polygon':
+                bounds = shape.bounds
+                lat_range = [bounds[1] , bounds[3]]
+                long_range = [bounds [0], bounds [2]]
+            # Or something is wrong with the mesh
+            else:
+                raise TypeError(f'Expected Polygon or MultiPolygon, instead got {shape.geom_type}')
+            
             return Boundary (lat_range , long_range)
 
         def load_agg_data (cellbox_json):
@@ -118,7 +138,7 @@ class AggregatedCellBox:
                 cell_json (dict): A JSON parsable dictionary representation of this AggregatedCellBox
         '''
         cell_json = {
-            "geometry": str(Polygon(self.get_bounds().get_bounds())),
+            "geometry": str(self.get_bounds().to_poly_string()),
             'cx': float(self.get_bounds().getcx()),
             'cy': float(self.get_bounds().getcy()),
             'dcx': float(self.get_bounds().getdcx()),
