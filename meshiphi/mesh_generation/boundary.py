@@ -46,7 +46,28 @@ class Boundary:
         Creates a Boundary object from a string representation of a polygon.
         """
         if "MULTIPOLYGON" in poly_string:
-            pass
+
+            coord_strings = poly_string.split("MULTIPOLYGON (((")[1].split(")))")[0].split(")), ((")
+            # pos_coords on +180 side of antimeridian
+            # neg_coords on -180 side of antimeridian
+            pos_coords, neg_coords = [[polygon_coords.split(',') 
+                                        for polygon_coords in coord_string] 
+                                        for coord_string in coord_strings]
+
+            pos_x = [float(coord.split(" ")[1]) for coord in pos_coords]
+            pos_y = [float(coord.split(" ")[0]) for coord in pos_coords]
+            neg_x = [float(coord.split(" ")[1]) for coord in neg_coords]
+            neg_y = [float(coord.split(" ")[0]) for coord in neg_coords]
+
+            assert(pos_y == neg_y), "Latitudes of polygons in multipolygon " + \
+                                    "don't match, cannot construct valid " + \
+                                    "boundary object"
+
+            lat_min = min(pos_y)
+            lat_max = max(pos_y)
+            long_min = min(pos_x)
+            long_max = max(neg_x)
+
         else:    
             coords = poly_string.split("POLYGON ((")[1].split("))")[0].split(", ")
             x = [float(coord.split(" ")[0]) for coord in coords]
@@ -57,10 +78,10 @@ class Boundary:
             long_min = min(y)
             long_max = max(y)
 
-            long_range = [long_min, long_max]
-            lat_range = [lat_min, lat_max]
+        long_range = [long_min, long_max]
+        lat_range = [lat_min, lat_max]
 
-            bounds = Boundary(long_range, lat_range)
+        bounds = Boundary(long_range, lat_range)
 
         return bounds
 
