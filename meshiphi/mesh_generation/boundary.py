@@ -46,14 +46,20 @@ class Boundary:
         Creates a Boundary object from a string representation of a polygon.
         """
         if "MULTIPOLYGON" in poly_string:
+            # Seperate out uneccessary components
+            poly_string = poly_string.split("MULTIPOLYGON (((")[1]
+            poly_string = poly_string.split(")))")[0]
+            # Split into two sets of polygon coords
+            coord_strings = poly_string.split(")), ((")
+            assert(len(coord_strings) == 2), \
+                "Too many polygons in multipolygon, cannot form boundary object"
 
-            coord_strings = poly_string.split("MULTIPOLYGON (((")[1].split(")))")[0].split(")), ((")
             # pos_coords on +180 side of antimeridian
             # neg_coords on -180 side of antimeridian
             pos_coords, neg_coords = [[polygon_coords.split(',') 
                                         for polygon_coords in coord_string] 
                                         for coord_string in coord_strings]
-
+            # Extract longs and lats for each polygon
             pos_x = [float(coord.split(" ")[1]) for coord in pos_coords]
             pos_y = [float(coord.split(" ")[0]) for coord in pos_coords]
             neg_x = [float(coord.split(" ")[1]) for coord in neg_coords]
@@ -62,7 +68,7 @@ class Boundary:
             assert(pos_y == neg_y), "Latitudes of polygons in multipolygon " + \
                                     "don't match, cannot construct valid " + \
                                     "boundary object"
-
+            
             lat_min = min(pos_y)
             lat_max = max(pos_y)
             long_min = min(pos_x)
