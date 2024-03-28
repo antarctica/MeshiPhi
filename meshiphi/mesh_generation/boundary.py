@@ -76,8 +76,8 @@ class Boundary:
 
         else:    
             coords = poly_string.split("POLYGON ((")[1].split("))")[0].split(", ")
-            x = [float(coord.split(" ")[0]) for coord in coords]
-            y = [float(coord.split(" ")[1]) for coord in coords]
+            x = [float(coord.split(" ")[1]) for coord in coords]
+            y = [float(coord.split(" ")[0]) for coord in coords]
 
             lat_min = min(x)
             lat_max = max(x)
