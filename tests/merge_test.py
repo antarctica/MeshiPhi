@@ -32,7 +32,7 @@ class TestAutomater:
         'environment_mesh.py':  ['test_env_mesh.py']
     }
 
-    def __init__(self, from_branch=None, into_branch="main", regression=True, unit=True):
+    def __init__(self, from_branch=None, into_branch=None, regression=True, unit=True):
         """
         Runs through test suite only taking into account relevant tests for the 
         modified files
@@ -56,10 +56,15 @@ class TestAutomater:
         os.chdir(self.repo_dir)
         logging.debug(f'Set base directory to {os.getcwd()}')
         
+        # Set default branch to compare to if not user set
+        if not into_branch:
+            into_branch = "main"
+
         # Get files that are different between branches
         diff_files = self.get_diff_filenames(from_branch=from_branch, 
                                              into_branch=into_branch)
 
+        # Run relevant tests
         if regression:  self.run_regression_tests(diff_files)
         if unit:        self.run_unit_tests(diff_files)
 
