@@ -103,7 +103,7 @@ class TestAutomater:
 
         # Otherwise provide a message
         else:
-            logging.info("---No relevant tests found---")
+            logging.info(" --- No relevant tests found --- ")
         
         # Change back to repo base directory
         os.chdir(self.repo_dir)
@@ -120,6 +120,7 @@ class TestAutomater:
         reg_test_dir = os.path.join(self.repo_dir, 
                                     'tests', 
                                     'regression_tests')
+        logging.info("Attempting regression tests...")
         self._run_tests(diff_files, reg_test_dir, self.regression_test_dict)
 
     def run_unit_tests(self, diff_files):
@@ -134,6 +135,7 @@ class TestAutomater:
         unit_test_dir = os.path.join(self.repo_dir, 
                                     'tests', 
                                     'unit_tests')
+        logging.info("Attempting unit tests...")
         self._run_tests(diff_files, unit_test_dir, self.unit_test_dict)
 
     @staticmethod

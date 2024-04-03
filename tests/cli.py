@@ -1,8 +1,10 @@
 import argparse
 
 from .merge_test import TestAutomater
+from meshiphi.utils import setup_logging, timed_call
 
-def merge_test_cli():
+@setup_logging
+def get_args(default_output=None):
     ap = argparse.ArgumentParser()
     # Add one or two arguments as branches
     # If one, compare current branch to specified one
@@ -20,8 +22,23 @@ def merge_test_cli():
                     default=False,
                     action="store_true",
                     help="Run only unit tests")
+    # Output file specified
+    ap.add_argument("-o", "--output",
+                    default=default_output,
+                    help="Output file")
+    # Verbose logging specified
+    ap.add_argument("-v", "--verbose",
+                    default=False,
+                    action="store_true",
+                    help="Turn on DEBUG level logging")
     
-    args = ap.parse_args()
+    return ap.parse_args()
+    
+@timed_call
+def merge_test_cli():
+
+    default_output = "pytest.meshiphi.log"
+    args = get_args(default_output=default_output)
 
     # Default is both are true. Turn one off if only one specified
     if args.regression and not args.unit:
