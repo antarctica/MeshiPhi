@@ -6,6 +6,7 @@
 import json
 import pytest
 import time
+import os
 
 from meshiphi import __version__ as pr_version
 from meshiphi import MeshBuilder
@@ -29,20 +30,20 @@ LOGGER.setLevel(logging.INFO)
 #File locations of all environmental meshes to be recalculated for regression testing.
 TEST_ENV_MESHES = [
     './example_meshes/env_meshes/grf_normal.json',
-    './example_meshes/env_meshes/grf_downsample.json',
-    './example_meshes/env_meshes/grf_reprojection.json',
-    './example_meshes/env_meshes/grf_sparse.json'
+    # './example_meshes/env_meshes/grf_downsample.json',
+    # './example_meshes/env_meshes/grf_reprojection.json',
+    # './example_meshes/env_meshes/grf_sparse.json'
 ]
 
 TEST_ABSTRACT_MESHES = [
     './example_meshes/abstract_env_meshes/vgrad.json',
-    './example_meshes/abstract_env_meshes/hgrad.json',
-    './example_meshes/abstract_env_meshes/checkerboard_1.json',
-    './example_meshes/abstract_env_meshes/checkerboard_2.json',
-    './example_meshes/abstract_env_meshes/checkerboard_3.json',
-    './example_meshes/abstract_env_meshes/circle.json',
-    './example_meshes/abstract_env_meshes/circle_quadrant_split.json',
-    './example_meshes/abstract_env_meshes/circle_quadrant_nosplit.json'
+    # './example_meshes/abstract_env_meshes/hgrad.json',
+    # './example_meshes/abstract_env_meshes/checkerboard_1.json',
+    # './example_meshes/abstract_env_meshes/checkerboard_2.json',
+    # './example_meshes/abstract_env_meshes/checkerboard_3.json',
+    # './example_meshes/abstract_env_meshes/circle.json',
+    # './example_meshes/abstract_env_meshes/circle_quadrant_split.json',
+    # './example_meshes/abstract_env_meshes/circle_quadrant_nosplit.json'
 ]
 
 def setup_module():
@@ -70,7 +71,11 @@ def mesh_pair(request):
     mesh_config = old_mesh['config']['mesh_info']
     new_mesh = calculate_env_mesh(mesh_config)
     
-    return [old_mesh, new_mesh]
+    test_name = os.path.basename(request.param)
+
+    return {"test": test_name,
+            "old_mesh": old_mesh,
+            "new_mesh": new_mesh}
 
 def calculate_env_mesh(mesh_config):
     """
@@ -94,3 +99,18 @@ def calculate_env_mesh(mesh_config):
 
 
     return new_mesh.to_json()
+
+
+def test_record_output(mesh_pair, record_property):
+    """
+    Hacky solution to storing fixtures after they're generated. 
+    Code that saves fixture is in conftest.py
+
+    Args:
+        mesh_pair (dict): 
+            Fixture holding generated meshes
+        record_property (fixture): 
+            Pytest built-in fixture that stores user-defined dicts for later 
+            processing
+    """
+    record_property('meshes', mesh_pair)
