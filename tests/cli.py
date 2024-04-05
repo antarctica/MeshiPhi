@@ -1,6 +1,6 @@
 import argparse
 
-from .merge_test import TestAutomater
+from tests.merge_test import TestAutomater
 from meshiphi.utils import setup_logging, timed_call
 
 @setup_logging
@@ -44,7 +44,7 @@ def merge_test_cli():
     if args.regression and not args.unit:
         reg  = True
         unit = False
-    elif args.unit and not args.regressions:
+    elif args.unit and not args.regression:
         unit = True
         reg  = False
     else:
