@@ -1,11 +1,11 @@
 
 import unittest
 import json
-from polar_route.mesh_generation.environment_mesh import EnvironmentMesh
-from polar_route.mesh_generation.mesh_builder import MeshBuilder
-from polar_route.mesh_generation.direction import Direction
+from meshiphi.mesh_generation.environment_mesh import EnvironmentMesh
+from meshiphi.mesh_generation.mesh_builder import MeshBuilder
+from meshiphi.mesh_generation.direction import Direction
 
-from polar_route.mesh_generation.boundary import Boundary
+from meshiphi.mesh_generation.boundary import Boundary
 class TestMeshBuilder(unittest.TestCase):
    def setUp(self):
       self.config = None
