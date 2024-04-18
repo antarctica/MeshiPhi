@@ -1,11 +1,8 @@
-
-
-
 from datetime import datetime
 from datetime import timedelta
 
 from math import cos, sin, asin, sqrt, radians
-from shapely import wkt
+from shapely import wkt, MultiPolygon
 
 class Boundary:
     """
@@ -48,14 +45,44 @@ class Boundary:
         """
         Creates a Boundary object from a string representation of a polygon.
         """
-        coords = poly_string.split("POLYGON ((")[1].split("))")[0].split(", ")
-        x = [float(coord.split(" ")[0]) for coord in coords]
-        y = [float(coord.split(" ")[1]) for coord in coords]
+        if "MULTIPOLYGON" in poly_string:
+            # Seperate out uneccessary components
+            poly_string = poly_string.split("MULTIPOLYGON (((")[1]
+            poly_string = poly_string.split(")))")[0]
+            # Split into two sets of polygon coords
+            coord_strings = poly_string.split(")), ((")
+            assert(len(coord_strings) == 2), \
+                "Too many polygons in multipolygon, cannot form boundary object"
 
-        lat_min = min(x)
-        lat_max = max(x)
-        long_min = min(y)
-        long_max = max(y)
+            # pos_coords on +180 side of antimeridian
+            # neg_coords on -180 side of antimeridian
+            pos_coords, neg_coords = [[polygon_coords.split(',') 
+                                        for polygon_coords in coord_string] 
+                                        for coord_string in coord_strings]
+            # Extract longs and lats for each polygon
+            pos_x = [float(coord.split(" ")[1]) for coord in pos_coords]
+            pos_y = [float(coord.split(" ")[0]) for coord in pos_coords]
+            neg_x = [float(coord.split(" ")[1]) for coord in neg_coords]
+            neg_y = [float(coord.split(" ")[0]) for coord in neg_coords]
+
+            assert(pos_y == neg_y), "Latitudes of polygons in multipolygon " + \
+                                    "don't match, cannot construct valid " + \
+                                    "boundary object"
+            
+            lat_min = min(pos_y)
+            lat_max = max(pos_y)
+            long_min = min(pos_x)
+            long_max = max(neg_x)
+
+        else:    
+            coords = poly_string.split("POLYGON ((")[1].split("))")[0].split(", ")
+            x = [float(coord.split(" ")[1]) for coord in coords]
+            y = [float(coord.split(" ")[0]) for coord in coords]
+
+            lat_min = min(x)
+            lat_max = max(x)
+            long_min = min(y)
+            long_max = max(y)
 
         long_range = [long_min, long_max]
         lat_range = [lat_min, lat_max]
@@ -154,8 +181,6 @@ class Boundary:
             raise ValueError('Boundary: range should contain two values')
         if lat_range[0] > lat_range [1]:
              raise ValueError('Boundary: Latitude start range should be smaller than range end')
-        if long_range[0] > long_range [1]:
-             raise ValueError('Boundary: Longtitude start range should be smaller than range end')
         if long_range[0] < -180 or long_range[1] > 180:
             raise ValueError('Boundary: Longtitude range should be within -180:180')
         if len (time_range) > 0:
@@ -171,7 +196,13 @@ class Boundary:
                 cx (float): the x-position of the top-left corner of the CellBox
                     given in degrees longitude.
         """
-        return self.long_range[0] + self.get_width()/2
+        cx = self.long_range[0] + self.get_width()/2
+        
+        if cx > 180:
+            cx -= 360
+        
+        return cx
+
     def getcy(self):
         """
             returns y-position of the centroid of the cellbox
@@ -199,7 +230,11 @@ class Boundary:
                 width (float): the width of the CellBox
                     given in degrees longtitude.
         """
-        width = self.long_range[1] - self.long_range[0]
+        # If not over the antimeridian
+        if self.long_range[1] > self.long_range[0]:
+            width = self.long_range[1] - self.long_range[0]
+        else:
+            width = (180 - self.long_range[0]) + (self.long_range[1] + 180)
         return width
     def get_time_range (self):
         """
@@ -299,13 +334,33 @@ class Boundary:
                 Shapely polygon with corners at the min/max lat/long 
                 values of this boundary
         """
-        polygon = wkt.loads(
-                    f'POLYGON(({self.get_long_min()} {self.get_lat_min()},' + \
-                             f'{self.get_long_min()} {self.get_lat_max()},' + \
-                             f'{self.get_long_max()} {self.get_lat_max()},' + \
-                             f'{self.get_long_max()} {self.get_lat_min()},' + \
-                             f'{self.get_long_min()} {self.get_lat_min()}))'
-            )
+        # If not going over the antimeridian
+        if self.get_long_min() < self.get_long_max():
+            # Create a polygon of boundary
+            polygon = wkt.loads(
+                        f'POLYGON(({self.get_long_min()} {self.get_lat_min()},' + \
+                                f'{self.get_long_min()} {self.get_lat_max()},' + \
+                                f'{self.get_long_max()} {self.get_lat_max()},' + \
+                                f'{self.get_long_max()} {self.get_lat_min()},' + \
+                                f'{self.get_long_min()} {self.get_lat_min()}))'
+                )
+        else:
+            # Create a multipolygon of boundary
+            polygon_1 = wkt.loads(
+                        f'POLYGON(({self.get_long_min()} {self.get_lat_min()},' + \
+                                f'{self.get_long_min()} {self.get_lat_max()},' + \
+                                f'180 {self.get_lat_max()},' + \
+                                f'180 {self.get_lat_min()},' + \
+                                f'{self.get_long_min()} {self.get_lat_min()}))'
+                )
+            polygon_2 = wkt.loads(
+                        f'POLYGON((-180 {self.get_lat_min()},' + \
+                                f'-180 {self.get_lat_max()},' + \
+                                f'{self.get_long_max()} {self.get_lat_max()},' + \
+                                f'{self.get_long_max()} {self.get_lat_min()},' + \
+                                f'-180 {self.get_lat_min()}))'
+                )
+            polygon = MultiPolygon([polygon_1, polygon_2])
         return polygon
 
     def to_poly_string(self):
@@ -318,11 +373,7 @@ class Boundary:
                 String representation of the shapely polygon with corners at 
                 the min/max lat/long values of this boundary
         """
-        return f'POLYGON (({self.get_long_min():g} {self.get_lat_min():g}, ' + \
-                        f'{self.get_long_min():g} {self.get_lat_max():g}, ' + \
-                        f'{self.get_long_max():g} {self.get_lat_max():g}, ' + \
-                        f'{self.get_long_max():g} {self.get_lat_min():g}, ' + \
-                        f'{self.get_long_min():g} {self.get_lat_min():g}))'
+        return self.to_polygon().wkt
 
     def split(self):
         """
