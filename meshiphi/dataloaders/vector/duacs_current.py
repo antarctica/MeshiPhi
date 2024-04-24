@@ -38,8 +38,10 @@ class DuacsCurrentDataLoader(VectorDataLoader):
                             'longitude': 'long',
                             'ugos': 'uC',
                             'vgos': 'vC'})
-        # Drop unnecessary variable
-        data = data.drop_vars('crs')
+
+        # Drop unnecessary variable, if present
+        if 'crs' in data.keys():
+            data = data.drop_vars('crs')
 
         # Trim to initial datapoints
         data = self.trim_datapoints(bounds, data=data)
