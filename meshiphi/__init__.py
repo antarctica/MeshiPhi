@@ -1,10 +1,9 @@
 __version__ = "2.0.7"
-
-__description__ = "meshiphi: Earth's digital twin mapped on a non-uniform mesh"
+__description__ = "MeshiPhi: Earth's digital twin mapped on a non-uniform mesh"
 __license__ = "MIT"
-__author__ = "Samuel Hall, George Coombs, Harrison Abbot, Ayat Fekry, Jonathan Smith, Maria Fox, James Byrne, Michael Thorne"
-__email__ = "polarroute@bas.ac.uk"
-__copyright__ = "2022-2023, BAS AI Lab"
+__author__ = "Autonomous Marine Operations Planning (AMOP) Team, AI Lab, British Antarctic Survey"
+__email__ = "amop@bas.ac.uk"
+__copyright__ = "2021-, BAS AI Lab"
 
 # Wrapped in try-except so that setup.py can import meshiphi without crashing due to dependency errors
 try:
