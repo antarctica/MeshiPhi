@@ -22,7 +22,7 @@ def pytest_runtest_teardown(item, nextitem):
     meshes = {key: val for key, val in results['meshes'].items() if key != 'test'}
 
     # Create outputs folder if it doesn't exist yet
-    os.mkdirs(os.path.dirname(save_filename), exist_ok=True)
+    os.makedirs(os.path.dirname(save_filename), exist_ok=True)
     # Output as a json
     with open(save_filename,'w') as fp:
         json.dump(meshes, fp, indent=4)

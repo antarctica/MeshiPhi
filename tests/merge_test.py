@@ -32,7 +32,9 @@ class TestAutomater:
         'environment_mesh.py':  ['test_env_mesh.py']
     }
 
-    def __init__(self, from_branch=None, into_branch=None, regression=True, unit=True):
+    def __init__(self, from_branch=None, into_branch=None, 
+                 regression=True, unit=True, 
+                 plot=False):
         """
         Runs through test suite only taking into account relevant tests for the 
         modified files
@@ -51,6 +53,7 @@ class TestAutomater:
                 Flag for running unit tests. 
                 Defaults to True.
         """
+        self.start_dir = os.getcwd()
         # Set working directory
         self.repo_dir = self.get_base_dir()
         os.chdir(self.repo_dir)
@@ -63,10 +66,23 @@ class TestAutomater:
         # Get files that are different between branches
         diff_files = self.get_diff_filenames(from_branch=from_branch, 
                                              into_branch=into_branch)
+        
+        # Initialise arrays with each test, organise by status
+        self.passes = []
+        self.fails = []
+        self.errors = []
 
         # Run relevant tests
         if regression:  self.run_regression_tests(diff_files)
         if unit:        self.run_unit_tests(diff_files)
+
+        all_tests = self.passes + self.fails + self.errors
+        for test_info in all_tests:
+            logging.info(str(test_info))
+
+        # Copy fixture outputs to cwd if there are fails
+        # Plot differences
+        # Output set(diff attributes) as text
 
     def _run_tests(self, diff_files, test_dir, test_dict):
         """
@@ -99,14 +115,70 @@ class TestAutomater:
             for test in relevant_tests:
                 test_file_path = os.path.join(test_dir, test)
                 logging.info(f'\t- {test_file_path}')
-                pytest.main(['-x', test_file_path, '-v'])
 
+                command = ['pytest', test_file_path, 
+                                     '-rA']
+                                    #  '--show-capture=no', 
+                                    #  '--log-cli-level', '30',
+                                    #  '--tb=line']
+                pytest_output = sp.run(command, stdout=sp.PIPE)
+                pytest_stdout = pytest_output.stdout.decode('utf-8')
+                passes, fails, errors = self.parse_pytest_stdout(pytest_stdout)
+                self.passes += passes
+                self.fails += fails
+                self.errors += errors
         # Otherwise provide a message
         else:
             logging.info(" --- No relevant tests found --- ")
         
         # Change back to repo base directory
         os.chdir(self.repo_dir)
+
+    @staticmethod
+    def parse_pytest_stdout(stdout):
+        """
+        Turns stdout of Pytest into TestInfo objects
+
+        Args:
+            stdout (str): Minimal output of Pytest
+
+        Returns:
+            tuple: lists of TestInfo objects, organised into pass, fail, and error
+        """
+        # Split into three categories
+        passes = []
+        fails = []
+        errors = []
+        # Get index of line in stdout that contains short summary info
+        stdout_lines = stdout.split('\n')
+        summary_idx = [idx 
+                       for idx, s in enumerate(stdout_lines) 
+                       if 'short test summary info' in s][0]
+        # Iterate through pytest summary output
+        for line in stdout_lines[summary_idx:]:
+            # Only read the lines with all necessary info
+            if '::' in line:
+                # Split into pertinent parts
+                split_line = line.replace('::', ' ').replace('[',' ').replace(']', ' ')
+                split_line = split_line.split()
+                status = split_line[0]
+                test_file = split_line[1]
+                test_method = os.path.basename(split_line[2])
+                reference_file = split_line[3]
+                # Store as object
+                test_info = TestInfo(test_file, test_method, reference_file, status)
+                # Append to correct list
+                if status == 'PASSED':
+                    passes += [test_info]
+                elif status == 'FAILED':
+                    fails += [test_info]
+                elif status == 'ERROR':
+                    errors += [test_info]
+                else:
+                    raise ValueError(f'Unexpected test status {status}. Expected PASSED, FAILED, or ERROR')
+
+        return passes, fails, errors
+
 
     def run_regression_tests(self, diff_files):
         """
@@ -197,3 +269,36 @@ class TestAutomater:
                 relevant_tests += package_tests
 
         return relevant_tests
+    
+    def save_tests(self, passes=False, fails=True, errors=True):
+        # Define output folder
+        write_folder = os.path.join(self.start_dir, 'pytest_output')
+        os.makedirs(write_folder, exist_ok=True)
+        # Get list of files to copy
+        reference_files = []
+        if passes:
+            reference_files += [test_info.reference for test_info in self.passes]
+        if fails:
+            reference_files += [test_info.reference for test_info in self.fails]
+        if errors:
+            reference_files += [test_info.reference for test_info in self.errors]
+        # Keep unique entries
+        reference_files = list(set(reference_files))
+
+        for reference_file in reference_files:
+            if reference_file in self.regression_test_dict.values():
+                # Copy saved regression test to pytest_output folder
+                sp.run(['cp', 
+                        os.path.join(self.repo_dir, 'tests', 'regression_tests', '.outputs', reference_file), 
+                        os.path.join(write_folder, reference_file)])
+
+
+class TestInfo:
+    def __init__(self, file, test, reference, status):
+        self.file = file
+        self.test = test
+        self.reference = reference
+        self.status = status
+
+    def __str__(self):
+        return f'{self.status} - {self.file} > {self.test} > {self.reference}'

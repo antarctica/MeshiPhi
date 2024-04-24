@@ -8,8 +8,7 @@ import pytest
 import time
 import os
 
-from meshiphi import __version__ as pr_version
-from meshiphi import MeshBuilder
+import meshiphi
 
 # Import tests, which are automatically run
 
@@ -47,7 +46,7 @@ TEST_ABSTRACT_MESHES = [
 ]
 
 def setup_module():
-    LOGGER.info(f'PolarRoute version: {pr_version}')
+    LOGGER.info(f'MeshiPhi version: {meshiphi.__version__}')
 
 @pytest.fixture(scope='session', autouse=False, params=TEST_ENV_MESHES + TEST_ABSTRACT_MESHES)
 def mesh_pair(request):
@@ -89,7 +88,7 @@ def calculate_env_mesh(mesh_config):
     """
     start = time.perf_counter()
 
-    mesh_builder = MeshBuilder(mesh_config)
+    mesh_builder = meshiphi.MeshBuilder(mesh_config)
     new_mesh = mesh_builder.build_environmental_mesh()
 
     end = time.perf_counter()

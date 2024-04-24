@@ -22,6 +22,17 @@ def get_args(default_output=None):
                     default=False,
                     action="store_true",
                     help="Run only unit tests")
+    # Save pytest fixtures generated
+    ap.add_argument("-s", "--save",
+                    default=False,
+                    action="store_true",
+                    help="Save generated output to current directory")
+    # Save pytest fixtures generated
+    ap.add_argument("-p", "--plot",
+                    default=False,
+                    action="store_true",
+                    help="Plot differences between generated output to reference")
+    
     # Output file specified
     ap.add_argument("-o", "--output",
                     default=default_output,
