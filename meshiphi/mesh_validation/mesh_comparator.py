@@ -59,6 +59,10 @@ class MeshComparator:
             Args: 
                 mesh1 (json): The first mesh to compare
                 mesh2 (json): The second mesh to compare
+
+            Returns:
+
+                list: A list of the ID's of the missing cellboxes
         """
 
         cellboxes1 = pd.DataFrame(mesh1['cellboxes']).set_index('geometry')
