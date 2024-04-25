@@ -67,8 +67,10 @@ class DensityDataLoader(LutDataLoader):
         # Remove empty geometry rows from df
         drop_idxs = []
         for idx, row in density_df.iterrows():
-            if row['geometry'].is_empty:
+            if row['geometry'].is_empty or \
+               row['geometry'].geom_type not in ['Polygon', 'MultiPolygon']:
                 drop_idxs += [idx]
+
         density_df.drop(index=drop_idxs, inplace=True)
         density_df.drop(columns=['index'], inplace=True)
 
