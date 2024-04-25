@@ -125,6 +125,32 @@ optional arguments:
     -o : output location
 
 
+^^^^^^^^^^^^^^
+merge_mesh
+^^^^^^^^^^^^^^
+
+When multiple compatilble meshes have been created using the :ref:`create_mesh` command, they can be merged together using the :ref:`merge_mesh` command.
+This will combine the meshes into a single mesh file, replacing cellboxes in mesh1 with cellboxes in mesh2 where they overlap.
+
+
+::
+
+    merge_mesh <mesh1.json> <mesh2.json>
+
+positional arguments:
+
+::
+
+    mesh1 : A digital environment file.
+    mesh2 : A digital environment file.
+optional arguments:
+
+::
+
+    -v : verbose logging
+    -o : output location
+
+
 ^^^^^^^^^^^^^^^^^^^^^
 plot_mesh (GeoPlot)
 ^^^^^^^^^^^^^^^^^^^^^
