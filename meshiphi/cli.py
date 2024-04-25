@@ -14,7 +14,8 @@ def get_args(
         default_output: str,
         config_arg: bool = True,
         mesh_arg: bool = False,
-        format_arg: bool = False):
+        format_arg: bool = False,
+        merge_arg: bool = False):
     """
     Adds required command line arguments to all CLI entry points.
 
@@ -56,6 +57,10 @@ def get_args(
         ap.add_argument( "-f", "--format_conf",
                         default = None,
                         help = "File location of Export to Tif configuration parameters")
+
+    if merge_arg:
+        ap.add_argument("merge", type=argparse.FileType("r"),
+                    help="File location of the environmental mesh to merge with")
 
 
 
@@ -142,3 +147,25 @@ def export_mesh_cli():
     logging.info(f"exporting mesh to {args.output} in format {args.format}")
 
     env_mesh.save(args.output, args.format , args.format_conf)
+
+@timed_call
+def merge_mesh_cli():
+    """
+        CLI entry point for merging two meshes.
+    """
+    default_output = "merged_mesh.output.json"
+    args = get_args(default_output, config_arg = False, mesh_arg=True, merge_arg=True)
+    logging.info("{} {}".format(inspect.stack()[0][3][:-4], version))
+
+    mesh1 = json.load(args.mesh)
+    mesh2 = json.load(args.merge)
+
+    env_mesh1 = EnvironmentMesh.load_from_json(mesh1)
+    env_mesh2 = EnvironmentMesh.load_from_json(mesh2)
+
+    env_mesh1.merge_mesh(env_mesh2)
+    merged_mesh_json = env_mesh1.to_json()
+
+    logging.info("Saving merged mesh to {}".format(args.output))
+    
+    json.dump(merged_mesh_json, open(args.output, "w"), indent=4)
