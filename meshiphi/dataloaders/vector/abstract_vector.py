@@ -83,9 +83,9 @@ class VectorDataLoader(DataLoaderInterface):
                      "of initial boundary")
         # If there's 0 datapoints in the initial boundary, raise ValueError
         if data_coverage == 0:
-            logging.error('\tDataloader has no data in initial region!')
-            raise ValueError(f"Dataloader {params['dataloader_name']}"+\
-                              " contains no data within initial region!")
+            logging.warning('\tDataloader has no data in initial region!')
+            # raise ValueError(f"Dataloader {params['dataloader_name']}"+\
+                            #   " contains no data within initial region!")
         else:
             # Cut dataset down to initial boundary
             logging.info(
