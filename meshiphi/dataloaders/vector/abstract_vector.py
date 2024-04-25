@@ -538,14 +538,13 @@ class VectorDataLoader(DataLoaderInterface):
                 'HET' = Threshold values defined in config are exceeded \n
                 'CLR' = None of the HET conditions were triggered \n
         '''
-        if data is None:
-            data = self.trim_datapoints(bounds)
-
+        data = self.trim_datapoints(bounds, data=data)
+        
         # Get length of dataset in bounds  
-        if type(self.data) == pd.core.frame.DataFrame:
-            num_dp = len(self.trim_datapoints(bounds))
-        elif type(self.data) == xr.core.dataset.Dataset:
-            num_dp = min(self.trim_datapoints(bounds).count().values())
+        if type(data) == pd.core.frame.DataFrame:
+            num_dp = len(data)
+        elif type(data) == xr.core.dataset.Dataset:
+            num_dp = min(data.count().values())
 
         # Set default homogeneity 
         hom_type = 'CLR'
