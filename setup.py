@@ -25,8 +25,7 @@ setup(
     url="https://www.github.com/antarctica",
     project_urls={
     },
-    classifiers=[el.lstrip() for el in """
-        Development Status :: 3 - Alpha
+    classifiers=[el.lstrip() for el in """Development Status :: 3 - Alpha
         Intended Audience :: Science/Research
         Intended Audience :: System Administrators
         License :: OSI Approved :: MIT License
@@ -35,8 +34,7 @@ setup(
         Programming Language :: Python
         Programming Language :: Python :: 3
         Programming Language :: Python :: 3.7
-        Topic :: Scientific/Engineering
-    """.split('\n')],
+        Topic :: Scientific/Engineering""".split('\n')],
     entry_points={
         'console_scripts': [
             "create_mesh=meshiphi.cli:create_mesh_cli",
