@@ -85,6 +85,16 @@ class MeshComparator:
 
         
     def compare_cellbox_values(self, mesh1, mesh2):
+        """
+        Compare the values of the cellboxes in the two meshes
+
+        Args:
+            mesh1 (json): the first mesh to compare
+            mesh2 (json): the second mesh to compare
+
+        Returns:
+            DataFrame: a dataframe containing the results of the comparison
+        """
 
         df_a = pd.DataFrame(mesh1['cellboxes']).set_index('geometry')
         df_b = pd.DataFrame(mesh2['cellboxes']).set_index('geometry')
@@ -113,6 +123,16 @@ class MeshComparator:
         return diff
 
     def compare_cellbox_attributes(self, mesh1, mesh2):  
+        """
+        Compare the attributes of the cellboxes in the two meshes
+
+        Args:
+            mesh1 (json): the first mesh to compare
+            mesh2 (json): the second mesh to compare
+
+        Returns:
+            dict: a dictionary containing the results of the comparison
+        """
 
         mesh1_attributes = set(mesh1['cellboxes'][0].keys())
         mesh2_attributes = set(mesh2['cellboxes'][0].keys())
@@ -128,6 +148,16 @@ class MeshComparator:
         return results    
 
     def compare_neighbour_graph_values(self, mesh1, mesh2):
+        """
+        Compare the values of the neighbour graph in the two meshes 
+
+        Args:
+            mesh1 (json): the first mesh to compare
+            mesh2 (json): the second mesh to compare
+
+        Returns:
+            dict: a dictionary containing the results of the comparison
+        """
 
         ng_1 = mesh1['neighbour_graph']
         ng_2 = mesh2['neighbour_graph']
