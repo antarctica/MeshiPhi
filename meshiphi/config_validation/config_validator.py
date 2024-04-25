@@ -66,7 +66,7 @@ def validate_mesh_config(config):
         """
         correctly_formatted = False
         # If relative time is parsed
-        if re.match('TODAY[+,-]\d+', time_str.replace(' ','')):
+        if re.match(r'TODAY[+,-]\d+', time_str.replace(' ','')):
             correctly_formatted = True
         elif time_str == 'TODAY':
             correctly_formatted = True
@@ -94,7 +94,7 @@ def validate_mesh_config(config):
             bound_max (float): Maximum value of boundary in the same axis
             cell_size (float): Initial cellbox size in the same axis
         """
-        assert((bound_max - bound_min)%cell_size == 0), \
+        assert(((bound_max - bound_min)/cell_size)%1 == 0), \
             f"{bound_max}-{bound_min}={bound_max-bound_min} is not evenly "+\
             f"divided by {cell_size}"
         

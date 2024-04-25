@@ -2,8 +2,9 @@ from meshiphi.dataloaders.lut.abstract_lut import LutDataLoader
 
 import logging
 
+import geopandas as gpd
 import pandas as pd
-from shapely import wkt
+from shapely import wkt, Polygon, MultiPolygon
 
 class DensityDataLoader(LutDataLoader):
     def import_data(self, bounds):
@@ -25,6 +26,7 @@ class DensityDataLoader(LutDataLoader):
         northern_hemisphere = wkt.loads('POLYGON((-180 0, -180 90, 180 90, 180 0, -180 0))')
         southern_hemisphere = wkt.loads('POLYGON((-180 -90, -180 0, 180 0, 180 -90, -180 -90))')
         
+        # su = summer, au = autumn, wi = winter, sp = spring
         northern_seasons = {
             1: 'wi',  2: 'wi', 12: 'wi',
             3: 'sp',  4: 'sp',  5: 'sp', 
@@ -61,6 +63,17 @@ class DensityDataLoader(LutDataLoader):
                             'geometry': southern_hemisphere & bounds_polygon,    # Intersect shapes
                             'density': [densities[southern_seasons[month]] for month in dates.month]})
                         ]
-        )
+        ).reset_index()
+        # Remove empty geometry rows from df
+        drop_idxs = []
+        for idx, row in density_df.iterrows():
+            if row['geometry'].is_empty or \
+               row['geometry'].geom_type not in ['Polygon', 'MultiPolygon']:
+                drop_idxs += [idx]
+
+        density_df.drop(index=drop_idxs, inplace=True)
+        density_df.drop(columns=['index'], inplace=True)
+
+        density_df = density_df.drop_duplicates()
         density_df = density_df.set_index('time').sort_index()
         return density_df

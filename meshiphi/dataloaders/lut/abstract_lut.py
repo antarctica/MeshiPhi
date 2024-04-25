@@ -196,11 +196,11 @@ class LutDataLoader(DataLoaderInterface):
             bounds_polygon = bounds.to_polygon()
             # Extract out polygons, add to multipolygon
             data_polygon = unary_union([datum for datum in data.tolist()])
-            coverage = data_polygon.area / bounds_polygon.area
 
-            # Cap output at 100%
-            if coverage >= 1:   return 1
-            else:               return coverage
+            overlap_area = data_polygon.intersection(bounds_polygon).area
+            total_area = bounds_polygon.area
+
+            return overlap_area / total_area
         
 
     def trim_datapoints(self, bounds, data=None):
@@ -227,37 +227,8 @@ class LutDataLoader(DataLoaderInterface):
         intersections = lut_polys.query(bounds_polygon, predicate='intersects').tolist()
         # Return only rows intersecting with cellbox boundary
         return data.iloc[intersections]
-
-    def get_val_from_coord(self, long=None, lat=None, return_coords=False):
-        '''
-        Extracts value from self.data with lat and long specified in kwargs.
-        
-        Args:
-            long (float): Longitude coordinate to search for
-            lat (float) : Latitude coordinate to search for
-            return_coords (boolean): 
-                Flag for whether to return coordinates with the value or not
-            
-        Returns:
-            pd.DataFrame: 
-                Either with one entry (the value at the coords), 
-                Optionaly with coordinates associated with it if 
-                return_coords = True
-        '''
-        # Check if lat/long point is within any of the data polygons
-        point = Point(long, lat)
-        values = self.data[point.within(self.data['geometry'])][self.data_name]
-        # Add lat/long coords to df if return_coords True
-        if return_coords:
-            data = pd.DataFrame({'lat': lat,
-                                 'long': long,
-                                 self.data_name: values})
-        else:
-            data = values
-            
-        return data
     
-    def get_value(self, bounds, agg_type=None, skipna=False):
+    def get_value(self, bounds, agg_type=None, skipna=False, data=None):
         '''
         Retrieve aggregated value from within bounds
         
@@ -277,7 +248,7 @@ class LutDataLoader(DataLoaderInterface):
         Raises:
             ValueError: aggregation type not in list of available methods
         '''
-        polygons = self.trim_datapoints(bounds)
+        polygons = self.trim_datapoints(bounds, data=data)
         logging.debug(f"\t{len(polygons)} polygons found for attribute " + \
                       f"'{self.data_name}' within bounds '{bounds}'")
         
@@ -337,7 +308,7 @@ class LutDataLoader(DataLoaderInterface):
         
         return { self.data_name: ret_val}
 
-    def get_hom_condition(self, bounds, splitting_conds):
+    def get_hom_condition(self, bounds, splitting_conds, data=None):
         '''
         Retrieves homogeneity condition of data within
         boundary.
@@ -361,7 +332,7 @@ class LutDataLoader(DataLoaderInterface):
         '''
         bounds_polygon = bounds.to_polygon()
         # Extract polygons that overlap the boundary
-        polygons = self.trim_datapoints(bounds)['geometry'].tolist()
+        polygons = self.trim_datapoints(bounds, data=data)['geometry'].tolist()
         
     
         # If there's no polygon that overlaps with bounds        

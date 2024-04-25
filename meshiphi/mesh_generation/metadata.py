@@ -17,7 +17,7 @@ class Metadata:
     """
    
 
-    def __init__(self, data_loader , spliiting_conditions =None, value_fill_type= ""):
+    def __init__(self, data_loader , splitting_conditions =None, value_fill_type= "", data_subset=None):
         """
 
             Args:
@@ -28,14 +28,28 @@ class Metadata:
                 
         """ 
         self.data_loader = data_loader
-        self.splitting_conditions = spliiting_conditions
+        self.splitting_conditions = splitting_conditions
         self.value_fill_type = value_fill_type
+        self.data_name = data_loader.data_name
+        if data_subset is None:
+            if ',' in data_loader.data_name:
+                self.data_subset = data_loader.data[data_loader.data_name.split(',')]
+            else:
+                self.data_subset = data_loader.data[data_loader.data_name]
+        else:
+            self.data_subset = data_subset
   
     def get_data_loader(self): 
         """
         returns the data loader
         """
         return self.data_loader
+
+    def set_data_loader(self , data_loader): 
+        """
+        sets the data loader
+        """
+        self.data_loader = data_loader
 
     def get_splitting_conditions(self):
         """
@@ -44,18 +58,17 @@ class Metadata:
         
         return self.splitting_conditions
 
-    def set_data_loader(self , data_loader): 
-        """
-        sets the data loader
-        """
-        self.data_loader = data_loader
- 
-
     def set_splitting_conditions(self ,  splitting_conditions):
         """
         sets the splitting conditions
         """
         self.splitting_conditions = splitting_conditions
+
+    def get_value_fill_type(self ):
+        """
+        returns thevalue fill type
+        """
+        return self.value_fill_type   
 
     def set_value_fill_type(self , value_fill_type): 
         """
@@ -63,10 +76,14 @@ class Metadata:
         """
         self.value_fill_type = value_fill_type
 
-    def get_value_fill_type(self ):
+    def get_data_subset(self):
         """
-        returns thevalue fill type
+        gets the data subset
         """
-        return self.value_fill_type   
-  
-
+        return self.data_subset
+    
+    def set_data_subset(self, data_subset):
+        """
+        sets the data subset
+        """
+        self.data_subset = data_subset
