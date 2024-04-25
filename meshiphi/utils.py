@@ -12,7 +12,35 @@ from functools import wraps
 from calendar import monthrange
 from scipy.fftpack import fftshift
 
-    
+def longitude_domain(long):
+    """
+    Converts any longitude degree value into one between -180:180
+    """
+    # Allow input type to be list or ndarray
+    if isinstance(long, list):
+        return [longitude_domain(x) for x in long]
+    elif isinstance(long, np.ndarray):
+        return np.array([longitude_domain(x) for x in long])
+    # Return same format as input at antimeridian
+    elif long in [-180, 180]:
+        return long
+    # Otherwise convert it to be within domain
+    else:    
+        return (long + 180) % 360 - 180
+
+def longitude_distance(long_a, long_b):
+    """
+    Calculates the angular distance between two longitude values
+    """
+
+    long_dist = np.abs(longitude_domain(long_b) - longitude_domain(long_a))
+    long_dist = np.mod(long_dist, 360)
+
+    if long_dist > 180:
+        return 360 - long_dist
+    else:
+        return long_dist
+
 def frac_of_month(year, month, start_date=None, end_date=None):
     
     # Determine the number of days in the month specified
