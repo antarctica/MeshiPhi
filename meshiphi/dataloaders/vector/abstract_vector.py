@@ -538,6 +538,26 @@ class VectorDataLoader(DataLoaderInterface):
                 'HET' = Threshold values defined in config are exceeded \n
                 'CLR' = None of the HET conditions were triggered \n
         '''
+
+        def hom_type_from_field(vector_field, splitting_conds):
+            # Determine fraction of datapoints over threshold value
+            num_over_threshold = np.count_nonzero(splitting_field > splitting_conds['threshold'])
+            frac_over_threshold = num_over_threshold/splitting_field.size
+            # Return homogeneity condition
+            if   frac_over_threshold <= splitting_conds['lower_bound']: hom_type = "CLR"
+            elif frac_over_threshold >= splitting_conds['upper_bound']: 
+                if splitting_conds['split_lock'] == True:
+                    hom_type = "HOM"
+                    logging.debug(f"\tSplitting locked by attribute: '{self.data_name}' in bounds:'{bounds}'")
+                else: hom_type = "CLR"
+            else: hom_type = "HET"
+
+            return hom_type
+
+
+        # Set default values for splitting_conds if not provided
+        if 'split_lock' not in splitting_conds:
+            splitting_conds['split_lock'] = False
         data = self.trim_datapoints(bounds, data=data)
         
         # Get length of dataset in bounds  
@@ -554,23 +574,18 @@ class VectorDataLoader(DataLoaderInterface):
             logging.debug(f"\t{num_dp} datapoints found for attribute '{self.data_name}' within bounds '{bounds}'")
             hom_type = 'CLR'
         else:
-            # To allow multiple modes of splitting, chuck them in the splitting conditions
-            # Split if magnitude of curl(data) is larger than threshold 
             if 'curl' in splitting_conds:
-                curl = self.calc_curl(bounds)
-                if np.abs(curl) > splitting_conds['curl']:
-                    hom_type =  'HET'
+                splitting_field = self.calc_curl(bounds, collapse=False)
             # Split if max magnitude(any_vector - ave_vector) is larger than threshold
-            if 'dmag' in splitting_conds:
-                dmag = self.calc_dmag(bounds)
-                if np.abs(dmag) > splitting_conds['dmag']:
-                    hom_type = 'HET'
-                
-            # Split if Reynolds number is larger than threshold
-            if 'reynolds' in splitting_conds:        
-                reynolds = self.calc_reynolds_number(bounds)
-                if reynolds > splitting_conds['reynolds']:
-                    hom_type = 'HET'
+            elif 'divergence' in splitting_conds:
+                splitting_field = self.calc_divergence(bounds, collapse=False)
+            elif 'dmag' in splitting_conds:
+                splitting_field = self.calc_dmag(bounds, collapse=False)
+            elif 'reynolds' in splitting_conds:
+                raise ValueError('Reynolds splitting condition deprecated')      
+                # reynolds = self.calc_reynolds_number(bounds)
+            
+            hom_type = hom_type_from_field(splitting_field, splitting_conds)
 
         logging.debug(f"\thom_condition for attribute: '{self.data_name}' in bounds:'{bounds}' returned '{hom_type}'")
         
