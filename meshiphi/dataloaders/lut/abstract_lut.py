@@ -11,6 +11,7 @@ from shapely.strtree import STRtree
 from shapely.ops import unary_union
 
 from meshiphi.utils import round_to_sigfig
+from meshiphi import Boundary
 
 class LutDataLoader(DataLoaderInterface):
     '''
@@ -330,10 +331,17 @@ class LutDataLoader(DataLoaderInterface):
                 should split
                 
         '''
+
+        def coverage_from_rows(bounds, rows):
+            total_coverage = 0
+            for _, row in rows.iterrows():
+                total_coverage += self.calculate_coverage(bounds, row)
+            return total_coverage
+
         bounds_polygon = bounds.to_polygon()
         # Extract polygons that overlap the boundary
-        polygons = self.trim_datapoints(bounds, data=data)['geometry'].tolist()
-        
+        limited_lut = self.trim_datapoints(bounds, data=data)
+        polygons = limited_lut['geometry'].tolist()
     
         # If there's no polygon that overlaps with bounds        
         if not any([polygon.intersects(bounds_polygon) for polygon in polygons]):
@@ -342,7 +350,23 @@ class LutDataLoader(DataLoaderInterface):
         elif splitting_conds['boundary']:
             if any(p.boundary.intersects(bounds_polygon) for p in polygons):
                 return 'HET'
-            
+        # If want to split with upper/lower bound
+        elif splitting_conds['threshold']:
+            threshold = splitting_conds['threshold']
+            values = limited_lut[self.data_name]
+            # Extract out rows less than (lt_) / greater than (gt_) the threshold
+            gt_threshold = limited_lut[values > threshold]
+            lt_threshold = limited_lut[values < threshold]
+            # Turn df entries into single fractional area
+            frac_over_threshold  = coverage_from_rows(bounds, gt_threshold)
+            frac_under_threshold = coverage_from_rows(bounds, lt_threshold)
+            # If area outside of lower/upper_bound
+            if frac_over_threshold  > splitting_conds['upper_bound'] or \
+               frac_under_threshold < splitting_conds['lower_bound']:
+                return 'HET'
+            else:
+                return 'HOM'
+
         # Otherwise no boundaries intersected bounds
         return 'CLR'
 
