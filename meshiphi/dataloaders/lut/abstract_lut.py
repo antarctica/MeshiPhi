@@ -196,11 +196,11 @@ class LutDataLoader(DataLoaderInterface):
             bounds_polygon = bounds.to_polygon()
             # Extract out polygons, add to multipolygon
             data_polygon = unary_union([datum for datum in data.tolist()])
-            coverage = data_polygon.area / bounds_polygon.area
 
-            # Cap output at 100%
-            if coverage >= 1:   return 1
-            else:               return coverage
+            overlap_area = data_polygon.intersection(bounds_polygon).area
+            total_area = bounds_polygon.area
+
+            return overlap_area / total_area
         
 
     def trim_datapoints(self, bounds, data=None):

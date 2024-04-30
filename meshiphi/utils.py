@@ -33,12 +33,14 @@ def longitude_distance(long_a, long_b):
     Calculates the angular distance between two longitude values
     """
 
-    long_dist = longitude_domain(long_b) - longitude_domain(long_a)
-    if long_b >= long_a:
-        return long_dist
+    long_dist = np.abs(longitude_domain(long_b) - longitude_domain(long_a))
+    long_dist = np.mod(long_dist, 360)
+
+    if long_dist > 180:
+        return 360 - long_dist
     else:
-        return 360 - np.abs(long_dist)
-    
+        return long_dist
+
 def frac_of_month(year, month, start_date=None, end_date=None):
     
     # Determine the number of days in the month specified

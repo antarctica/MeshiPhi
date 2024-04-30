@@ -284,7 +284,6 @@ class Boundary:
             returns the min of time range
         """
         return self.time_range[0]
-
     def get_time_max(self):
         """
             returns the max of time range
@@ -398,7 +397,6 @@ class Boundary:
 
         return bounds
         
-    
     def __str__(self):
 
 

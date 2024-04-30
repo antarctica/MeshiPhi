@@ -9,7 +9,7 @@ import xarray as xr
 import pandas as pd
 from rasterio.enums import Resampling
 
-from meshiphi.utils import round_to_sigfig
+from meshiphi.mesh_generation.boundary import Boundary
 
 
 
@@ -81,9 +81,9 @@ class ScalarDataLoader(DataLoaderInterface):
                      "of initial boundary")
         # If there's 0 datapoints in the initial boundary, raise ValueError
         if data_coverage == 0:
-            logging.error('\tDataloader has no data in initial region!')
-            raise ValueError(f"Dataloader {params['dataloader_name']}"+\
-                              " contains no data within initial region!")
+            logging.warning('\tDataloader has no data in initial region!')
+            #raise ValueError(f"Dataloader {params['dataloader_name']}"+\
+            #                  " contains no data within initial region!")
         else:
             # Cut dataset down to initial boundary
             logging.info(
@@ -189,28 +189,18 @@ class ScalarDataLoader(DataLoaderInterface):
             # Otherwise, calculate coverage, assuming rectangular region 
             # in mercator projection
             else:
-                # Get range of latitude values
-                data_lat_range = data.lat.max() - data.lat.min()
-                bounds_lat_range = bounds.get_lat_max() - bounds.get_lat_min()
-                # Get range of longitude values
-                data_long_range = data.long.max() - data.long.min()
-                # If not going over antimeridian
-                if bounds.get_long_max() > bounds.get_long_min():
-                    bounds_long_range = bounds.get_long_max() - bounds.get_long_min()
-                # If goes over antimeridian
-                else:
-                    bounds_long_range = (180 - bounds.get_long_min()) + \
-                                        (bounds.get_long_max() + 180)
-                # Calcualte area of each region
-                data_area = data_lat_range * data_long_range
-                bounds_area = bounds_lat_range * bounds_long_range
-                # If data area completely covers bounds, 100% coverage
-                if data_area >= bounds_area:
-                    return 1
-                # Otherwise return decimal fraction
-                else:
-                    return data_area / bounds_area
-                
+                # Create a polygon to calculate overlap region from
+                data_boundary = Boundary([data.lat.min(), data.lat.max()],
+                                         [data.long.min(), data.long.max()])
+                data_polygon = data_boundary.to_polygon()
+                bounds_polygon = bounds.to_polygon()
+
+                # Get fraction of bounds covered by data
+                overlap_area = data_polygon.intersection(bounds_polygon).area
+                total_area = bounds_polygon.area
+
+                return overlap_area / total_area
+
                 
         def calculate_coverage_from_xr(bounds, data):
             # Remove all NaN columns/rows
@@ -222,27 +212,18 @@ class ScalarDataLoader(DataLoaderInterface):
             # Otherwise, calculate coverage, assuming rectangular region 
             # in mercator projection
             else:
-                # Get range of latitude values
-                data_lat_range = data.lat.max().item() - data.lat.min().item()
-                bounds_lat_range = bounds.get_lat_max() - bounds.get_lat_min()
-                # Get range of longitude values
-                data_long_range = data.long.max().item() - data.long.min().item()
-                # If not going over antimeridian
-                if bounds.get_long_max() > bounds.get_long_min():
-                    bounds_long_range = bounds.get_long_max() - bounds.get_long_min()
-                # If goes over antimeridian
-                else:
-                    bounds_long_range = (180 - bounds.get_long_min()) + \
-                                        (bounds.get_long_max() + 180)
-                # Calcualte area of each region
-                data_area = data_lat_range * data_long_range
-                bounds_area = bounds_lat_range * bounds_long_range
-                # If data area completely covers bounds, 100% coverage
-                if data_area >= bounds_area:
-                    return 1
-                # Otherwise return decimal fraction
-                else:
-                    return data_area / bounds_area
+                # Create a polygon to calculate overlap region from
+                data_boundary = Boundary([data.lat.min().item(), data.lat.max().item()],
+                                         [data.long.min().item(), data.long.max().item()])
+                data_polygon = data_boundary.to_polygon()
+                bounds_polygon = bounds.to_polygon()
+
+                # Get fraction of bounds covered by data
+                overlap_area = data_polygon.intersection(bounds_polygon).area
+                total_area = bounds_polygon.area
+
+                return overlap_area / total_area
+
         # Use self.data if not no explicit dataset specified
         if data is None:
             data = self.data

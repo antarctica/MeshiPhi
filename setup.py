@@ -41,7 +41,8 @@ setup(
         'console_scripts': [
             "create_mesh=meshiphi.cli:create_mesh_cli",
             "export_mesh=meshiphi.cli:export_mesh_cli",
-            "rebuild_mesh=meshiphi.cli:rebuild_mesh_cli"],
+            "rebuild_mesh=meshiphi.cli:rebuild_mesh_cli",
+            "merge_mesh=meshiphi.cli:merge_mesh_cli"],
     },
     keywords=[],
     packages=find_packages(),
