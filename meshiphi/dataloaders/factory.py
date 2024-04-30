@@ -17,7 +17,6 @@ from meshiphi.dataloaders.scalar.era5_wind_dir import ERA5WindDirDataLoader
 from meshiphi.dataloaders.scalar.visual_iced import VisualIcedDataLoader
 from meshiphi.dataloaders.scalar.ecmwf_sig_wave_height import ECMWFSigWaveHeightDataLoader
 
-
 from meshiphi.dataloaders.vector.baltic_current import BalticCurrentDataLoader
 from meshiphi.dataloaders.vector.era5_wind import ERA5WindDataLoader
 from meshiphi.dataloaders.vector.north_sea_current import NorthSeaCurrentDataLoader
@@ -27,6 +26,7 @@ from meshiphi.dataloaders.vector.vector_csv import VectorCSVDataLoader
 from meshiphi.dataloaders.vector.vector_grf import VectorGRFDataLoader
 from meshiphi.dataloaders.vector.duacs_current import DuacsCurrentDataLoader
 from meshiphi.dataloaders.vector.era5_wave_direction_vector import ERA5WaveDirectionLoader
+from meshiphi.dataloaders.vector.vector_shape import VectorShapeDataLoader
 
 from meshiphi.dataloaders.lut.density import DensityDataLoader
 from meshiphi.dataloaders.lut.thickness import ThicknessDataLoader
@@ -113,6 +113,9 @@ class DataLoaderFactory:
             'duacs_currents':       (DuacsCurrentDataLoader, ['files']),
             'oras5_currents':       (ORAS5CurrentDataLoader, ['files']),
             'sose':                 (SOSEDataLoader, ['files']),
+            # Vector - Abstract shapes
+            'vector_circle': (VectorShapeDataLoader, []),
+            'vector_gradient': (VectorShapeDataLoader, []),
             # LUT
             'thickness':        (ThicknessDataLoader, []),
             'density':          (DensityDataLoader, []),
