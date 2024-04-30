@@ -29,7 +29,7 @@ created by the MeshBuilder object, though the object is mutable and can be updat
 
 .. autoclass:: meshiphi.mesh_generation.environment_mesh.EnvironmentMesh
    :special-members: __init__  
-   :members: load_from_json, update_cellbox , to_json, to_geojson, to_tif ,save
+   :members: load_from_json, update_cellbox , to_json, to_geojson, to_tif, save, merge_mesh, split_and_replace
 
 NeighbourGraph
 ***************

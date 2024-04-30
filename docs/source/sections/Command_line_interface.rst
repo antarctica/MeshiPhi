@@ -143,6 +143,7 @@ positional arguments:
 
     mesh1 : A digital environment file.
     mesh2 : A digital environment file.
+   
 optional arguments:
 
 ::
