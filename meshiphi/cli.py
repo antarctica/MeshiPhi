@@ -59,8 +59,14 @@ def get_args(
                         help = "File location of Export to Tif configuration parameters")
 
     if merge_arg:
-        ap.add_argument("merge", type=argparse.FileType("r"),
+        ap.add_argument("merge",
                     help="File location of the environmental mesh to merge with")
+        ap.add_argument("-d", "--directory",
+                    default=None,
+                    action="store_true",
+                    help="Flag to indicate that the merge file is a directory of meshes \
+                        to merge. If set, the merge file is expected to be a directory of \
+                        meshes to merge with the input mesh. The output will be a single merged mesh.")
 
 
 
@@ -153,19 +159,39 @@ def merge_mesh_cli():
     """
         CLI entry point for merging two meshes.
     """
+
+    from os import listdir 
+    from os.path import isfile, join
+
     default_output = "merged_mesh.output.json"
     args = get_args(default_output, config_arg = False, mesh_arg=True, merge_arg=True)
     logging.info("{} {}".format(inspect.stack()[0][3][:-4], version))
 
-    mesh1 = json.load(args.mesh)
-    mesh2 = json.load(args.merge)
-
+    with open(args.mesh.name, "r") as f:
+        mesh1 = json.load(args.mesh)
     env_mesh1 = EnvironmentMesh.load_from_json(mesh1)
-    env_mesh2 = EnvironmentMesh.load_from_json(mesh2)
+    
+    if args.directory:
+        logging.debug("Merging multiple meshes from directory {} with input mesh".format(args.merge))
 
-    env_mesh1.merge_mesh(env_mesh2)
+        merge_dir = args.merge
+        merge_meshes = [f for f in listdir(merge_dir) if isfile(join(merge_dir, f))]
+
+        for mesh in merge_meshes:
+            with open(merge_dir + "/" + mesh, "r") as f:
+                merge_mesh = json.load(f)
+            env_mesh_merge = EnvironmentMesh.load_from_json(merge_mesh)
+
+            env_mesh1.merge_mesh(env_mesh_merge)
+    else:
+    
+        with open(args.merge, "r") as f:
+            mesh2 = json.load(f)    
+        env_mesh2 = EnvironmentMesh.load_from_json(mesh2)
+
+        env_mesh1.merge_mesh(env_mesh2)
+       
     merged_mesh_json = env_mesh1.to_json()
 
     logging.info("Saving merged mesh to {}".format(args.output))
-    
     json.dump(merged_mesh_json, open(args.output, "w"), indent=4)
