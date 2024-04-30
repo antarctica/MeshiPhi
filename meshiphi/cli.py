@@ -178,7 +178,8 @@ def merge_mesh_cli():
         merge_meshes = [f for f in listdir(merge_dir) if isfile(join(merge_dir, f))]
 
         for mesh in merge_meshes:
-            with open(merge_dir + "/" + mesh, "r") as f:
+            path = join(merge_dir, mesh)
+            with open(path, "r") as f:
                 merge_mesh = json.load(f)
             env_mesh_merge = EnvironmentMesh.load_from_json(merge_mesh)
 
