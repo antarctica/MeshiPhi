@@ -150,6 +150,7 @@ optional arguments:
 
     -v : verbose logging
     -o : output location
+    -d, --directory : Flag indicating the mesh files to be merged are in a directory, not an individual file 
 
 
 ^^^^^^^^^^^^^^^^^^^^^
