@@ -128,11 +128,9 @@ class MeshBuilder:
                 cellbox.set_data_source(updated_meta_data_list)
 
 
-        
         logging.info("Initialising neighbour graph...")
         self.neighbour_graph = NeighbourGraph(cellboxes, grid_width)
         self.neighbour_graph.set_global_mesh (self.check_global_mesh(bounds, cellboxes, int(grid_width)))
-
 
 
         max_split_depth = 0
@@ -247,7 +245,6 @@ class MeshBuilder:
             
         return updated_meta_data_list
             
-
     def check_value_fill_type(self, data_source):
         def is_float(element: any) -> bool:
             if element is None: 
@@ -359,8 +356,6 @@ class MeshBuilder:
                 cellbox.set_data_source(
                     cellbox.get_data_source() + [meta_data_obj]
                 )
-
-        
 
     def validate_bounds(self, bounds, cell_width, cell_height):
         assert (bounds.get_long_max() - bounds.get_long_min()) % cell_width == 0, \
@@ -549,7 +544,6 @@ class MeshBuilder:
             if self.neighbour_graph.get_neighbour_case(cellboxes[south_east_indx], cellboxes[indx]) == Direction.north_east:
                 se_neighbour_map[1].append(indx)
 
-   
     def fill_ne_map(self, north_east_indx, north_neighbour_indx, east_neighbour_indx, ne_neighbour_map):
         """
              method that fills the North east neighbours
@@ -566,7 +560,6 @@ class MeshBuilder:
             if self.neighbour_graph.get_neighbour_case(cellboxes[north_east_indx], cellboxes[indx]) == Direction.south_east:
                 ne_neighbour_map[3].append(indx)
 
-    
     def fill_nw_map(self,  north_west_indx, north_neighbour_indx, west_neighbour_indx, nw_neighbour_map):
         """
              method that fills the North west neighbours
@@ -583,7 +576,6 @@ class MeshBuilder:
             if self.neighbour_graph.get_neighbour_case(cellboxes[north_west_indx], cellboxes[indx]) == Direction.south_west:
                 nw_neighbour_map[-1].append(indx)
 
-  
     def fill_sw_neighbour_map(self, south_west_indx, south_neighbour_indx, west_neighbour_indx, sw_neighbour_map):
         """
              method that fills the South west neighbours
