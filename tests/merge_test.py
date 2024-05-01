@@ -2,35 +2,21 @@ import subprocess as sp
 import os
 import logging
 import pytest
+from tests import REGRESSION_TESTS_BY_FILE, UNIT_TESTS_BY_FILE
+import glob
+import json
+import pandas as pd
+import geopandas as gpd
+from shapely import wkt
+import matplotlib.pyplot as plt
+from meshiphi.mesh_generation.environment_mesh import EnvironmentMesh
+from meshiphi.mesh_validation.mesh_comparator import MeshComparator
 
 import logging
 
 
+
 class TestAutomater:
-
-    regression_test_dict = {
-        'mesh_builder.py':      ['test_mesh.py'],
-        'mesh.py':              ['test_mesh.py'],
-        'neighbour_graph.py':   ['test_mesh.py'],
-        'metadata.py':          ['test_mesh.py'],
-        'aggregated_cellbox.py':['test_mesh.py'],
-        'boundary.py':          ['test_mesh.py'],
-        'cellbox.py':           ['test_mesh.py'],
-        'direction.py':         ['test_mesh.py'],
-        'environment_mesh.py':  ['test_mesh.py']
-    }
-
-    unit_test_dict = {
-        'mesh_builder.py':      ['test_mesh_builder.py'],
-        'mesh.py':              [],
-        'neighbour_graph.py':   ['test_neighbour_graph.py'],
-        'metadata.py':          [],
-        'aggregated_cellbox.py':[],
-        'boundary.py':          ['test_boundary.py'],
-        'cellbox.py':           ['test_cellbox.py'],
-        'direction.py':         [],
-        'environment_mesh.py':  ['test_env_mesh.py']
-    }
 
     def __init__(self, from_branch=None, into_branch=None, 
                  regression=True, unit=True, 
@@ -83,6 +69,10 @@ class TestAutomater:
         # Copy fixture outputs to cwd if there are fails
         # Plot differences
         # Output set(diff attributes) as text
+
+        self.save_tests(fails=True, errors=True)
+        if plot:
+            self.plot_tests()
 
     def _run_tests(self, diff_files, test_dir, test_dict):
         """
@@ -193,7 +183,7 @@ class TestAutomater:
                                     'tests', 
                                     'regression_tests')
         logging.info("Attempting regression tests...")
-        self._run_tests(diff_files, reg_test_dir, self.regression_test_dict)
+        self._run_tests(diff_files, reg_test_dir, REGRESSION_TESTS_BY_FILE)
 
     def run_unit_tests(self, diff_files):
         """
@@ -208,7 +198,7 @@ class TestAutomater:
                                     'tests', 
                                     'unit_tests')
         logging.info("Attempting unit tests...")
-        self._run_tests(diff_files, unit_test_dir, self.unit_test_dict)
+        self._run_tests(diff_files, unit_test_dir, UNIT_TESTS_BY_FILE)
 
     @staticmethod
     def get_base_dir():
@@ -284,15 +274,54 @@ class TestAutomater:
             reference_files += [test_info.reference for test_info in self.errors]
         # Keep unique entries
         reference_files = list(set(reference_files))
+        reference_files = [os.path.basename(file) for file in reference_files]
 
         for reference_file in reference_files:
-            if reference_file in self.regression_test_dict.values():
-                # Copy saved regression test to pytest_output folder
-                sp.run(['cp', 
-                        os.path.join(self.repo_dir, 'tests', 'regression_tests', '.outputs', reference_file), 
-                        os.path.join(write_folder, reference_file)])
+            # Move saved regression test to pytest_output folder
+            sp.run(['mv', 
+                    os.path.join(self.repo_dir, 'tests', 'regression_tests', '.outputs', reference_file), 
+                    os.path.join(write_folder, reference_file)])
 
+    def plot_tests(self):
 
+        def add_df_to_ax(df, ax, c='black'):
+            if df.empty:
+                logging.info('skipping empty plot')
+                return ax
+            df = df.reset_index()
+            df['geometry'] = df['geometry'].apply(wkt.loads)
+            gdf = gpd.GeoDataFrame(df, crs="EPSG:4326", geometry='geometry')
+
+            gdf.plot(ax=ax, color=c, alpha=0.2, edgecolor=c)
+            return ax
+
+        saved_tests_folder = os.path.join(self.start_dir, 'pytest_output')
+
+        for test_output in glob.glob(f'{saved_tests_folder}/*.json'):
+            with open(test_output, 'r') as fp:
+                test_json = json.load(fp)
+            old_json = test_json['old_mesh']
+            new_json = test_json['new_mesh']
+
+            new_df = pd.DataFrame(new_json['cellboxes']).set_index('geometry')
+            mc = MeshComparator()
+            diff_bounds_df = mc.compare_cellbox_boundaries(old_json, new_json)
+            diff_values_df = mc.compare_cellbox_values(old_json, new_json)
+            diff_attrib_df = mc.compare_cellbox_attributes(old_json, new_json)
+            diff_ngraph_df = mc.compare_neighbour_graph_values(old_json, new_json)
+            
+            fig, ax = plt.subplots()
+
+            ax = add_df_to_ax(new_df, ax, c='darkgrey')
+            ax = add_df_to_ax(diff_bounds_df, ax, c='red')
+            ax = add_df_to_ax(diff_values_df, ax, c='green')
+            ax = add_df_to_ax(diff_attrib_df, ax, c='blue')
+            ax = add_df_to_ax(diff_ngraph_df, ax, c='purple')
+
+            plot_output = test_output[:-4]+'svg'
+
+            plt.savefig(f'{plot_output}', bbox_inches="tight")
+            plt.close()
 class TestInfo:
     def __init__(self, file, test, reference, status):
         self.file = file
