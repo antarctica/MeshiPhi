@@ -133,6 +133,8 @@ class MeshBuilder:
         self.neighbour_graph = NeighbourGraph(cellboxes, grid_width)
         self.neighbour_graph.set_global_mesh (self.check_global_mesh(bounds, cellboxes, int(grid_width)))
 
+
+
         max_split_depth = 0
         if 'splitting' in self.config:
             max_split_depth = self.config['splitting']['split_depth']
@@ -142,6 +144,31 @@ class MeshBuilder:
         if self.is_jgrid_mesh():
             logging.warning("We're using the legacy Java style cell grid")
 
+        # Connect south polar cellboxes
+        # Find all cellboxes with lat_min = -90
+        south_polar_cellboxes = []
+        for cellbox in self.mesh.cellboxes:
+            if cellbox.bounds.get_lat_min() == -90:
+                south_polar_cellboxes.append(int(cellbox.get_id()))
+
+        # Connect south polar cellboxes to all other south polar cellboxes
+        for sp_cellbox in south_polar_cellboxes:
+            neighbours = south_polar_cellboxes.copy()
+            neighbours.remove(sp_cellbox)
+            self.neighbour_graph.get_graph()[sp_cellbox]["4"] = neighbours
+
+        # Connect north polar cellboxes
+        # Find all cellboxes with lat_max = 90
+        north_polar_cellboxes = []
+        for cellbox in self.mesh.cellboxes:
+            if cellbox.bounds.get_lat_max() == 90:
+                north_polar_cellboxes.append(int(cellbox.get_id()))
+
+        # Connect north polar cellboxes to all other north polar cellboxes
+        for np_cellbox in north_polar_cellboxes:
+            neighbours = north_polar_cellboxes.copy()
+            neighbours.remove(np_cellbox)
+            self.neighbour_graph.get_graph()[np_cellbox]["-4"] = neighbours
 
     def initialize_meta_data(self, bounds, min_datapoints):
         '''
@@ -220,7 +247,6 @@ class MeshBuilder:
             
         return updated_meta_data_list
             
-
 
     def check_value_fill_type(self, data_source):
         def is_float(element: any) -> bool:
