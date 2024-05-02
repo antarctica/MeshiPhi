@@ -51,15 +51,14 @@ def merge_test_cli():
     default_output = "pytest.meshiphi.log"
     args = get_args(default_output=default_output)
 
-    # Default is both are true. Turn one off if only one specified
-    if args.regression and not args.unit:
-        reg  = True
-        unit = False
-    elif args.unit and not args.regression:
-        unit = True
-        reg  = False
+    # Turn one off if only one specified
+    if sum([args.regression, args.unit]) == 1:
+        reg  = args.regression
+        unit = args.unit
+    # Else, either both are selected, or neither are selected
+    # Default is both are true
     else:
-        reg  = True
+        reg  = True,
         unit = True
 
     # Set appropriate from/into branch to pass to TestAutomater
@@ -74,4 +73,5 @@ def merge_test_cli():
     TestAutomater(from_branch=from_branch, 
                   into_branch=into_branch,
                   regression=reg,
-                  unit=unit)
+                  unit=unit,
+                  plot=args.plot)
