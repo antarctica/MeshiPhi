@@ -1,20 +1,17 @@
-import subprocess as sp
 import os
-import logging
-import pytest
-from tests import REGRESSION_TESTS_BY_FILE, UNIT_TESTS_BY_FILE
-import glob
 import json
+import logging
+import subprocess as sp
 import pandas as pd
 import geopandas as gpd
 from shapely import wkt
+
 import matplotlib.pyplot as plt
-from meshiphi.mesh_generation.environment_mesh import EnvironmentMesh
+from matplotlib.patches import Patch
+from matplotlib.colors import to_rgba
+
 from meshiphi.mesh_validation.mesh_comparator import MeshComparator
-
-import logging
-
-
+from tests import REGRESSION_TESTS_BY_FILE, UNIT_TESTS_BY_FILE
 
 class TestAutomater:
 
@@ -169,7 +166,6 @@ class TestAutomater:
 
         return passes, fails, errors
 
-
     def run_regression_tests(self, diff_files):
         """
         Runs relevant regression tests for files within 'diff_files' 
@@ -277,51 +273,119 @@ class TestAutomater:
         reference_files = [os.path.basename(file) for file in reference_files]
 
         for reference_file in reference_files:
+
+            pytest_output_file    = os.path.join(self.repo_dir, 
+                                                 'tests', 
+                                                 'regression_tests', 
+                                                 '.outputs', 
+                                                 reference_file)
+            current_location_file = os.path.join(write_folder, 
+                                                 reference_file)
+
+            # Remove any existing files in output folder to avoid potential confusion
+            for filename in os.listdir(write_folder):
+                logging.warning(f'Removing {filename} from {write_folder}')
+                sp.run('rm', filename)
+
             # Move saved regression test to pytest_output folder
             sp.run(['mv', 
-                    os.path.join(self.repo_dir, 'tests', 'regression_tests', '.outputs', reference_file), 
-                    os.path.join(write_folder, reference_file)])
+                    pytest_output_file, 
+                    current_location_file])
 
     def plot_tests(self):
 
-        def add_df_to_ax(df, ax, c='black'):
+        def add_df_to_ax(df, ax, c='black', ids=False, label=None, a=0.2):
+            # Only attempt plotting if there's something to plot
             if df.empty:
-                logging.info('skipping empty plot')
-                return ax
+                logging.info('Nothing to plot, skipping')
+                return ax, None
+            # Turn geometry wkt to shapely polygons
             df = df.reset_index()
             df['geometry'] = df['geometry'].apply(wkt.loads)
             gdf = gpd.GeoDataFrame(df, crs="EPSG:4326", geometry='geometry')
 
-            gdf.plot(ax=ax, color=c, alpha=0.2, edgecolor=c)
-            return ax
+            # Plot polygons
+            gdf.plot(ax=ax, color=c, alpha=a, edgecolor=c)
+            
+            # Create a patch for the legend to plot
+            legend_entry = Patch(facecolor=to_rgba(c, a), 
+                                 edgecolor=c,
+                                 label=label)
+            
+            # Set a column to have roughly the centrepoint of each cellbox
+            gdf['coords'] = gdf['geometry'].apply(
+                lambda x: x.representative_point().coords[:][0]
+            )
+            if ids:
+                # Print cellbox id within the cellbox
+                for idx, row in gdf.iterrows():
+                    ax.annotate(row['id'], 
+                                xy=row['coords'], 
+                                ha='center',
+                                fontsize=row['dcx'])
 
+            return ax, legend_entry
+
+        # Save plot to same folder as save_tests
         saved_tests_folder = os.path.join(self.start_dir, 'pytest_output')
 
-        for test_output in glob.glob(f'{saved_tests_folder}/*.json'):
+        # For each test saved
+        for test_output in os.listdir(saved_tests_folder):
             with open(test_output, 'r') as fp:
                 test_json = json.load(fp)
             old_json = test_json['old_mesh']
             new_json = test_json['new_mesh']
 
+            # Create dataframe with every cellbox
             new_df = pd.DataFrame(new_json['cellboxes']).set_index('geometry')
+
+            # Compare old to new, save cellboxes that are different
             mc = MeshComparator()
             diff_bounds_df = mc.compare_cellbox_boundaries(old_json, new_json)
             diff_values_df = mc.compare_cellbox_values(old_json, new_json)
             diff_attrib_df = mc.compare_cellbox_attributes(old_json, new_json)
             diff_ngraph_df = mc.compare_neighbour_graph_values(old_json, new_json)
             
-            fig, ax = plt.subplots()
+            # Create a plotting window
+            _, ax = plt.subplots()
 
-            ax = add_df_to_ax(new_df, ax, c='darkgrey')
-            ax = add_df_to_ax(diff_bounds_df, ax, c='red')
-            ax = add_df_to_ax(diff_values_df, ax, c='green')
-            ax = add_df_to_ax(diff_attrib_df, ax, c='blue')
-            ax = add_df_to_ax(diff_ngraph_df, ax, c='purple')
-
+            # Add empty background with cellbox boundaries
+            ax, _ = add_df_to_ax(new_df, ax, c='darkgrey')
+            # Add cellboxes with different boundaries to original
+            ax, legend_1 = add_df_to_ax(diff_bounds_df, ax, 
+                                        c='red', ids=True,
+                                        label='Boundary')
+            # Add cellboxes with different values to original
+            ax, legend_2 = add_df_to_ax(diff_values_df, ax, 
+                                        c='green', ids=True, 
+                                        label='Values')
+            # Add cellboxes with different attributes to original
+            ax, legend_3 = add_df_to_ax(diff_attrib_df, ax, 
+                                        c='blue', ids=True, 
+                                        label='Attributes')
+            # Add cellboxes with different neighbour graph to original
+            ax, legend_4 = add_df_to_ax(diff_ngraph_df, ax, 
+                                        c='purple', ids=True, 
+                                        label='Neighbour graph')
+            # Save legend entries to handle later, remove None entries
+            legend_boxes = [legend_1, legend_2, legend_3, legend_4]
+            legend_boxes = [x for x in legend_boxes if x is not None]
+            # Draw legend
+            ax.legend(handles = legend_boxes, 
+                      title = 'Mismatched\n',
+                      title_fontsize = 'large',
+                      loc = 'center left',
+                      bbox_to_anchor = (1, 0.5))
+            # Remove whitespace between polygons and axes
+            ax.margins(0)
+            # Save as vector image so can zoom in to see ID per diff cellbox
             plot_output = test_output[:-4]+'svg'
+
+            ax.set_title('Differences in new mesh')
 
             plt.savefig(f'{plot_output}', bbox_inches="tight")
             plt.close()
+
 class TestInfo:
     def __init__(self, file, test, reference, status):
         self.file = file
