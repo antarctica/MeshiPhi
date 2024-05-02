@@ -231,7 +231,7 @@ class VectorShapeDataLoader(VectorDataLoader):
         x_dist_from_centre = np.abs(x - c_x)
         y_dist_from_centre = np.abs(y - c_y)
         # Turn this into a mask of values within the rectangle
-        mask = x_dist_from_centre <= self.width and y_dist_from_centre <= self.height
+        mask = np.logical_and(x_dist_from_centre <= self.width, y_dist_from_centre <= self.height)
         # Set up empty dataframe to populate with dummy data
         dummy_df = pd.DataFrame(columns=['lat', 'long', 'dummy_data_u', 'dummy_data_v'])
         logging.info("\tGenerating vector dataset")
