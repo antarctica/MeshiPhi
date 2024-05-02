@@ -143,7 +143,7 @@ class MeshBuilder:
             logging.warning("We're using the legacy Java style cell grid")
 
         # Connect south polar cellboxes
-        # Find all cellboxes with lat_min = -90
+        # Find all cellboxes with lat_min = -90 (touching the south pole)
         south_polar_cellboxes = []
         for cellbox in self.mesh.cellboxes:
             if cellbox.bounds.get_lat_min() == -90:
@@ -156,7 +156,7 @@ class MeshBuilder:
             self.neighbour_graph.get_graph()[sp_cellbox]["4"] = neighbours
 
         # Connect north polar cellboxes
-        # Find all cellboxes with lat_max = 90
+        # Find all cellboxes with lat_max = 90 (touching the north pole)
         north_polar_cellboxes = []
         for cellbox in self.mesh.cellboxes:
             if cellbox.bounds.get_lat_max() == 90:
