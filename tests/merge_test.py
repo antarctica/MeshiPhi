@@ -15,7 +15,7 @@ from tests import REGRESSION_TESTS_BY_FILE, UNIT_TESTS_BY_FILE
 
 class TestAutomater:
 
-    def __init__(self, from_branch=None, into_branch=None, 
+    def __init__(self, from_branch=None, into_branch="main", 
                  regression=True, unit=True, 
                  plot=False, summary=True):
         """
@@ -42,10 +42,6 @@ class TestAutomater:
         os.chdir(self.repo_dir)
         logging.debug(f'Set base directory to {os.getcwd()}')
         
-        # Set default branch to compare to if not user set
-        if not into_branch:
-            into_branch = "main"
-
         # Get files that are different between branches
         diff_files = self.get_diff_filenames(from_branch=from_branch, 
                                              into_branch=into_branch)
