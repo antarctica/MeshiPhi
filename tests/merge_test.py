@@ -72,13 +72,19 @@ class TestAutomater:
         self.save_tests(output_folder, fails=True, errors=True)
 
         # For each test saved
-        for test_output_file in os.listdir(output_folder):
+        currently_existing_files = os.listdir(output_folder)
+        currently_existing_jsons = [file for file in currently_existing_files 
+                                    if file.endswith('.json')]
+        for test_output_file in currently_existing_jsons:
             test_output_path = os.path.join(output_folder, test_output_file)
             # Skip over any non-json files that might be leftover in folder
             # e.g. Saved plots
             if not test_output_file.endswith('.json'):
                 continue
-      
+            # Print a seperator, 32 from the length of logging prefix
+            remaining_terminal_width = os.get_terminal_size().columns-32
+            logging.info(f"{'='*remaining_terminal_width}")
+            logging.info(f'Processing {test_output_path}')
             # Save plot if requested
             if plot:
                 self.plot_test(test_output_path)
@@ -322,27 +328,37 @@ class TestAutomater:
         reference_files = list(set(reference_files))
         reference_files = [os.path.basename(file) for file in reference_files]
 
-        # For each file generated in the testing
-        for reference_file in reference_files:
+        # Remove any existing files in output folder to avoid potential confusion
+        for existing_filename in os.listdir(output_folder):
+            logging.warning(f'Removing {existing_filename} from {output_folder}')
+            existing_filepath = os.path.join(output_folder, existing_filename)
+            sp.run(['rm', existing_filepath])
 
-            pytest_output_file    = os.path.join(self.repo_dir, 
+        # For each file generated in the testing
+        pytest_output_dir = os.path.join(self.repo_dir, 
                                                  'tests', 
                                                  'regression_tests', 
-                                                 '.outputs', 
-                                                 reference_file)
-            current_location_file = os.path.join(output_folder, 
-                                                 reference_file)
-
-            # Remove any existing files in output folder to avoid potential confusion
-            for existing_filename in os.listdir(output_folder):
-                logging.warning(f'Removing {existing_filename} from {output_folder}')
-                existing_filepath = os.path.join(output_folder, existing_filename)
-                sp.run(['rm', existing_filepath])
-
-            # Move saved regression test to pytest_output folder
-            sp.run(['mv', 
-                    pytest_output_file, 
-                    current_location_file])
+                                                 '.outputs')
+        # For each computed mesh
+        for pytest_output_file in os.scandir(pytest_output_dir):
+            test_comparison_filename = os.path.basename(pytest_output_file)
+            cwd_filename = os.path.join(output_folder, 
+                                        test_comparison_filename)
+            
+            # Do a quick comparison
+            old_json, new_json = self.read_test_output(pytest_output_file)
+            comparison = self.compare_meshes(old_json, new_json)
+            # Remove full new mesh from comparison dict
+            del comparison['new_mesh']
+            # Determine which meshes have no differences
+            identical_meshes = [df.empty for df in comparison.values()]
+            # If no difference in meshes, remove the file
+            if all(identical_meshes):
+                command = ['rm', pytest_output_file]
+            # If there is a difference, move the file to current directory
+            else:
+                command = ['mv', pytest_output_file, cwd_filename]
+            sp.run(command)
 
     @staticmethod
     def read_test_output(test_output_file):
@@ -431,7 +447,7 @@ class TestAutomater:
             """
             # Only attempt plotting if there's something to plot
             if df.empty:
-                logging.info('Nothing to plot, skipping')
+                logging.debug('Nothing to plot, skipping')
                 return ax, None
             # Turn geometry wkt to shapely polygons
             df = df.reset_index()

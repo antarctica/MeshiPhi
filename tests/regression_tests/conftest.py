@@ -16,8 +16,8 @@ def pytest_runtest_teardown(item, nextitem):
     results = dict(item.user_properties)
     if not results:
         return
-    
-    save_filename = f".outputs/{results['meshes']['test']}"
+    test_name = results['meshes']['test']
+    save_filename = f".outputs/{test_name.split('.')[0]+'.comparison.json'}"
     # Only care about the meshes used as a fixture
     meshes = {key: val for key, val in results['meshes'].items() if key != 'test'}
 
