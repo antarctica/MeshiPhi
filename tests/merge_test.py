@@ -17,7 +17,7 @@ class TestAutomater:
 
     def __init__(self, from_branch=None, into_branch=None, 
                  regression=True, unit=True, 
-                 plot=False):
+                 plot=False, summary=True):
         """
         Runs through test suite only taking into account relevant tests for the 
         modified files
@@ -63,13 +63,29 @@ class TestAutomater:
         for test_info in all_tests:
             logging.info(str(test_info))
 
-        # Copy fixture outputs to cwd if there are fails
-        # Plot differences
-        # Output set(diff attributes) as text
 
-        self.save_tests(fails=True, errors=True)
-        if plot:
-            self.plot_tests()
+        # Define output folder
+        output_folder = os.path.join(self.start_dir, 'pytest_output')
+        os.makedirs(output_folder, exist_ok=True)
+
+        # Save failing test output to current working directory
+        self.save_tests(output_folder, fails=True, errors=True)
+
+        # For each test saved
+        for test_output_file in os.listdir(output_folder):
+            test_output_path = os.path.join(output_folder, test_output_file)
+            # Skip over any non-json files that might be leftover in folder
+            # e.g. Saved plots
+            if not test_output_file.endswith('.json'):
+                continue
+      
+            # Save plot if requested
+            if plot:
+                self.plot_test(test_output_path)
+
+            # Write summary to CLI if requested
+            if summary:
+                self.summarise(test_output_path)
 
     def _run_tests(self, diff_files, test_dir, test_dict):
         """
@@ -211,9 +227,24 @@ class TestAutomater:
     def get_diff_filenames(from_branch=None, into_branch=None):
         """
         Gets a list of files that have changed between 'from_branch' and 'into_branch'
+
+        Args:
+            from_branch (str, optional):
+                Test branch to compare. 
+                Defaults to current working branch.
+            into_branch (str, optional): 
+                'Ground truth' branch to compare from_branch to. 
+                Defaults to main.
+
+        Returns:
+            list(str): 
+                List of files that are different between 
+                from_branch and into_branch
         """
         # Make sure that at least branch merging into is defined
-        assert(into_branch), "Must specify branch being 'diff'ed with"
+        if into_branch is None:
+            into_branch = 'main'
+
         # Base command to run as arg list
         command = ['git', '--no-pager', 'diff', '--name-only']
         
@@ -246,6 +277,15 @@ class TestAutomater:
     def get_relevant_tests(self, diff_file, test_dict):
         """
         Determines the relevant tests to run from filename
+
+        Args:
+            diff_file (str): File that is modified from into_branch
+            test_dict (dict): Mapping of modified file to relevant tests
+
+        Returns:
+            list(str): 
+                List of tests that need to be run due to diff_file being 
+                modified from ground truth
         """
         relevant_tests = []
         # For each available mapping of files to tests
@@ -256,10 +296,20 @@ class TestAutomater:
 
         return relevant_tests
     
-    def save_tests(self, passes=False, fails=True, errors=True):
-        # Define output folder
-        write_folder = os.path.join(self.start_dir, 'pytest_output')
-        os.makedirs(write_folder, exist_ok=True)
+    def save_tests(self, output_folder, passes=False, fails=True, errors=True):
+        """
+        Saves copy of newly generated test meshes to 'pytest_output' folder
+        in current working directory. Meshes will be saved as
+        './pytest_output/<test_name>.json'
+
+        Args:
+            passes (bool, optional): 
+                Choice to save tests that pass. Defaults to False.
+            fails (bool, optional): 
+                Choice to save tests that fail. Defaults to True.
+            errors (bool, optional): 
+                Choice to save tests that error. Defaults to True.
+        """
         # Get list of files to copy
         reference_files = []
         if passes:
@@ -272,6 +322,7 @@ class TestAutomater:
         reference_files = list(set(reference_files))
         reference_files = [os.path.basename(file) for file in reference_files]
 
+        # For each file generated in the testing
         for reference_file in reference_files:
 
             pytest_output_file    = os.path.join(self.repo_dir, 
@@ -279,22 +330,105 @@ class TestAutomater:
                                                  'regression_tests', 
                                                  '.outputs', 
                                                  reference_file)
-            current_location_file = os.path.join(write_folder, 
+            current_location_file = os.path.join(output_folder, 
                                                  reference_file)
 
             # Remove any existing files in output folder to avoid potential confusion
-            for filename in os.listdir(write_folder):
-                logging.warning(f'Removing {filename} from {write_folder}')
-                sp.run('rm', filename)
+            for existing_filename in os.listdir(output_folder):
+                logging.warning(f'Removing {existing_filename} from {output_folder}')
+                existing_filepath = os.path.join(output_folder, existing_filename)
+                sp.run(['rm', existing_filepath])
 
             # Move saved regression test to pytest_output folder
             sp.run(['mv', 
                     pytest_output_file, 
                     current_location_file])
 
-    def plot_tests(self):
+    @staticmethod
+    def read_test_output(test_output_file):
+        """
+        Reads test output file and extracts out two meshes;
+        the old 'ground truth' mesh, and the newly generated mesh
+
+        Args:
+            test_output_file (str): 
+                Filename of json file holding both meshes
+
+        Returns:
+            dict: Ground truth 'old' json mesh
+            dict: Updated 'new' json mesh
+        """
+        with open(test_output_file, 'r') as fp:
+            test_json = json.load(fp)
+        old_json = test_json['old_mesh']
+        new_json = test_json['new_mesh']
+
+        return old_json, new_json
+
+    def compare_meshes(self, old_json, new_json):
+        """
+        Runs mesh comparator on old and new mesh stored within 
+        test_output_file
+
+        Args:
+            old_json (dict): 
+                Mesh with old 'ground truth' values
+            new_json (dict):
+                Newly generated mesh to compare against old_mesh
+
+        Returns:
+            dict: Mesh comparison dataframes indexed by human readable labels
+        """
+
+
+        mc = MeshComparator()
+        
+        mesh_comparison = {
+            'new_mesh': pd.DataFrame(new_json['cellboxes']).set_index('geometry'),
+            'bounds':   mc.compare_cellbox_boundaries(old_json, new_json),
+            'values':   mc.compare_cellbox_values(old_json, new_json),
+            'attributes': mc.compare_cellbox_attributes(old_json, new_json),
+            'neighbour_graph': mc.compare_neighbour_graph_values(old_json, new_json)
+        }
+
+        return mesh_comparison
+
+    def plot_test(self, test_output):
+        """
+        Creates a plot of the differences between the newly generated mesh and
+        the ground truth mesh. The mesh displayed will be the new mesh, with
+        cellboxes different to the ground truth mesh being highlighted in a unique
+        colour depending on the difference.
+
+        Saves image to current working directory under
+        './pytest_output/<test_name>.svg'
+        """
 
         def add_df_to_ax(df, ax, c='black', ids=False, label=None, a=0.2):
+            """
+            Converts dataframe output from the MeshComparator into a plotable 
+            feature
+
+            Args:
+                df (pd.DataFrame): 
+                    Output of MeshComparator. Rows relate to each cellbox that 
+                    is different between old and new meshes. 
+                ax (mpl.Axes): 
+                    Matplotlib axes object to plot onto
+                c (str, optional): 
+                    Colour to plot cellbox. Defaults to 'black'.
+                a (float, optional):
+                    Alpha value of cellboxes being plotted. Defaults to 0.2.
+                ids (bool, optional): 
+                    Flag indicating whether cellbox ID should be added to cellboxes. 
+                    Defaults to False.
+                label (str, optional): 
+                    Label to add to legend entry. Defaults to None.
+
+            Returns:
+                mpl.Axes: Axes object after being plotted ontop of
+                mpl.Patch: Custom legend entry for plotted cellboxes
+            """
             # Only attempt plotting if there's something to plot
             if df.empty:
                 logging.info('Nothing to plot, skipping')
@@ -326,66 +460,90 @@ class TestAutomater:
 
             return ax, legend_entry
 
-        # Save plot to same folder as save_tests
-        saved_tests_folder = os.path.join(self.start_dir, 'pytest_output')
+        # Read in test output file and compare meshes in it
+        old_json, new_json = self.read_test_output(test_output)
+        mesh_comparison = self.compare_meshes(old_json, new_json)
+        
+        # Create a plotting window
+        _, ax = plt.subplots()
 
-        # For each test saved
-        for test_output in os.listdir(saved_tests_folder):
-            with open(test_output, 'r') as fp:
-                test_json = json.load(fp)
-            old_json = test_json['old_mesh']
-            new_json = test_json['new_mesh']
+        # Add empty background with cellbox boundaries
+        ax, _ = add_df_to_ax(mesh_comparison['new_mesh'], 
+                                ax, c='darkgrey')
+        # Add cellboxes with different boundaries to original
+        ax, legend_1 = add_df_to_ax(mesh_comparison['bounds'], ax, 
+                                    c='red', ids=True,
+                                    label='Boundary')
+        # Add cellboxes with different values to original
+        ax, legend_2 = add_df_to_ax(mesh_comparison['values'], ax, 
+                                    c='green', ids=True, 
+                                    label='Values')
+        # Add cellboxes with different attributes to original
+        ax, legend_3 = add_df_to_ax(mesh_comparison['attributes'], ax, 
+                                    c='blue', ids=True, 
+                                    label='Attributes')
+        # Add cellboxes with different neighbour graph to original
+        ax, legend_4 = add_df_to_ax(mesh_comparison['neighbour_graph'], ax, 
+                                    c='purple', ids=True, 
+                                    label='Neighbour graph')
+        # Save legend entries to handle later, remove None entries
+        legend_boxes = [legend_1, legend_2, legend_3, legend_4]
+        legend_boxes = [x for x in legend_boxes if x is not None]
+        # Draw legend
+        ax.legend(handles = legend_boxes, 
+                    title = 'Mismatched\n',
+                    title_fontsize = 'large',
+                    loc = 'center left',
+                    bbox_to_anchor = (1, 0.5))
+        # Remove whitespace between polygons and axes
+        ax.margins(0)
+        # Save as vector image so can zoom in to see ID per diff cellbox
+        plot_output = test_output[:-4]+'svg'
 
-            # Create dataframe with every cellbox
-            new_df = pd.DataFrame(new_json['cellboxes']).set_index('geometry')
+        ax.set_title('Differences in new mesh')
 
-            # Compare old to new, save cellboxes that are different
-            mc = MeshComparator()
-            diff_bounds_df = mc.compare_cellbox_boundaries(old_json, new_json)
-            diff_values_df = mc.compare_cellbox_values(old_json, new_json)
-            diff_attrib_df = mc.compare_cellbox_attributes(old_json, new_json)
-            diff_ngraph_df = mc.compare_neighbour_graph_values(old_json, new_json)
+        plt.savefig(f'{plot_output}', bbox_inches="tight")
+        plt.close()
+
+    def summarise(self, test_output):
+        """
+        Write out a summary of the difference in cellboxes in the terminal
+
+        Args:
+            test_output (str): Filename of saved test mesh
+        """
+        def print_summary(comparison, summary_key):
+            """
+            Prints out a summary of the number of different values
+            in the old mesh compared to the new mesh
+            """
+            logging.info(f"Comparing {summary_key}:")
+            # Extract out the relevant dfs
+            new_df = comparison['new_mesh']
+            diff_df = comparison[summary_key]
             
-            # Create a plotting window
-            _, ax = plt.subplots()
+            if diff_df.empty:
+                logging.info("\tNo differences found!")
+            else:
+                # Get length of dfs to get fractional values
+                num_new_cbs = len(new_df.index)
+                num_diff_cbs = len(diff_df.index)
+                # Write to terminal
+                logging.info(f'\t{num_diff_cbs}/{num_new_cbs} are different in the '\
+                            "newly generated mesh")
+                logging.debug( "\tDifferent cellboxes have the following id's in the "\
+                            f"new mesh: \n{diff_df['id'].to_list()}")
+            
+        # Read in test output file and compare meshes in it
+        old_json, new_json = self.read_test_output(test_output)
+        mesh_comparison = self.compare_meshes(old_json, new_json)
 
-            # Add empty background with cellbox boundaries
-            ax, _ = add_df_to_ax(new_df, ax, c='darkgrey')
-            # Add cellboxes with different boundaries to original
-            ax, legend_1 = add_df_to_ax(diff_bounds_df, ax, 
-                                        c='red', ids=True,
-                                        label='Boundary')
-            # Add cellboxes with different values to original
-            ax, legend_2 = add_df_to_ax(diff_values_df, ax, 
-                                        c='green', ids=True, 
-                                        label='Values')
-            # Add cellboxes with different attributes to original
-            ax, legend_3 = add_df_to_ax(diff_attrib_df, ax, 
-                                        c='blue', ids=True, 
-                                        label='Attributes')
-            # Add cellboxes with different neighbour graph to original
-            ax, legend_4 = add_df_to_ax(diff_ngraph_df, ax, 
-                                        c='purple', ids=True, 
-                                        label='Neighbour graph')
-            # Save legend entries to handle later, remove None entries
-            legend_boxes = [legend_1, legend_2, legend_3, legend_4]
-            legend_boxes = [x for x in legend_boxes if x is not None]
-            # Draw legend
-            ax.legend(handles = legend_boxes, 
-                      title = 'Mismatched\n',
-                      title_fontsize = 'large',
-                      loc = 'center left',
-                      bbox_to_anchor = (1, 0.5))
-            # Remove whitespace between polygons and axes
-            ax.margins(0)
-            # Save as vector image so can zoom in to see ID per diff cellbox
-            plot_output = test_output[:-4]+'svg'
+        print_summary(mesh_comparison, 'bounds')
+        print_summary(mesh_comparison, 'values')
+        print_summary(mesh_comparison, 'attributes')
+        print_summary(mesh_comparison, 'neighbour_graph')       
 
-            ax.set_title('Differences in new mesh')
-
-            plt.savefig(f'{plot_output}', bbox_inches="tight")
-            plt.close()
-
+        
 class TestInfo:
     def __init__(self, file, test, reference, status):
         self.file = file
