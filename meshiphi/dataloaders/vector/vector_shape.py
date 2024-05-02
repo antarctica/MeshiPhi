@@ -21,7 +21,7 @@ class VectorShapeDataLoader(VectorDataLoader):
                 Dictionary of attributes the dataloader will require,
                 completed with default values if not provided in config.
         """
-        # Add default scalar params
+        # Add default vector params
         params = super().add_default_params(params)
 
         # Number of datapoints to populate per axis
@@ -40,6 +40,14 @@ class VectorShapeDataLoader(VectorDataLoader):
         if params['dataloader_name'] == 'circle':
             if 'radius' not in params:
                 params['radius'] = 1
+            if 'centre' not in params:
+                params['centre'] = (None, None)
+        # Define default rectangle parameters
+        elif params['dataloader_name'] == 'rectangle':
+            if 'width' not in params:
+                params['width'] = 1
+            if 'height' not in params:
+                params['width'] = 1
             if 'centre' not in params:
                 params['centre'] = (None, None)
         # Define default gradient params
@@ -70,6 +78,8 @@ class VectorShapeDataLoader(VectorDataLoader):
             data = self.gen_circle(bounds)
         elif self.dataloader_name == 'vector_gradient':
             data = self.gen_gradient(bounds)
+        elif self.dataloader_name == 'vector_rectangle':
+            data = self.gen_rectangle(bounds)
         else:
             raise ValueError(
                 f'Unknown vector shape type: {self.dataloader_name}'
@@ -106,7 +116,7 @@ class VectorShapeDataLoader(VectorDataLoader):
             gradient = np.linspace(0, 1, self.nx)
 
         dummy_df = pd.DataFrame(columns=['lat', 'long', 'dummy_data_u', 'dummy_data_v'])
-        logging.info("- Generating dataset")
+        logging.info("- Generating vector dataset")
         # For each combination of lat/long
         for i in range(self.ny):
             for j in range(self.nx):
@@ -154,7 +164,7 @@ class VectorShapeDataLoader(VectorDataLoader):
         c_y = self.lat[int(self.ny / 2)] if not self.centre[0] else self.centre[0]
         c_x = self.long[int(self.nx / 2)] if not self.centre[1] else self.centre[1]
 
-        # Create vectors for row and col idx's
+        # Create vectors for row and col indices
         y = np.vstack(np.linspace(bounds.get_lat_min(),
                                   bounds.get_lat_max(),
                                   self.ny))
@@ -167,7 +177,64 @@ class VectorShapeDataLoader(VectorDataLoader):
         mask = dist_from_centre <= self.radius
         # Set up empty dataframe to populate with dummy data
         dummy_df = pd.DataFrame(columns=['lat', 'long', 'dummy_data_u', 'dummy_data_v'])
-        logging.info("\tGenerating dataset")
+        logging.info("\tGenerating vector dataset")
+        # For each combination of lat/long
+        for i in range(self.ny):
+            for j in range(self.nx):
+                # Create a new row, adding mask value
+                row = pd.DataFrame(data={'lat': self.lat[i],
+                                         'long': self.long[j],
+                                         'dummy_data_u': mask[i][j],
+                                         'dummy_data_v': mask[i][j]}, index=[0])
+                # Avoid concat with empty df
+                if dummy_df.empty:
+                    dummy_df = row
+                else:
+                    dummy_df = pd.concat([dummy_df, row],
+                                         ignore_index=True)
+
+        # Change boolean values to int
+        dummy_df['dummy_data_u'] = dummy_df['dummy_data_u'].astype(int)
+        dummy_df['dummy_data_v'] = dummy_df['dummy_data_v'].astype(int)
+        # Multiply by scaling factor if present
+        dummy_df['dummy_data_u'] = dummy_df['dummy_data_u'] * self.multiplier_u
+        dummy_df['dummy_data_v'] = dummy_df['dummy_data_v'] * self.multiplier_v
+
+        return dummy_df
+
+    def gen_rectangle(self, bounds):
+        """
+            Generates a rectangle within bounds of lat/long min/max.
+            Side lengths and centroid can be defined in the config, as well as
+            resolution of simulated datapoints
+            Args:
+                bounds (Boundary): Limits of lat/long to generate within
+        """
+        logging.info("\tSetting up boundary of dataset")
+        # Generate rows
+        self.lat = np.linspace(bounds.get_lat_min(), bounds.get_lat_max(), self.ny)
+        # Generate cols
+        self.long = np.linspace(bounds.get_long_min(), bounds.get_long_max(), self.nx)
+
+        # Set centre as centre of data_grid if none specified
+        c_y = self.lat[int(self.ny / 2)] if not self.centre[0] else self.centre[0]
+        c_x = self.long[int(self.nx / 2)] if not self.centre[1] else self.centre[1]
+
+        # Create vectors for row and col indices
+        y = np.vstack(np.linspace(bounds.get_lat_min(),
+                                  bounds.get_lat_max(),
+                                  self.ny))
+        x = np.linspace(bounds.get_long_min(), bounds.get_long_max(), self.nx)
+
+        logging.info("\tCreating mask of a rectangle")
+        # Create a 2D-array with distance along cartesian axes from defined centre
+        x_dist_from_centre = np.abs(x - c_x)
+        y_dist_from_centre = np.abs(y - c_y)
+        # Turn this into a mask of values within the rectangle
+        mask = x_dist_from_centre <= self.width and y_dist_from_centre <= self.height
+        # Set up empty dataframe to populate with dummy data
+        dummy_df = pd.DataFrame(columns=['lat', 'long', 'dummy_data_u', 'dummy_data_v'])
+        logging.info("\tGenerating vector dataset")
         # For each combination of lat/long
         for i in range(self.ny):
             for j in range(self.nx):

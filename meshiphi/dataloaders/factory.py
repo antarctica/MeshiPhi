@@ -100,7 +100,7 @@ class DataLoaderFactory:
             'ecmwf_sig_wave_height': (ECMWFSigWaveHeightDataLoader, ['files']),
             # Scalar - Abstract shapes
             'circle':       (ShapeDataLoader, []),
-            'square':       (ShapeDataLoader, []),
+            'rectangle':    (ShapeDataLoader, []),
             'gradient':     (ShapeDataLoader, []),
             'checkerboard': (ShapeDataLoader, []),
             # Vector
@@ -116,6 +116,7 @@ class DataLoaderFactory:
             # Vector - Abstract shapes
             'vector_circle': (VectorShapeDataLoader, []),
             'vector_gradient': (VectorShapeDataLoader, []),
+            'vector_rectangle': (VectorShapeDataLoader, []),
             # LUT
             'thickness':        (ThicknessDataLoader, []),
             'density':          (DensityDataLoader, []),
