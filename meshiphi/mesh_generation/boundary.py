@@ -28,16 +28,23 @@ class Boundary:
                config (json): json object that contains the boundary attributes
                 
         """
-        long_min = config['region']['long_min']
-        long_max = config['region']['long_max']
         lat_min = config['region']['lat_min']
         lat_max = config['region']['lat_max']
-        start_time = config['region']['start_time']
-        end_time = config['region']['end_time']
         lat_range = [lat_min, lat_max]
+
+        long_min = config['region']['long_min']
+        long_max = config['region']['long_max']
         long_range = [long_min , long_max]
-        time_range = [start_time , end_time]
+
+        if 'start_time' in config['region'] and 'end_time' in config['region']:
+            start_time = config['region']['start_time']
+            end_time = config['region']['end_time']
+            time_range = [start_time , end_time]
+        else:
+            time_range = None
+
         obj = Boundary (lat_range , long_range , time_range)
+
         return obj
 
     @classmethod
