@@ -408,4 +408,26 @@ class Boundary:
 
         return "{"+ lat_range + ", " + long_range + ", " + time_range + "}"
 
+    def __eq__(self, other):
+        """
+        Evaluates whether two Boundary objects have the same lat/long min/max, 
+        and start/end time
 
+        Args:
+            other (Boundary): Boundary object being compared to
+
+        Returns:
+            bool: True if all boundary edges are equal
+        """
+        boundary_checks = []
+
+        boundary_checks += (self.get_lat_min()    == other.get_lat_min())
+        boundary_checks += (self.get_lat_max()    == other.get_lat_max())
+        boundary_checks += (self.get_long_min()   == other.get_long_min())
+        boundary_checks += (self.get_long_max()   == other.get_long_max())
+
+        
+        boundary_checks += (self.get_start_time() == other.get_start_time())
+        boundary_checks += (self.get_end_time()   == other.get_end_time())
+
+        return all(boundary_checks)
