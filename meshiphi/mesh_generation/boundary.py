@@ -426,15 +426,31 @@ class Boundary:
         Returns:
             bool: True if all boundary edges are equal
         """
+        # List to store each check for equality
         boundary_checks = []
+        # Add bool indicating if spatial boundary matches between the two
+        boundary_checks += [(self.get_lat_min()    == other.get_lat_min())]
+        boundary_checks += [(self.get_lat_max()    == other.get_lat_max())]
+        boundary_checks += [(self.get_long_min()   == other.get_long_min())]
+        boundary_checks += [(self.get_long_max()   == other.get_long_max())]
 
-        boundary_checks += (self.get_lat_min()    == other.get_lat_min())
-        boundary_checks += (self.get_lat_max()    == other.get_lat_max())
-        boundary_checks += (self.get_long_min()   == other.get_long_min())
-        boundary_checks += (self.get_long_max()   == other.get_long_max())
+        # Check if obects have the attributes to be tested
+        has_start_time = ([hasattr(self, 'start_time'), hasattr(other, 'start_time')])
+        has_end_time   = ([hasattr(self, 'end_time'),   hasattr(other, 'end_time')])
 
+        # If they both have the attribute, check that they are equal
+        if all(has_start_time):
+            boundary_checks += [(self.get_start_time() == other.get_start_time())]
+        # If only one has the attribute, they aren't equal
+        elif any(has_start_time):
+            boundary_checks += [False]
+        # Otherwise, we don't need to append to the check list
+
+        # Same logic, just with other temporal boundary
+        if all(has_end_time):
+            boundary_checks += [(self.get_end_time()   == other.get_end_time())]
+        elif any(has_end_time):
+            boundary_checks += [False]
         
-        boundary_checks += (self.get_start_time() == other.get_start_time())
-        boundary_checks += (self.get_end_time()   == other.get_end_time())
-
+        # See if every check has passed
         return all(boundary_checks)
