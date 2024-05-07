@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>7.5.1.1. Abstract Look Up Table Dataloader &mdash; meshiphi 1.1.6 documentation</title>
+  <title>7.5.1.1. Abstract Look Up Table Dataloader &mdash; meshiphi 2.0.8 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
 
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=b108bffd"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=505e95f4"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -219,7 +219,7 @@ Used for when data_name not defined in params.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="meshiphi.dataloaders.lut.abstract_lut.LutDataLoader.get_hom_condition">
-<span class="sig-name descname"><span class="pre">get_hom_condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splitting_conds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#meshiphi.dataloaders.lut.abstract_lut.LutDataLoader.get_hom_condition" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_hom_condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splitting_conds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#meshiphi.dataloaders.lut.abstract_lut.LutDataLoader.get_hom_condition" title="Permalink to this definition"></a></dt>
 <dd><p>Retrieves homogeneity condition of data within
 boundary.</p>
 <dl class="field-list simple">
@@ -251,31 +251,8 @@ should split</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="meshiphi.dataloaders.lut.abstract_lut.LutDataLoader.get_val_from_coord">
-<span class="sig-name descname"><span class="pre">get_val_from_coord</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">long</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#meshiphi.dataloaders.lut.abstract_lut.LutDataLoader.get_val_from_coord" title="Permalink to this definition"></a></dt>
-<dd><p>Extracts value from self.data with lat and long specified in kwargs.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>long</strong> (<em>float</em>) – Longitude coordinate to search for</p></li>
-<li><p><strong>lat</strong> (<em>float</em>) – Latitude coordinate to search for</p></li>
-<li><p><strong>return_coords</strong> (<em>boolean</em>) – Flag for whether to return coordinates with the value or not</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Either with one entry (the value at the coords),
-Optionaly with coordinates associated with it if
-return_coords = True</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>pd.DataFrame</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="meshiphi.dataloaders.lut.abstract_lut.LutDataLoader.get_value">
-<span class="sig-name descname"><span class="pre">get_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agg_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skipna</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#meshiphi.dataloaders.lut.abstract_lut.LutDataLoader.get_value" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agg_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skipna</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#meshiphi.dataloaders.lut.abstract_lut.LutDataLoader.get_value" title="Permalink to this definition"></a></dt>
 <dd><p>Retrieve aggregated value from within bounds</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -396,7 +373,7 @@ Defaults to dataloader’s data attribute.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2022-2023, BAS AI Lab.</p>
+    <p>&#169; Copyright 2021-, BAS AI Lab.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
