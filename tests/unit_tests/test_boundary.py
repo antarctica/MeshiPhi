@@ -56,34 +56,30 @@ class TestBoundary (unittest.TestCase):
         test_current_datestring  = 'TODAY'
         soln_current_datetime   = datetime.today()
         soln_current_datestring = soln_current_datetime.strftime(desired_date_format)
+        self.assertEqual(Boundary.parse_datetime(test_current_datestring),
+                         soln_current_datestring)
 
         test_past_datestring = 'TODAY - 5'
         soln_past_datetime   = datetime.today() - timedelta(days = 5)
         soln_past_datestring = soln_past_datetime.strftime(desired_date_format)
+        self.assertEqual(Boundary.parse_datetime(test_past_datestring),
+                         soln_past_datestring)
 
         test_future_datestring = 'TODAY + 5'
         soln_future_datetime   = datetime.today() + timedelta(days = 5)
         soln_future_datestring = soln_future_datetime.strftime(desired_date_format)
+        self.assertEqual(Boundary.parse_datetime(test_future_datestring),
+                         soln_future_datestring)
 
         test_absolute_datestring = '2000-01-01'
         soln_absolute_datestring = '2000-01-01'
+        self.assertEqual(Boundary.parse_datetime(test_absolute_datestring),
+                         soln_absolute_datestring)
 
         malformed_datestring_1 = '20000101'
         malformed_datestring_2 = '01-01-2000'
         malformed_datestring_3 = 'Jan 01 2000'
         malformed_datestring_4 = '1st Jan 2000'
-
-        self.assertEqual(Boundary.parse_datetime(test_past_datestring),
-                         soln_past_datestring)
-
-        self.assertEqual(Boundary.parse_datetime(test_future_datestring),
-                         soln_future_datestring)
-
-        self.assertEqual(Boundary.parse_datetime(test_current_datestring),
-                         soln_current_datestring)
-
-        self.assertEqual(Boundary.parse_datetime(test_absolute_datestring),
-                         soln_absolute_datestring)
 
         self.assertRaises(ValueError, 
                           Boundary.parse_datetime, 
