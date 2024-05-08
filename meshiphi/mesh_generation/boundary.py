@@ -63,9 +63,12 @@ class Boundary:
 
             # pos_coords on +180 side of antimeridian
             # neg_coords on -180 side of antimeridian
-            pos_coords, neg_coords = [[polygon_coords.split(',') 
-                                        for polygon_coords in coord_string] 
-                                        for coord_string in coord_strings]
+            pos_coords, neg_coords = [coord_string.split(',')
+                                      for coord_string in coord_strings]
+            # Remove leading whitespace from WKT elements
+            pos_coords = [pc.lstrip() for pc in pos_coords]
+            neg_coords = [nc.lstrip() for nc in neg_coords]
+            
             # Extract longs and lats for each polygon
             pos_x = [float(coord.split(" ")[0]) for coord in pos_coords]
             pos_y = [float(coord.split(" ")[1]) for coord in pos_coords]
@@ -86,15 +89,15 @@ class Boundary:
             x = [float(coord.split(" ")[0]) for coord in coords]
             y = [float(coord.split(" ")[1]) for coord in coords]
 
-            lat_min = min(x)
-            lat_max = max(x)
-            long_min = min(y)
-            long_max = max(y)
+            lat_min = min(y)
+            lat_max = max(y)
+            long_min = min(x)
+            long_max = max(x)
 
         long_range = [long_min, long_max]
         lat_range = [lat_min, lat_max]
 
-        bounds = Boundary(long_range, lat_range)
+        bounds = Boundary(lat_range, long_range)
 
         return bounds
 
@@ -187,7 +190,7 @@ class Boundary:
         if len(lat_range) < 2 or len (long_range)<2 :
             raise ValueError('Boundary: range should contain two values')
         if lat_range[0] > lat_range [1]:
-             raise ValueError('Boundary: Latitude start range should be smaller than range end')
+             raise ValueError(f'Boundary: Latitude start range {lat_range[0]} should be smaller than range end {lat_range[1]}')
         if long_range[0] < -180 or long_range[1] > 180:
             raise ValueError('Boundary: Longtitude range should be within -180:180')
         if len (time_range) > 0:
