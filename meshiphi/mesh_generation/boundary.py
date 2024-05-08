@@ -112,7 +112,7 @@ class Boundary:
         """
         if time_range is None:
             time_range=[]
-        else: 
+        elif time_range != []: 
              time_range[0] = self.parse_datetime(time_range[0])
              time_range[1] = self.parse_datetime(time_range[1])
 
@@ -122,7 +122,8 @@ class Boundary:
         self.long_range = long_range
         self.time_range = time_range
 
-    def parse_datetime(self, datetime_str: str):
+    @staticmethod
+    def parse_datetime(datetime_str):
         """
             Attempts to parse a string containing reference to system time into datetime format.
             If given the string 'TODAY', will return system time.
@@ -131,7 +132,7 @@ class Boundary:
             
             Args:
                 datetime_str (String): String attempted to be parsed to datetime format. 
-                    Expected input format is '%d%m%Y'
+                    Expected input format is '%Y-%m-%d', or 'TODAY +- n'
             Returns:
                 date (String): date in a String format, '%Y-%m-%d'.
             Raises:
@@ -193,10 +194,12 @@ class Boundary:
              raise ValueError(f'Boundary: Latitude start range {lat_range[0]} should be smaller than range end {lat_range[1]}')
         if long_range[0] < -180 or long_range[1] > 180:
             raise ValueError('Boundary: Longtitude range should be within -180:180')
-        if len (time_range) > 0:
-            if datetime.strptime(time_range[0], '%Y-%m-%d') > datetime.strptime(time_range[1], '%Y-%m-%d'):
-                     raise ValueError('Boundary: Start time range should be smaller than range end')
-
+        if time_range != []:
+            if len(time_range) == 2:
+                if datetime.strptime(time_range[0], '%Y-%m-%d') > datetime.strptime(time_range[1], '%Y-%m-%d'):
+                        raise ValueError('Boundary: Start time range should be smaller than range end')
+            else:
+                raise ValueError(f'Boundary: Time range needs two dates, instead got {len(time_range)}')
     # Functions used for getting data from a cellbox
     def getcx(self):
         """
@@ -399,10 +402,10 @@ class Boundary:
 
         # 0 = south_west, 1 = north_west, 2 = south_east, 3 = north_east
         bounds = [
-            Boundary([self.get_lat_min(), lat_mid], [self.get_long_min(), long_mid]),
-            Boundary([lat_mid, self.get_lat_max()], [self.get_long_min(), long_mid]),
-            Boundary([self.get_lat_min(), lat_mid], [long_mid, self.get_long_max()]),
-            Boundary([lat_mid, self.get_lat_max()], [long_mid, self.get_long_max()])
+            Boundary([self.get_lat_min(), lat_mid], [self.get_long_min(), long_mid], self.get_time_range()),
+            Boundary([lat_mid, self.get_lat_max()], [self.get_long_min(), long_mid], self.get_time_range()),
+            Boundary([self.get_lat_min(), lat_mid], [long_mid, self.get_long_max()], self.get_time_range()),
+            Boundary([lat_mid, self.get_lat_max()], [long_mid, self.get_long_max()], self.get_time_range())
         ]
 
         return bounds
