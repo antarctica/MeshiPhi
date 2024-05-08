@@ -67,10 +67,10 @@ class Boundary:
                                         for polygon_coords in coord_string] 
                                         for coord_string in coord_strings]
             # Extract longs and lats for each polygon
-            pos_x = [float(coord.split(" ")[1]) for coord in pos_coords]
-            pos_y = [float(coord.split(" ")[0]) for coord in pos_coords]
-            neg_x = [float(coord.split(" ")[1]) for coord in neg_coords]
-            neg_y = [float(coord.split(" ")[0]) for coord in neg_coords]
+            pos_x = [float(coord.split(" ")[0]) for coord in pos_coords]
+            pos_y = [float(coord.split(" ")[1]) for coord in pos_coords]
+            neg_x = [float(coord.split(" ")[0]) for coord in neg_coords]
+            neg_y = [float(coord.split(" ")[1]) for coord in neg_coords]
 
             assert(pos_y == neg_y), "Latitudes of polygons in multipolygon " + \
                                     "don't match, cannot construct valid " + \
@@ -83,8 +83,8 @@ class Boundary:
 
         else:    
             coords = poly_string.split("POLYGON ((")[1].split("))")[0].split(", ")
-            x = [float(coord.split(" ")[1]) for coord in coords]
-            y = [float(coord.split(" ")[0]) for coord in coords]
+            x = [float(coord.split(" ")[0]) for coord in coords]
+            y = [float(coord.split(" ")[1]) for coord in coords]
 
             lat_min = min(x)
             lat_max = max(x)
@@ -429,10 +429,10 @@ class Boundary:
         # List to store each check for equality
         boundary_checks = []
         # Add bool indicating if spatial boundary matches between the two
-        boundary_checks += [(self.get_lat_min()    == other.get_lat_min())]
-        boundary_checks += [(self.get_lat_max()    == other.get_lat_max())]
-        boundary_checks += [(self.get_long_min()   == other.get_long_min())]
-        boundary_checks += [(self.get_long_max()   == other.get_long_max())]
+        boundary_checks += [(self.get_lat_min()  == other.get_lat_min())]
+        boundary_checks += [(self.get_lat_max()  == other.get_lat_max())]
+        boundary_checks += [(self.get_long_min() == other.get_long_min())]
+        boundary_checks += [(self.get_long_max() == other.get_long_max())]
 
         # Check if obects have the attributes to be tested
         has_start_time = ([hasattr(self, 'start_time'), hasattr(other, 'start_time')])
@@ -448,7 +448,7 @@ class Boundary:
 
         # Same logic, just with other temporal boundary
         if all(has_end_time):
-            boundary_checks += [(self.get_end_time()   == other.get_end_time())]
+            boundary_checks += [(self.get_end_time() == other.get_end_time())]
         elif any(has_end_time):
             boundary_checks += [False]
         
