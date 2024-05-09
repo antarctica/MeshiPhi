@@ -74,4 +74,5 @@ def merge_test_cli():
                   into_branch=into_branch,
                   regression=reg,
                   unit=unit,
-                  plot=args.plot)
+                  plot=args.plot,
+                  save=args.save)

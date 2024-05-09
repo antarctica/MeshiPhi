@@ -17,7 +17,7 @@ class TestAutomater:
 
     def __init__(self, from_branch=None, into_branch="main", 
                  regression=True, unit=True, 
-                 plot=False, summary=True):
+                 save=False, plot=False, summary=True):
         """
         Runs through test suite only taking into account relevant tests for the 
         modified files
@@ -290,10 +290,12 @@ class TestAutomater:
                 modified from ground truth
         """
         relevant_tests = []
+        # Strip path from filename
+        diff_file = os.path.basename(diff_file)
         # For each available mapping of files to tests
         for package_file, package_tests in test_dict.items():
             # If found a match 
-            if package_file in diff_file:
+            if package_file == diff_file:
                 relevant_tests += package_tests
 
         return relevant_tests
@@ -465,10 +467,13 @@ class TestAutomater:
             if ids:
                 # Print cellbox id within the cellbox
                 for idx, row in gdf.iterrows():
+                    # Scale cell ID label to fit nicely within cellbox
+                    fontsize = 2*row['dcx']*(2**row['dcx'])
                     ax.annotate(row['id'], 
-                                xy=row['coords'], 
+                                xy=(row['cx'], row['cy']), 
                                 ha='center',
-                                fontsize=row['dcx'])
+                                va='center',
+                                fontsize=fontsize)
 
             return ax, legend_entry
 
