@@ -28,15 +28,15 @@ LOGGER.setLevel(logging.INFO)
 
 #File locations of all environmental meshes to be recalculated for regression testing.
 TEST_ENV_MESHES = [
-    './example_meshes/env_meshes/grf_normal.json',
+    # './example_meshes/env_meshes/grf_normal.json',
     # './example_meshes/env_meshes/grf_downsample.json',
     # './example_meshes/env_meshes/grf_reprojection.json',
-    # './example_meshes/env_meshes/grf_sparse.json'
+    './example_meshes/env_meshes/grf_sparse.json'
 ]
 
 TEST_ABSTRACT_MESHES = [
-    './example_meshes/abstract_env_meshes/vgrad.json',
-    # './example_meshes/abstract_env_meshes/hgrad.json',
+    # './example_meshes/abstract_env_meshes/vgrad.json',
+    './example_meshes/abstract_env_meshes/hgrad.json',
     # './example_meshes/abstract_env_meshes/checkerboard_1.json',
     # './example_meshes/abstract_env_meshes/checkerboard_2.json',
     # './example_meshes/abstract_env_meshes/checkerboard_3.json',
@@ -100,16 +100,30 @@ def calculate_env_mesh(mesh_config):
     return new_mesh.to_json()
 
 
-def test_record_output(mesh_pair, record_property):
+def test_record_output(mesh_pair, tmp_path):
     """
-    Hacky solution to storing fixtures after they're generated. 
-    Code that saves fixture is in conftest.py
+    Store fixtures after they're generated to avoid having to recompute
+    meshes for diagnosis upon failure
 
     Args:
         mesh_pair (dict): 
             Fixture holding generated meshes
-        record_property (fixture): 
-            Pytest built-in fixture that stores user-defined dicts for later 
-            processing
+        tmp_path (fixture): 
+            Pytest built-in fixture that creates a unique temporary directory
+            for this test's run
     """
-    record_property('meshes', mesh_pair)
+
+    test_name = mesh_pair['test']
+    test_basename = test_name.split('.')[0]
+    # Save files to folder above where pytest would normally save, since tmp_path is the directory
+    # we want to scrape later. Otherwise, pytest will add subdirectories which overwrite eachother
+    # after 3 tests, and it's possible for more than 3 tests to be run in one pytest call
+    # Ref: https://docs.pytest.org/en/7.1.x/how-to/tmp_path.html#the-default-base-temporary-directory
+    save_filename = os.path.join(tmp_path, '..', f'{test_basename}.comparison.json')
+
+    # Only care about the meshes used as a fixture
+    meshes = {key: val for key, val in mesh_pair.items() if key != 'test'}
+
+    # Output as a json
+    with open(save_filename,'w') as fp:
+        json.dump(meshes, fp, indent=4)

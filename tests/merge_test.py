@@ -75,7 +75,9 @@ class TestAutomater:
         self.errors = []
 
         # Run relevant tests
+        logging.info(double_separator)
         if regression:  self.run_regression_tests(diff_files, save_to=temp_dir)
+        logging.info(single_separator)
         if unit:        self.run_unit_tests(diff_files, save_to=temp_dir)
 
         # Write status for all tests to terminal
@@ -87,14 +89,10 @@ class TestAutomater:
         for test_info in self.errors:
             logging.info(str(test_info))
 
-        # Pytest creates 3 subfolders in temp_dir, holding the past 3 runs
-        # test_record_output is the method in test_mesh.py that is saving the fixtures
-        # mcurrent is the suffix given to the most recent subfolder
-        current_tmp_dir = os.path.join(temp_dir, 'test_record_output___example_mcurrent')
         # For each test file saved
         logging.info(double_separator)
-        for test_output_file in os.listdir(current_tmp_dir):
-            test_output_path = os.path.join(current_tmp_dir, test_output_file)
+        for test_output_file in os.listdir(temp_dir):
+            test_output_path = os.path.join(temp_dir, test_output_file)
             # Skip over any non-json files that might be leftover in folder
             # e.g. Saved plots that are generated in this loop
             if not test_output_file.endswith('.json'):
@@ -111,7 +109,7 @@ class TestAutomater:
                 logging.info(single_separator)
         if save:
             # Save failing test output to current working directory
-            self.save_tests(current_tmp_dir, output_folder, fails=True, errors=True)
+            self.save_tests(temp_dir, output_folder, fails=True, errors=True)
 
         # Finally, remove temp folder
         shutil.rmtree(temp_dir)
@@ -163,6 +161,7 @@ class TestAutomater:
                 self.passes += passes
                 self.fails += fails
                 self.errors += errors
+
         # Otherwise provide a message
         else:
             logging.info(" --- No relevant tests found --- ")
@@ -359,12 +358,12 @@ class TestAutomater:
 
         # For each computed mesh
         for pytest_output_file in os.listdir(tmp_dir):
-            cwd_filename = os.path.join(output_folder, 
-                                        pytest_output_file)
-            
             # Do a quick comparison
             pytest_output_path = os.path.join(tmp_dir, pytest_output_file)
-
+            
+            # Skip over subdirectories
+            if os.path.isdir(pytest_output_path):
+                continue
             old_json, new_json = self.read_test_output(pytest_output_path)
             comparison = self.compare_meshes(old_json, new_json)
             # Remove full new mesh from comparison dict
@@ -376,6 +375,8 @@ class TestAutomater:
                 os.remove(pytest_output_path)
             # If there is a difference, move the file to current directory
             else:
+                cwd_filename = os.path.join(output_folder, 
+                                            pytest_output_file)
                 shutil.copyfile(pytest_output_path, cwd_filename)
 
     @staticmethod
@@ -560,6 +561,7 @@ class TestAutomater:
             Prints out a summary of the number of different values
             in the old mesh compared to the new mesh
             """
+            
             logging.info(f"Comparing {summary_key}:")
             # Extract out the relevant dfs
             new_df = comparison['new_mesh']
