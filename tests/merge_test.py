@@ -1,10 +1,13 @@
+import tempfile
 import os
+import shutil
 import json
 import logging
 import subprocess as sp
 import pandas as pd
 import geopandas as gpd
 from shapely import wkt
+
 
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
@@ -41,7 +44,27 @@ class TestAutomater:
         self.repo_dir = self.get_base_dir()
         os.chdir(self.repo_dir)
         logging.debug(f'Set base directory to {os.getcwd()}')
-        
+        # Create a temporary directory to write mesh fixtures to
+        # in case user wants to save with -s flag
+        temp_dir = tempfile.mkdtemp()
+
+        # Create a seperator, 32 = length of logging prefix
+        remaining_terminal_width = os.get_terminal_size().columns-32
+        double_separator = '='*remaining_terminal_width
+        single_separator = '-'*remaining_terminal_width
+
+        # Define an output folder if save requested
+        if save:
+            # Define output folder
+            output_folder = os.path.join(self.start_dir, 'pytest_output')
+            # Remove any existing files in output folder to avoid potential confusion
+            logging.warning(f'Overwriting {output_folder}')
+            shutil.rmtree(output_folder)
+            # Recreate folder
+            os.makedirs(output_folder, exist_ok=True)
+        else:
+            output_folder = None
+
         # Get files that are different between branches
         diff_files = self.get_diff_filenames(from_branch=from_branch, 
                                              into_branch=into_branch)
@@ -52,44 +75,48 @@ class TestAutomater:
         self.errors = []
 
         # Run relevant tests
-        if regression:  self.run_regression_tests(diff_files)
-        if unit:        self.run_unit_tests(diff_files)
+        if regression:  self.run_regression_tests(diff_files, save_to=temp_dir)
+        if unit:        self.run_unit_tests(diff_files, save_to=temp_dir)
 
-        all_tests = self.passes + self.fails + self.errors
-        for test_info in all_tests:
+        # Write status for all tests to terminal
+        logging.info(double_separator)
+        for test_info in self.passes:
+            logging.debug(str(test_info))
+        for test_info in self.fails:
+            logging.info(str(test_info))
+        for test_info in self.errors:
             logging.info(str(test_info))
 
-
-        # Define output folder
-        output_folder = os.path.join(self.start_dir, 'pytest_output')
-        os.makedirs(output_folder, exist_ok=True)
-
-        # Save failing test output to current working directory
-        self.save_tests(output_folder, fails=True, errors=True)
-
-        # For each test saved
-        currently_existing_files = os.listdir(output_folder)
-        currently_existing_jsons = [file for file in currently_existing_files 
-                                    if file.endswith('.json')]
-        for test_output_file in currently_existing_jsons:
-            test_output_path = os.path.join(output_folder, test_output_file)
+        # Pytest creates 3 subfolders in temp_dir, holding the past 3 runs
+        # test_record_output is the method in test_mesh.py that is saving the fixtures
+        # mcurrent is the suffix given to the most recent subfolder
+        current_tmp_dir = os.path.join(temp_dir, 'test_record_output___example_mcurrent')
+        # For each test file saved
+        logging.info(double_separator)
+        for test_output_file in os.listdir(current_tmp_dir):
+            test_output_path = os.path.join(current_tmp_dir, test_output_file)
             # Skip over any non-json files that might be leftover in folder
-            # e.g. Saved plots
+            # e.g. Saved plots that are generated in this loop
             if not test_output_file.endswith('.json'):
                 continue
-            # Print a seperator, 32 from the length of logging prefix
-            remaining_terminal_width = os.get_terminal_size().columns-32
-            logging.info(f"{'='*remaining_terminal_width}")
-            logging.info(f'Processing {test_output_path}')
+
             # Save plot if requested
             if plot:
-                self.plot_test(test_output_path)
+                self.plot_test(test_output_path, save_to=output_folder)
 
             # Write summary to CLI if requested
             if summary:
+                logging.info(f'Analysing {test_output_file}')
                 self.summarise(test_output_path)
+                logging.info(single_separator)
+        if save:
+            # Save failing test output to current working directory
+            self.save_tests(current_tmp_dir, output_folder, fails=True, errors=True)
 
-    def _run_tests(self, diff_files, test_dir, test_dict):
+        # Finally, remove temp folder
+        shutil.rmtree(temp_dir)
+
+    def _run_tests(self, diff_files, test_dir, test_dict, save_to=None):
         """
         Runs relevant regression or unit tests within 'test_dir'
 
@@ -101,6 +128,9 @@ class TestAutomater:
             test_dict (dict): 
                 Mapping between diff file and relevant test
         """
+        if save_to is None:
+            save_to = os.devnull
+
         relevant_tests = []
         # Change to reg test folder
         os.chdir(test_dir)
@@ -122,7 +152,8 @@ class TestAutomater:
                 logging.info(f'\t- {test_file_path}')
 
                 command = ['pytest', test_file_path, 
-                                     '-rA']
+                                     '-rA',
+                                     '--basetemp', save_to]
                                     #  '--show-capture=no', 
                                     #  '--log-cli-level', '30',
                                     #  '--tb=line']
@@ -139,6 +170,36 @@ class TestAutomater:
         # Change back to repo base directory
         os.chdir(self.repo_dir)
 
+    def run_regression_tests(self, diff_files, save_to=None):
+        """
+        Runs relevant regression tests for files within 'diff_files' 
+
+        Args:
+            diff_files (list): 
+                List of files that are different from comparison branch
+        """
+        # Get base directory for regression tests
+        reg_test_dir = os.path.join(self.repo_dir, 
+                                    'tests', 
+                                    'regression_tests')
+        logging.info("Attempting regression tests...")
+        self._run_tests(diff_files, reg_test_dir, REGRESSION_TESTS_BY_FILE, save_to=save_to)
+
+    def run_unit_tests(self, diff_files, save_to=None):
+        """
+        Runs relevant unit tests for files within 'diff_files' 
+
+        Args:
+            diff_files (list): 
+                List of files that are different from comparison branch
+        """
+        # Get base directory for unit tests
+        unit_test_dir = os.path.join(self.repo_dir, 
+                                    'tests', 
+                                    'unit_tests')
+        logging.info("Attempting unit tests...")
+        self._run_tests(diff_files, unit_test_dir, UNIT_TESTS_BY_FILE, save_to=save_to)
+    
     @staticmethod
     def parse_pytest_stdout(stdout):
         """
@@ -183,36 +244,6 @@ class TestAutomater:
                     raise ValueError(f'Unexpected test status {status}. Expected PASSED, FAILED, or ERROR')
 
         return passes, fails, errors
-
-    def run_regression_tests(self, diff_files):
-        """
-        Runs relevant regression tests for files within 'diff_files' 
-
-        Args:
-            diff_files (list): 
-                List of files that are different from comparison branch
-        """
-        # Get base directory for regression tests
-        reg_test_dir = os.path.join(self.repo_dir, 
-                                    'tests', 
-                                    'regression_tests')
-        logging.info("Attempting regression tests...")
-        self._run_tests(diff_files, reg_test_dir, REGRESSION_TESTS_BY_FILE)
-
-    def run_unit_tests(self, diff_files):
-        """
-        Runs relevant unit tests for files within 'diff_files' 
-
-        Args:
-            diff_files (list): 
-                List of files that are different from comparison branch
-        """
-        # Get base directory for unit tests
-        unit_test_dir = os.path.join(self.repo_dir, 
-                                    'tests', 
-                                    'unit_tests')
-        logging.info("Attempting unit tests...")
-        self._run_tests(diff_files, unit_test_dir, UNIT_TESTS_BY_FILE)
 
     @staticmethod
     def get_base_dir():
@@ -300,7 +331,7 @@ class TestAutomater:
 
         return relevant_tests
     
-    def save_tests(self, output_folder, passes=False, fails=True, errors=True):
+    def save_tests(self, tmp_dir, output_folder, passes=False, fails=True, errors=True):
         """
         Saves copy of newly generated test meshes to 'pytest_output' folder
         in current working directory. Meshes will be saved as
@@ -326,25 +357,15 @@ class TestAutomater:
         reference_files = list(set(reference_files))
         reference_files = [os.path.basename(file) for file in reference_files]
 
-        # Remove any existing files in output folder to avoid potential confusion
-        for existing_filename in os.listdir(output_folder):
-            logging.warning(f'Removing {existing_filename} from {output_folder}')
-            existing_filepath = os.path.join(output_folder, existing_filename)
-            sp.run(['rm', existing_filepath])
-
-        # For each file generated in the testing
-        pytest_output_dir = os.path.join(self.repo_dir, 
-                                                 'tests', 
-                                                 'regression_tests', 
-                                                 '.outputs')
         # For each computed mesh
-        for pytest_output_file in os.scandir(pytest_output_dir):
-            test_comparison_filename = os.path.basename(pytest_output_file)
+        for pytest_output_file in os.listdir(tmp_dir):
             cwd_filename = os.path.join(output_folder, 
-                                        test_comparison_filename)
+                                        pytest_output_file)
             
             # Do a quick comparison
-            old_json, new_json = self.read_test_output(pytest_output_file)
+            pytest_output_path = os.path.join(tmp_dir, pytest_output_file)
+
+            old_json, new_json = self.read_test_output(pytest_output_path)
             comparison = self.compare_meshes(old_json, new_json)
             # Remove full new mesh from comparison dict
             del comparison['new_mesh']
@@ -352,11 +373,10 @@ class TestAutomater:
             identical_meshes = [df.empty for df in comparison.values()]
             # If no difference in meshes, remove the file
             if all(identical_meshes):
-                command = ['rm', pytest_output_file]
+                os.remove(pytest_output_path)
             # If there is a difference, move the file to current directory
             else:
-                command = ['mv', pytest_output_file, cwd_filename]
-            sp.run(command)
+                shutil.copyfile(pytest_output_path, cwd_filename)
 
     @staticmethod
     def read_test_output(test_output_file):
@@ -407,7 +427,7 @@ class TestAutomater:
 
         return mesh_comparison
 
-    def plot_test(self, test_output):
+    def plot_test(self, test_output, save_to=None):
         """
         Creates a plot of the differences between the newly generated mesh and
         the ground truth mesh. The mesh displayed will be the new mesh, with
@@ -514,12 +534,18 @@ class TestAutomater:
                     bbox_to_anchor = (1, 0.5))
         # Remove whitespace between polygons and axes
         ax.margins(0)
-        # Save as vector image so can zoom in to see ID per diff cellbox
-        plot_output = test_output[:-4]+'svg'
 
-        ax.set_title('Differences in new mesh')
+        test_name = test_output[:-5]
+        ax.set_title(f'Differences in {test_name}')
 
-        plt.savefig(f'{plot_output}', bbox_inches="tight")
+        if save_to:
+            # Save as vector image so can zoom in to see ID per diff cellbox
+            plot_output = test_name + '.svg'
+            filename = os.path.basename(plot_output)
+            save_output = os.path.join(save_to, filename)
+            plt.savefig(save_output, bbox_inches="tight")
+        else:
+            plt.show()
         plt.close()
 
     def summarise(self, test_output):
