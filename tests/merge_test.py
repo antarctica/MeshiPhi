@@ -83,6 +83,16 @@ class TestAutomater:
         if regression:  self.run_regression_tests(diff_files, save_to=temp_dir)
         if unit:        self.run_unit_tests(diff_files, save_to=temp_dir)
 
+        # Write status for all tests to terminal
+        logging.info(double_separator)
+        for test_info in self.passes:
+            logging.debug(str(test_info))
+        for test_info in self.fails:
+            logging.info(str(test_info))
+        for test_info in self.errors:
+            logging.info(str(test_info))
+        logging.info(double_separator)
+
         # For each test file saved
         for test_output_file in os.listdir(temp_dir):
             test_output_path = os.path.join(temp_dir, test_output_file)
@@ -97,26 +107,31 @@ class TestAutomater:
 
             # Write summary to CLI if requested
             if summary:
-                logging.info(single_separator)
                 logging.info(f'Analysing {test_output_file}')
                 self.summarise(test_output_path)
+                logging.info(single_separator)
         if save:
             # Save failing test output to current working directory
             self.save_tests(temp_dir, output_folder, fails=True, errors=True)
 
+
+        # Out of every test run
+        all_tests = self.passes + self.fails + self.errors
+        # Get list of unique files (i.e. unique test sets)
+        diff_test_files = set([ti.file for ti in all_tests])
+        # Set up empty array to store status for calculating stats
+        status_by_file = {test: [] for test in diff_test_files}
+        # Append status to each unique test set
+        for test in all_tests:
+            status_by_file[test.file] += [test.status]
+        for test_file, statuses in status_by_file.items():
+            num_passes = statuses.count("PASSED")
+            num_tests  = len(statuses)
+            logging.info(f'{num_passes}/{num_tests} tests passed for {test_file}')
+
+        logging.info(single_separator)
         # Finally, remove temp folder
         shutil.rmtree(temp_dir)
-
-        # Write status for all tests to terminal
-        logging.info(double_separator)
-        for test_info in self.passes:
-            logging.debug(str(test_info))
-        for test_info in self.fails:
-            logging.info(str(test_info))
-        for test_info in self.errors:
-            logging.info(str(test_info))
-        logging.info(double_separator)
-
 
     def _run_tests(self, diff_files, test_dir, test_dict, save_to=None):
         """
@@ -163,7 +178,7 @@ class TestAutomater:
                 pytest_stdout = pytest_output.stdout.decode('utf-8')
                 passes, fails, errors = self.parse_pytest_stdout(pytest_stdout)
                 self.passes += passes
-                self.fails += fails
+                self.fails  += fails
                 self.errors += errors
 
         # Otherwise provide a message
