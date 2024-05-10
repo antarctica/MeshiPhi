@@ -58,8 +58,12 @@ class TestAutomater:
             # Define output folder
             output_folder = os.path.join(self.start_dir, 'pytest_output')
             # Remove any existing files in output folder to avoid potential confusion
-            logging.warning(f'Overwriting {output_folder}')
-            shutil.rmtree(output_folder)
+            # Remove folder if it exists
+            try:
+                shutil.rmtree(output_folder)
+                logging.warning(f'Overwriting {output_folder}')
+            except FileNotFoundError:
+                logging.debug(f"{output_folder} doesn't exist, nothing to remove")
             # Recreate folder
             os.makedirs(output_folder, exist_ok=True)
         else:
@@ -77,20 +81,9 @@ class TestAutomater:
         # Run relevant tests
         logging.info(double_separator)
         if regression:  self.run_regression_tests(diff_files, save_to=temp_dir)
-        logging.info(single_separator)
         if unit:        self.run_unit_tests(diff_files, save_to=temp_dir)
 
-        # Write status for all tests to terminal
-        logging.info(double_separator)
-        for test_info in self.passes:
-            logging.debug(str(test_info))
-        for test_info in self.fails:
-            logging.info(str(test_info))
-        for test_info in self.errors:
-            logging.info(str(test_info))
-
         # For each test file saved
-        logging.info(double_separator)
         for test_output_file in os.listdir(temp_dir):
             test_output_path = os.path.join(temp_dir, test_output_file)
             # Skip over any non-json files that might be leftover in folder
@@ -104,15 +97,26 @@ class TestAutomater:
 
             # Write summary to CLI if requested
             if summary:
+                logging.info(single_separator)
                 logging.info(f'Analysing {test_output_file}')
                 self.summarise(test_output_path)
-                logging.info(single_separator)
         if save:
             # Save failing test output to current working directory
             self.save_tests(temp_dir, output_folder, fails=True, errors=True)
 
         # Finally, remove temp folder
         shutil.rmtree(temp_dir)
+
+        # Write status for all tests to terminal
+        logging.info(double_separator)
+        for test_info in self.passes:
+            logging.debug(str(test_info))
+        for test_info in self.fails:
+            logging.info(str(test_info))
+        for test_info in self.errors:
+            logging.info(str(test_info))
+        logging.info(double_separator)
+
 
     def _run_tests(self, diff_files, test_dir, test_dict, save_to=None):
         """
@@ -536,14 +540,13 @@ class TestAutomater:
         # Remove whitespace between polygons and axes
         ax.margins(0)
 
-        test_name = test_output[:-5]
+        test_name = os.path.basename(test_output)[:-5]
         ax.set_title(f'Differences in {test_name}')
 
         if save_to:
             # Save as vector image so can zoom in to see ID per diff cellbox
             plot_output = test_name + '.svg'
-            filename = os.path.basename(plot_output)
-            save_output = os.path.join(save_to, filename)
+            save_output = os.path.join(save_to, plot_output)
             plt.savefig(save_output, bbox_inches="tight")
         else:
             plt.show()
