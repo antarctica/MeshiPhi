@@ -119,10 +119,33 @@ class TestScalarDataloader(unittest.TestCase):
         pass
 
     def test_downsample(self):
-        pass
+        for dataloader in self.dataloaders:
+            dataloader.downsample_factors = (2,2)
+
+            data = dataloader.downsample(agg_type='MIN')
+            data = dataloader.downsample(agg_type='MAX')
+            data = dataloader.downsample(agg_type='MEAN')
+            data = dataloader.downsample(agg_type='MEDIAN')
+            data = dataloader.downsample(agg_type='STD')
+            data = dataloader.downsample(agg_type='COUNT')
+
 
     def test_get_data_col_name(self):
-        pass
+        # For xr and pd dataloaders
+        for dataloader in self.dataloaders:
+            # Make sure it returns the default variable name
+            assert dataloader.get_data_col_name() == 'test_data'
 
     def test_set_data_col_name(self):
-        pass
+        # For xr and pd dataloaders
+        for dataloader in self.dataloaders:
+            # Set variable name to something other than 'test_data'
+            data = dataloader.set_data_col_name('data_test')
+            # Get a list of variables stored
+            if isinstance(data, pd.core.frame.DataFrame):
+                data_names = data.columns
+            elif isinstance(data, xr.core.dataset.Dataset):
+                data_names = list(data.keys())
+            # Ensure there is still only one variable, with the name 'data_test'
+            assert len(data_names) == 1
+            assert 'data_test' in data_names#
