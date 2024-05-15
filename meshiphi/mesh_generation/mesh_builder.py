@@ -103,8 +103,7 @@ class MeshBuilder:
         cellboxes = self.initialize_cellboxes(bounds, cell_width, cell_height)
         
         # Calculate width of mesh in cell-coordinates rather than degrees
-        grid_width = np.divide(bounds.get_width(),
-                            cell_width)
+        grid_width = np.divide(bounds.get_width(), cell_width)
         
         min_datapoints = 5
         if 'splitting' in self.config:
