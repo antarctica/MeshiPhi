@@ -4,7 +4,7 @@ import inspect
 import logging
 
 from meshiphi import __version__ as version
-from meshiphi.utils import setup_logging, timed_call, convert_decimal_days
+from meshiphi.utils import setup_logging, timed_call
 from meshiphi.mesh_generation.mesh_builder import MeshBuilder
 from meshiphi.mesh_generation.environment_mesh import EnvironmentMesh
 from meshiphi.test_automation.test_automater import TestAutomater
@@ -203,11 +203,10 @@ def merge_mesh_cli():
 def merge_test_cli():
     """
     CLI Entry point for automated testing. Assumes you have git and pytest installed.
-    By default, compares default working branch to main
 
     Usage: 
-    meshiphi_test [OPTIONS]                     # Compares current branch to main 
-    meshiphi_test <reference_branch> [OPTIONS]  # Compares current branch to reference_branch
+    meshiphi_test [OPTIONS]                                  # Compares current branch to main 
+    meshiphi_test <reference_branch> [OPTIONS]               # Compares current branch to reference_branch
     meshiphi_test <test_branch> <reference_branch> [OPTIONS] # Compares test_branch to reference_branch
     """
 
@@ -234,7 +233,9 @@ def merge_test_cli():
         ap.add_argument("-s", "--save",
                         default=False,
                         action="store_true",
-                        help="Save generated output to current directory")
+                        help="Creates a 'pytest_output' folder in your current "\
+                             "working directory and populates it with test "\
+                             "outputs")
         # Save pytest fixtures generated
         ap.add_argument("-p", "--plot",
                         default=False,
