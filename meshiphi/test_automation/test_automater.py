@@ -126,9 +126,6 @@ class TestAutomater:
                 command = ['pytest', test_file_path, 
                                      '-rA',
                                      '--basetemp', save_to]
-                                    #  '--show-capture=no', 
-                                    #  '--log-cli-level', '30',
-                                    #  '--tb=line']
                 pytest_output = sp.run(command, stdout=sp.PIPE)
                 pytest_stdout = pytest_output.stdout.decode('utf-8')
                 passes, fails, errors = self.parse_pytest_stdout(pytest_stdout)
@@ -194,13 +191,13 @@ class TestAutomater:
     
     def _setup_output_folder(self):
         """
-        Creates a 'pytest_output' folder at the user's current working directory
+        Creates a 'pytest_meshiphi' folder at the user's current working directory
 
         Returns:
             str: Path to folder output is being saved to
         """
         # Define output folder as current location
-        output_folder = os.path.join(self.cwd, 'pytest_output')
+        output_folder = os.path.join(self.cwd, 'pytest_meshiphi')
         # Remove folder if it exists
         try:
             shutil.rmtree(output_folder)
@@ -395,9 +392,9 @@ class TestAutomater:
 
     def save_tests(self, tmp_dir, output_folder, passes=False, fails=True, errors=True):
         """
-        Saves copy of newly generated test meshes to 'pytest_output' folder
+        Saves copy of newly generated test meshes to 'pytest_meshiphi' folder
         in current working directory. Meshes will be saved as
-        './pytest_output/<test_name>.json'
+        './pytest_meshiphi/<test_name>.json'
 
         Args:
             passes (bool, optional): 
@@ -460,7 +457,7 @@ class TestAutomater:
         colour depending on the difference.
 
         Saves image to current working directory under
-        './pytest_output/<test_name>.svg'
+        './pytest_meshiphi/<test_name>.svg'
         """
 
         def add_df_to_ax(df, ax, c='black', ids=False, label=None, a=0.2):
