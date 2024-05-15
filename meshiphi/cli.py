@@ -200,12 +200,11 @@ def merge_mesh_cli():
 
 
 @timed_call
-def merge_test_cli():
+def meshiphi_test_cli():
     """
     CLI Entry point for automated testing. Assumes you have git and pytest installed.
 
     Usage: 
-    meshiphi_test [OPTIONS]                                  # Compares current branch to main 
     meshiphi_test <reference_branch> [OPTIONS]               # Compares current branch to reference_branch
     meshiphi_test <test_branch> <reference_branch> [OPTIONS] # Compares test_branch to reference_branch
     """
@@ -257,9 +256,9 @@ def merge_test_cli():
         reg  = args.regression
         unit = args.unit
     # Else, either both are selected, or neither are selected
-    # Default is both are true
+    # If neither selected, run both (makes no sense to run none)
     else:
-        reg  = True,
+        reg  = True
         unit = True
 
     # Set appropriate from/into branch to pass to TestAutomater
