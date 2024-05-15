@@ -14,7 +14,7 @@ from matplotlib.patches import Patch
 from matplotlib.colors import to_rgba
 
 from meshiphi.mesh_validation.mesh_comparator import MeshComparator
-from tests import REGRESSION_TESTS_BY_FILE, UNIT_TESTS_BY_FILE
+from meshiphi import REGRESSION_TESTS_BY_FILE, UNIT_TESTS_BY_FILE
 
 class TestAutomater:
 
