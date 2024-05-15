@@ -41,6 +41,10 @@ class TestAutomater:
         """
         # Get directory of this package, so can reference test files individually
         self.repo_dir = self.get_base_dir()
+        # Save current directory for output files
+        self.cwd = os.getcwd()
+        # Set base folder to repo directory to run git command later
+        os.chdir(self.repo_dir)
         # Create a temporary directory to write mesh fixtures to
         temp_dir = tempfile.mkdtemp()
         # Create a seperator, 32 = length of logging prefix
@@ -196,7 +200,7 @@ class TestAutomater:
             str: Path to folder output is being saved to
         """
         # Define output folder as current location
-        output_folder = os.path.join(os.getcwd(), 'pytest_output')
+        output_folder = os.path.join(self.cwd, 'pytest_output')
         # Remove folder if it exists
         try:
             shutil.rmtree(output_folder)
@@ -258,11 +262,12 @@ class TestAutomater:
         """
         Get base folder for repo.
         """
-        # Get parent directory of this file, and change to it to run git diff
+        # Get grandparent directory of this file, and change to it to run git diff
         dir_path = os.path.dirname(os.path.realpath(__file__))
         par_path = os.path.join(dir_path, os.pardir)
+        repo_path = os.path.join(par_path, os.pardir)
 
-        return os.path.abspath(par_path)
+        return os.path.abspath(repo_path)
 
     @staticmethod
     def get_diff_filenames(from_branch=None, into_branch=None):
@@ -417,12 +422,12 @@ class TestAutomater:
         # For each computed mesh
         for pytest_output_file in os.listdir(tmp_dir):
             # Do a quick comparison
-            pytest_output_path = os.path.join(tmp_dir, pytest_output_file)
-            
-            # Skip over subdirectories
-            if os.path.isdir(pytest_output_path):
+            basename, extension = os.path.splitext(pytest_output_file)
+            pytest_output_basename = os.path.join(tmp_dir, basename)
+            # Skip over non-json files (i.e. plots if generated, pytest subdirectories)
+            if extension != '.json':
                 continue
-            old_json, new_json = self.extract_test_meshes(pytest_output_path)
+            old_json, new_json = self.extract_test_meshes(pytest_output_basename+'.json')
             comparison = self.compare_meshes(old_json, new_json)
             # Remove full new mesh from comparison dict
             del comparison['new_mesh']
@@ -430,12 +435,22 @@ class TestAutomater:
             identical_meshes = [df.empty for df in comparison.values()]
             # If no difference in meshes, remove the file
             if all(identical_meshes):
-                os.remove(pytest_output_path)
+                shutil.rmtree(pytest_output_basename+'.json')
+                # Remove plot if it exists
+                shutil.rmtree(pytest_output_basename+'.svg',  ignore_errors=True)
             # If there is a difference, move the file to current directory
             else:
-                cwd_filename = os.path.join(output_folder, 
-                                            pytest_output_file)
-                shutil.copyfile(pytest_output_path, cwd_filename)
+                save_filename = os.path.join(output_folder, 
+                                            basename+'.json')
+                plot_filename = os.path.join(output_folder, 
+                                            basename+'.svg')
+                logging.info(save_filename)
+                shutil.copyfile(pytest_output_basename+'.json', save_filename)
+                # Try / Except in case plotting not done
+                try:
+                    shutil.copyfile(pytest_output_basename+'.svg',  plot_filename)
+                except IOError as e:
+                    logging.debug(e)
 
     def plot_test(self, test_output, save_to=None):
         """
