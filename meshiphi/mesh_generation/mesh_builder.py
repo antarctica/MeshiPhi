@@ -343,7 +343,7 @@ class MeshBuilder:
         
 
     def validate_bounds(self, bounds, cell_width, cell_height):
-        assert (bounds.get_long_max() - bounds.get_long_min()) % cell_width == 0, \
+        assert (bounds.get_long_max() - bounds.get_long_min()) % 360 % cell_width == 0, \
             f"""The defined longitude region <{bounds.get_long_min()} :{bounds.get_long_max()}>
             is not divisable by the initial cell width <{cell_width}>"""
 
