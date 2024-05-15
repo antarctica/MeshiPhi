@@ -42,7 +42,7 @@ setup(
             "export_mesh=meshiphi.cli:export_mesh_cli",
             "rebuild_mesh=meshiphi.cli:rebuild_mesh_cli",
             "merge_mesh=meshiphi.cli:merge_mesh_cli",
-            "merge_meshiphi_test=tests.cli:merge_test_cli"]
+            "meshiphi_test=meshiphi.cli:meshiphi_test_cli"]
     },
     keywords=[],
     packages=find_packages(),
