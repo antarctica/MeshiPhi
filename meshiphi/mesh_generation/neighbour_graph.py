@@ -1,6 +1,7 @@
 
 
 from meshiphi.mesh_generation.direction import Direction
+import logging
 
 
 class NeighbourGraph:
@@ -179,9 +180,22 @@ class NeighbourGraph:
 
         for indx in neighbour_indx_list:
             try:
-                self.neighbour_graph[indx][-1*direction].remove(cellbox_indx)
+                if cellbox_indx in self.neighbour_graph[indx][-1*direction]:
+                    self.neighbour_graph[indx][-1*direction].remove(cellbox_indx)
+
+                # In the case of Polar cellboxes, they are neighbours in the same direction
+                if cellbox_indx in self.neighbour_graph[indx][direction]:
+                    self.neighbour_graph[indx][direction].remove(cellbox_indx)
+
+            # Used when loading mesh for json    
             except KeyError:
-                self.neighbour_graph[str(indx)][str(-1*direction)].remove(int(cellbox_indx))
+                
+                if int(cellbox_indx) in self.neighbour_graph[str(indx)][str(-1*direction)]:
+                    self.neighbour_graph[str(indx)][str(-1*direction)].remove(int(cellbox_indx))
+
+                # In the case of Polar cellboxes, they are neighbours in the same direction
+                if int(cellbox_indx) in self.neighbour_graph[str(indx)][str(direction)]:
+                    self.neighbour_graph[str(indx)][str(direction)].remove(int(cellbox_indx))
                 
     def update_corner_neighbours(self, cellbox_indx, north_west_indx, north_east_indx, south_west_indx, south_east_indx):
         '''
@@ -349,6 +363,14 @@ class NeighbourGraph:
                 (long_b + cellbox_b.get_bounds().get_width()) > long_a) and (
                 long_b < (long_a + cellbox_a.get_bounds().get_width())):
             return Direction.north
+
+
+        # Polar cellbox case
+        if (lat_a == -90 and lat_b == -90):
+            return Direction.south
+        if (cellbox_a.get_bounds().get_lat_max() == 90 and cellbox_b.get_bounds().get_lat_max() == 90):
+            return Direction.north
+
         return 0  # Cells are not neighbours.
     
     def get_global_mesh_neighbour_case(self, cellbox_a, cellbox_b):

@@ -142,31 +142,6 @@ class MeshBuilder:
         if self.is_jgrid_mesh():
             logging.warning("We're using the legacy Java style cell grid")
 
-        # Connect south polar cellboxes
-        # Find all cellboxes with lat_min = -90 (touching the south pole)
-        south_polar_cellboxes = []
-        for cellbox in self.mesh.cellboxes:
-            if cellbox.bounds.get_lat_min() == -90:
-                south_polar_cellboxes.append(int(cellbox.get_id()))
-
-        # Connect south polar cellboxes to all other south polar cellboxes
-        for sp_cellbox in south_polar_cellboxes:
-            neighbours = south_polar_cellboxes.copy()
-            neighbours.remove(sp_cellbox)
-            self.neighbour_graph.get_graph()[sp_cellbox]["4"] = neighbours
-
-        # Connect north polar cellboxes
-        # Find all cellboxes with lat_max = 90 (touching the north pole)
-        north_polar_cellboxes = []
-        for cellbox in self.mesh.cellboxes:
-            if cellbox.bounds.get_lat_max() == 90:
-                north_polar_cellboxes.append(int(cellbox.get_id()))
-
-        # Connect north polar cellboxes to all other north polar cellboxes
-        for np_cellbox in north_polar_cellboxes:
-            neighbours = north_polar_cellboxes.copy()
-            neighbours.remove(np_cellbox)
-            self.neighbour_graph.get_graph()[np_cellbox]["-4"] = neighbours
 
     def initialize_meta_data(self, bounds, min_datapoints):
         '''
@@ -660,6 +635,57 @@ class MeshBuilder:
 
         env_mesh = EnvironmentMesh(self.mesh.get_bounds(
         ), agg_cellboxes, self.neighbour_graph, self.get_config())
+
+
+        logging.info('Connecting polar cellboxes...')
+        south_polar_cellboxes = []
+        north_polar_cellboxes = []
+        for cellbox in env_mesh.agg_cellboxes:
+            bounds = cellbox.get_bounds()
+            # Find south polar cellboxes
+            if bounds.get_lat_min() == -90:
+                south_polar_cellboxes.append(int(cellbox.get_id()))
+            # Find north polar cellboxes
+            if bounds.get_lat_max() == 90:
+                north_polar_cellboxes.append(int(cellbox.get_id()))
+
+        # Connect south polar cellboxes to all other south polar cellboxes
+        for cellbox_id in south_polar_cellboxes:
+            neighbours = south_polar_cellboxes.copy()
+            
+            # Remove self from neighbours
+            neighbours.remove(cellbox_id)
+
+            # Removing side neighbours so as no duplicate neighbours
+            east_neighbours = env_mesh.neighbour_graph.get_graph()[cellbox_id][2]
+            west_neighbours = env_mesh.neighbour_graph.get_graph()[cellbox_id][-2]
+
+            side_neighbours = east_neighbours + west_neighbours
+            
+            for neighbour in side_neighbours:
+                if neighbour in neighbours:
+                    neighbours.remove(neighbour)
+
+            env_mesh.neighbour_graph.get_graph()[cellbox_id]["4"] = neighbours
+
+        # Connect north polar cellboxes to all other north polar cellboxes
+        for cellbox_id in north_polar_cellboxes:
+            neighbours = north_polar_cellboxes.copy()
+
+            # Remove self from neighbours
+            neighbours.remove(cellbox_id)
+
+            # Removing side neighbours so as no duplicate neighbours
+            east_neighbours = env_mesh.neighbour_graph.get_graph()[cellbox_id][2]
+            west_neighbours = env_mesh.neighbour_graph.get_graph()[cellbox_id][-2]
+
+            side_neighbours = east_neighbours + west_neighbours
+
+            for neighbour in side_neighbours:
+                if neighbour in neighbours:
+                    neighbours.remove(neighbour)
+
+            env_mesh.neighbour_graph.get_graph()[cellbox_id]["-4"] = neighbours
 
         return env_mesh
 
