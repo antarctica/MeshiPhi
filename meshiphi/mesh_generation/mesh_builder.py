@@ -102,9 +102,16 @@ class MeshBuilder:
         cellboxes = []
         cellboxes = self.initialize_cellboxes(bounds, cell_width, cell_height)
         
-        # Account for going over the antimeridian with longitude_distance        
-        grid_width = np.divide(bounds.get_long_max() - bounds.get_long_min(),
-                               cell_width)
+        # If global mesh
+        if bounds.get_width() == 360:
+            # Account for going over the antimeridian manually       
+            grid_width = np.divide(bounds.get_long_max() - bounds.get_long_min(),
+                                cell_width)
+        else:
+            # Account for going over the antimeridian with longitude_distance        
+            grid_width = longitude_distance(bounds.get_long_min(), 
+                                            bounds.get_long_max()) / cell_width
+
         
         min_datapoints = 5
         if 'splitting' in self.config:
