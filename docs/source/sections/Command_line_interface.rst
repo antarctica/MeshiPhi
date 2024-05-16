@@ -129,7 +129,7 @@ optional arguments:
 merge_mesh
 ^^^^^^^^^^^^^^
 
-When multiple compatilble meshes have been created using the :ref:`create_mesh` command, they can be merged together using the :ref:`merge_mesh` command.
+When multiple compatible meshes have been created using the :ref:`create_mesh` command, they can be merged together using the :ref:`merge_mesh` command.
 This will combine the meshes into a single mesh file, replacing cellboxes in mesh1 with cellboxes in mesh2 where they overlap.
 
 
