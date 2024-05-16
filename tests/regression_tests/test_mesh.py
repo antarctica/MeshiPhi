@@ -6,9 +6,9 @@
 import json
 import pytest
 import time
+import os
 
-from meshiphi import __version__ as pr_version
-from meshiphi import MeshBuilder
+import meshiphi
 
 # Import tests, which are automatically run
 
@@ -46,7 +46,7 @@ TEST_ABSTRACT_MESHES = [
 ]
 
 def setup_module():
-    LOGGER.info(f'PolarRoute version: {pr_version}')
+    LOGGER.info(f'MeshiPhi version: {meshiphi.__version__}')
 
 @pytest.fixture(scope='session', autouse=False, params=TEST_ENV_MESHES + TEST_ABSTRACT_MESHES)
 def mesh_pair(request):
@@ -70,7 +70,11 @@ def mesh_pair(request):
     mesh_config = old_mesh['config']['mesh_info']
     new_mesh = calculate_env_mesh(mesh_config)
     
-    return [old_mesh, new_mesh]
+    test_name = os.path.basename(request.param)
+
+    return {"test": test_name,
+            "old_mesh": old_mesh,
+            "new_mesh": new_mesh}
 
 def calculate_env_mesh(mesh_config):
     """
@@ -84,7 +88,7 @@ def calculate_env_mesh(mesh_config):
     """
     start = time.perf_counter()
 
-    mesh_builder = MeshBuilder(mesh_config)
+    mesh_builder = meshiphi.MeshBuilder(mesh_config)
     new_mesh = mesh_builder.build_environmental_mesh()
 
     end = time.perf_counter()
@@ -94,3 +98,32 @@ def calculate_env_mesh(mesh_config):
 
 
     return new_mesh.to_json()
+
+
+def test_record_output(mesh_pair, tmp_path):
+    """
+    Store fixtures after they're generated to avoid having to recompute
+    meshes for diagnosis upon failure
+
+    Args:
+        mesh_pair (dict): 
+            Fixture holding generated meshes
+        tmp_path (fixture): 
+            Pytest built-in fixture that creates a unique temporary directory
+            for this test's run
+    """
+
+    test_name = mesh_pair['test']
+    test_basename = test_name.split('.')[0]
+    # Save files to folder above where pytest would normally save, since tmp_path is the directory
+    # we want to scrape later. Otherwise, pytest will add subdirectories which overwrite eachother
+    # after 3 tests, and it's possible for more than 3 tests to be run in one pytest call
+    # Ref: https://docs.pytest.org/en/7.1.x/how-to/tmp_path.html#the-default-base-temporary-directory
+    save_filename = os.path.join(tmp_path, '..', f'{test_basename}.comparison.json')
+
+    # Only care about the meshes used as a fixture
+    meshes = {key: val for key, val in mesh_pair.items() if key != 'test'}
+
+    # Output as a json
+    with open(save_filename,'w') as fp:
+        json.dump(meshes, fp, indent=4)

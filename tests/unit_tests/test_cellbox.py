@@ -2,8 +2,13 @@ import unittest
 from meshiphi.mesh_generation.metadata import Metadata
 from meshiphi.dataloaders.factory import DataLoaderFactory
 from meshiphi.mesh_generation.cellbox import CellBox
+<<<<<<< HEAD
 from meshiphi.mesh_generation.boundary import Boundary
 
+=======
+
+from meshiphi.mesh_generation.boundary import Boundary
+>>>>>>> 970bf87d867e03abe004f62071912e762ab30209
 class TestCellBox (unittest.TestCase):
 
     def setUp(self):

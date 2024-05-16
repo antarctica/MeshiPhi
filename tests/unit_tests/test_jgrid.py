@@ -2,7 +2,7 @@
 import unittest
 import json
 
-from polar_route.mesh_generation.mesh_builder import MeshBuilder
+from meshiphi.mesh_generation.mesh_builder import MeshBuilder
 class TestJGrid (unittest.TestCase):
    def setUp(self):
 
