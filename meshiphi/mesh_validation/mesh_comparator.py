@@ -8,6 +8,19 @@ class MeshComparator:
 
     @staticmethod
     def _return_as(df, return_type):
+        """
+        Allows for flexibility in how to return differences to user. Sets a
+        return type for each method. 
+
+        Args:
+            df (pd.DataFrame): Dataframe with all the discovered differences
+            return_type (str): Flag determining the type of output the user wants
+
+        Returns:
+            <various>: Output depends on what return_type is specified in args
+        """    
+    
+    
         # Set default return_type to entire dataframe
         if return_type is None:
             return_type = 'df'
@@ -18,10 +31,7 @@ class MeshComparator:
             return df['id']
         elif return_type in ['dataframe', 'df']:
             return df
-        # elif return_type in []
     
-
-
 
     def compare_cellbox_boundaries(self, mesh1, mesh2, return_type=None):
         """
@@ -30,10 +40,12 @@ class MeshComparator:
         Args: 
             mesh1 (json): the first mesh to compare
             mesh2 (json): the second mesh to compare
+            return_type (str, optional): Type of output user wants. Defaults to pd.DataFrame.
 
         Returns:
-            dict: a dictionary containing the results of the comparison
-
+            <various>: 
+                Output in format specified by return_type argument.
+                See _return_as() docstring for more info
         """
 
         cellboxes1 = pd.DataFrame(mesh1['cellboxes']).set_index('geometry')
@@ -52,49 +64,29 @@ class MeshComparator:
         # Otherise, create an empty dataframe
         else:
             mismatched_df = pd.DataFrame()
+
+        # TODO update to check if there are cells that are common but split in diff
+
         return self._return_as(mismatched_df, return_type)
+    
 
-        # results = {}
-        # matching_cells = 0
-        # mismatch_cells = 0
-        # split_cells = 0
-
-        # for cell in cellboxes1.index:
-        #     if cell in cellboxes2.index:
-        #         matching_cells += 1
-        #     else:
-        #         # Test if the split cellboxes exist in the other mesh
-        #         bounds = Boundary.from_poly_string(cell)
-        #         split_bounds = bounds.split()
-
-        #         found_split_cells = 0 
-        #         for bound in split_bounds:
-        #             if bound.to_poly_string() in cellboxes2.index:
-        #                 found_split_cells += 1    
-                
-        #         if found_split_cells == 4:
-        #             split_cells += 1
-        #         else:
-        #             mismatch_cells += 1
-
-        # results['matching_cells'] = matching_cells
-        # results['mismatch_cells'] = mismatch_cells
-        # results['split_cells'] = split_cells   
-
-        # return results  
         
     def compare_cellbox_values(self, mesh1, mesh2, return_type=None):
         """
         Compare the values of the cellboxes in the two meshes in cellboxes
         that both meshes have in common
 
-        Args:
+        Args: 
             mesh1 (json): the first mesh to compare
             mesh2 (json): the second mesh to compare
+            return_type (str, optional): Type of output user wants. Defaults to pd.DataFrame.
 
         Returns:
-            DataFrame: a dataframe containing the results of the comparison
+            <various>: 
+                Output in format specified by return_type argument.
+                See _return_as() docstring for more info
         """
+
 
         cellboxes1 = pd.DataFrame(mesh1['cellboxes']).set_index('geometry')
         cellboxes2 = pd.DataFrame(mesh2['cellboxes']).set_index('geometry')
@@ -143,13 +135,17 @@ class MeshComparator:
         Compare the attributes of the cellboxes in the two meshes if the meshes
         have cellboxes in common
 
-        Args:
+        Args: 
             mesh1 (json): the first mesh to compare
             mesh2 (json): the second mesh to compare
+            return_type (str, optional): Type of output user wants. Defaults to pd.DataFrame.
 
         Returns:
-            dict: a dictionary containing the results of the comparison
+            <various>: 
+                Output in format specified by return_type argument.
+                See _return_as() docstring for more info
         """
+
         # Load as a dict of pd Series
         # Can't load as a df as columns would be generated for every attribute in the mesh
         # so can't compare cellbox by cellbox
@@ -183,13 +179,17 @@ class MeshComparator:
         """
         Compare the values of the neighbour graph in the two meshes 
 
-        Args:
+        Args: 
             mesh1 (json): the first mesh to compare
             mesh2 (json): the second mesh to compare
+            return_type (str, optional): Type of output user wants. Defaults to pd.DataFrame.
 
         Returns:
-            dict: a dictionary containing the results of the comparison
+            <various>: 
+                Output in format specified by return_type argument.
+                See _return_as() docstring for more info
         """
+
 
         cellboxes2 = pd.DataFrame(mesh2['cellboxes']).set_index('geometry')
 
