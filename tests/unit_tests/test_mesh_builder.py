@@ -16,7 +16,7 @@ class TestMeshBuilder(unittest.TestCase):
           self.config = self.json_file ['config']['mesh_info']
           self.mesh_builder =  MeshBuilder(self.config)
           self.env_mesh = self.mesh_builder.build_environmental_mesh()
-          self.env_mesh.save("global_mesh.json")
+         #  self.env_mesh.save("global_mesh.json")
         
       
 
