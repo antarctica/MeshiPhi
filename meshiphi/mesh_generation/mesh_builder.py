@@ -102,9 +102,8 @@ class MeshBuilder:
         cellboxes = []
         cellboxes = self.initialize_cellboxes(bounds, cell_width, cell_height)
         
-        # Account for going over the antimeridian with longitude_distance        
-        grid_width = np.divide(bounds.get_long_max() - bounds.get_long_min(),
-                               cell_width)
+        # Calculate width of mesh in cell-coordinates rather than degrees
+        grid_width = np.divide(bounds.get_width(), cell_width)
         
         min_datapoints = 5
         if 'splitting' in self.config:
@@ -337,7 +336,7 @@ class MeshBuilder:
         
 
     def validate_bounds(self, bounds, cell_width, cell_height):
-        assert (bounds.get_long_max() - bounds.get_long_min()) % cell_width == 0, \
+        assert (bounds.get_long_max() - bounds.get_long_min()) % 360 % cell_width == 0, \
             f"""The defined longitude region <{bounds.get_long_min()} :{bounds.get_long_max()}>
             is not divisable by the initial cell width <{cell_width}>"""
 

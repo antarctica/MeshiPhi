@@ -291,7 +291,7 @@ class Boundary:
         """
             returns the max longtitude
         """
-        return self.long_range[1]  
+        return self.long_range[1]
     def get_time_min(self):
         """
             returns the min of time range
@@ -347,7 +347,7 @@ class Boundary:
                 Shapely polygon with corners at the min/max lat/long 
                 values of this boundary
         """
-        # If not going over the antimeridian
+        # If boundary not going over the antimeridian
         if self.get_long_min() < self.get_long_max():
             # Create a polygon of boundary
             polygon = wkt.loads(
@@ -357,6 +357,22 @@ class Boundary:
                                 f'{self.get_long_max()} {self.get_lat_min()},' + \
                                 f'{self.get_long_min()} {self.get_lat_min()}))'
                 )
+        elif self.get_long_min() == 180:
+            polygon = wkt.loads(
+                        f'POLYGON((-180 {self.get_lat_min()},' + \
+                                f'-180 {self.get_lat_max()},' + \
+                                f'{self.get_long_max()} {self.get_lat_max()},' + \
+                                f'{self.get_long_max()} {self.get_lat_min()},' + \
+                                f'-180 {self.get_lat_min()}))'
+                )
+        elif self.get_long_max() == -180:
+            polygon = wkt.loads(
+                        f'POLYGON(({self.get_long_min()} {self.get_lat_min()},' + \
+                                f'{self.get_long_min()} {self.get_lat_max()},' + \
+                                f'180 {self.get_lat_max()},' + \
+                                f'180 {self.get_lat_min()},' + \
+                                f'{self.get_long_min()} {self.get_lat_min()}))'
+            )
         else:
             # Create a multipolygon of boundary
             polygon_1 = wkt.loads(
