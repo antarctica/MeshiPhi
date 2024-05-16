@@ -7,13 +7,23 @@ from meshiphi.mesh_generation.boundary import Boundary
 class TestCellBox (unittest.TestCase):
 
     def setUp(self):
-        raise NotImplementedError
+        # Set a 'dummy_cellbox' for testing all the setters
+        self.dummy_cellbox        = CellBox(Boundary([ 10,  20], [ 30,  40]), 0)
+        # Don't want to reuse dummy cellbox for testing getters since the values may be borked from the setter tests
+        self.temporal_cellbox     = CellBox(Boundary([ 10,  20], [ 30,  40], ['1970-01-01','2021-12-31']), 1)
+        self.arbitrary_cellbox    = CellBox(Boundary([ 10,  20], [ 30,  40]), 2)
+        self.meridian_cellbox     = CellBox(Boundary([-50, -40], [-10,  10]), 3)
+        self.antimeridian_cellbox = CellBox(Boundary([-50, -40], [170,-170]), 4)
+        self.equatorial_cellbox   = CellBox(Boundary([-10,  10], [ 30,  40]), 5)
 
     def test_set_minimum_datapoints(self):
-        raise NotImplementedError
+        self.assertRaises(ValueError, self.dummy_cellbox.set_minimum_datapoints, -1)
+        
+        self.dummy_cellbox.set_minimum_datapoints(5)
+        self.assertEqual(self.dummy_cellbox.minimum_datapoints, 5)
 
     def test_get_minimum_datapoints(self):
-        raise NotImplementedError
+        self.assertEqual(self.arbitrary_cellbox.get_minimum_datapoints(), 10)
 
     def test_set_data_source(self):
         raise NotImplementedError
@@ -28,16 +38,20 @@ class TestCellBox (unittest.TestCase):
         raise NotImplementedError
 
     def test_set_split_depth(self):
-        raise NotImplementedError
+        self.assertRaises(ValueError, self.dummy_cellbox.set_split_depth, -1)
+
+        self.dummy_cellbox.set_split_depth(5)
+        self.assertEqual(self.dummy_cellbox.split_depth, 5)
 
     def test_get_split_depth(self):
         raise NotImplementedError
 
     def test_set_id(self):
-        raise NotImplementedError
-
+        self.dummy_cellbox.set_id(123)
+        self.assertEqual(self.dummy_cellbox.id, 123)
+        
     def test_get_id(self):
-        raise NotImplementedError
+        self.assertEqual(self.arbitrary_cellbox.get_id(), 2)
 
     def test_get_bounds(self):
         raise NotImplementedError
