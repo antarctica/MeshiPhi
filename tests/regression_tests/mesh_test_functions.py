@@ -6,25 +6,25 @@ SIG_FIG_TOLERANCE = 4
 
 # Testing mesh outputs
 def test_mesh_cellbox_count(mesh_pair):
-    compare_cellbox_count(mesh_pair[0], mesh_pair[1])
+    compare_cellbox_count(mesh_pair["old_mesh"], mesh_pair["new_mesh"])
 
 def test_mesh_cellbox_ids(mesh_pair):
-    compare_cellbox_ids(mesh_pair[0], mesh_pair[1])
+    compare_cellbox_ids(mesh_pair["old_mesh"], mesh_pair["new_mesh"])
 
 def test_mesh_cellbox_values(mesh_pair):
-    compare_cellbox_values(mesh_pair[0], mesh_pair[1])
+    compare_cellbox_values(mesh_pair["old_mesh"], mesh_pair["new_mesh"])
 
 def test_mesh_cellbox_attributes(mesh_pair):
-    compare_cellbox_attributes(mesh_pair[0], mesh_pair[1])
+    compare_cellbox_attributes(mesh_pair["old_mesh"], mesh_pair["new_mesh"])
 
 def test_mesh_neighbour_graph_count(mesh_pair):
-    compare_neighbour_graph_count(mesh_pair[0], mesh_pair[1])
+    compare_neighbour_graph_count(mesh_pair["old_mesh"], mesh_pair["new_mesh"])
 
 def test_mesh_neighbour_graph_ids(mesh_pair):
-    compare_neighbour_graph_ids(mesh_pair[0], mesh_pair[1])
+    compare_neighbour_graph_ids(mesh_pair["old_mesh"], mesh_pair["new_mesh"])
 
 def test_mesh_neighbour_graph_values(mesh_pair):
-    compare_neighbour_graph_values(mesh_pair[0], mesh_pair[1])
+    compare_neighbour_graph_values(mesh_pair["old_mesh"], mesh_pair["new_mesh"])
 
 
 # Comparison between old and new

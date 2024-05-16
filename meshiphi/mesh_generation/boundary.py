@@ -28,16 +28,23 @@ class Boundary:
                config (json): json object that contains the boundary attributes
                 
         """
-        long_min = config['region']['long_min']
-        long_max = config['region']['long_max']
         lat_min = config['region']['lat_min']
         lat_max = config['region']['lat_max']
-        start_time = config['region']['start_time']
-        end_time = config['region']['end_time']
         lat_range = [lat_min, lat_max]
+
+        long_min = config['region']['long_min']
+        long_max = config['region']['long_max']
         long_range = [long_min , long_max]
-        time_range = [start_time , end_time]
+
+        if 'start_time' in config['region'] and 'end_time' in config['region']:
+            start_time = config['region']['start_time']
+            end_time = config['region']['end_time']
+            time_range = [start_time , end_time]
+        else:
+            time_range = None
+
         obj = Boundary (lat_range , long_range , time_range)
+
         return obj
 
     @classmethod
@@ -56,14 +63,17 @@ class Boundary:
 
             # pos_coords on +180 side of antimeridian
             # neg_coords on -180 side of antimeridian
-            pos_coords, neg_coords = [[polygon_coords.split(',') 
-                                        for polygon_coords in coord_string] 
-                                        for coord_string in coord_strings]
+            pos_coords, neg_coords = [coord_string.split(',')
+                                      for coord_string in coord_strings]
+            # Remove leading whitespace from WKT elements
+            pos_coords = [pc.lstrip() for pc in pos_coords]
+            neg_coords = [nc.lstrip() for nc in neg_coords]
+            
             # Extract longs and lats for each polygon
-            pos_x = [float(coord.split(" ")[1]) for coord in pos_coords]
-            pos_y = [float(coord.split(" ")[0]) for coord in pos_coords]
-            neg_x = [float(coord.split(" ")[1]) for coord in neg_coords]
-            neg_y = [float(coord.split(" ")[0]) for coord in neg_coords]
+            pos_x = [float(coord.split(" ")[0]) for coord in pos_coords]
+            pos_y = [float(coord.split(" ")[1]) for coord in pos_coords]
+            neg_x = [float(coord.split(" ")[0]) for coord in neg_coords]
+            neg_y = [float(coord.split(" ")[1]) for coord in neg_coords]
 
             assert(pos_y == neg_y), "Latitudes of polygons in multipolygon " + \
                                     "don't match, cannot construct valid " + \
@@ -76,18 +86,18 @@ class Boundary:
 
         else:    
             coords = poly_string.split("POLYGON ((")[1].split("))")[0].split(", ")
-            x = [float(coord.split(" ")[1]) for coord in coords]
-            y = [float(coord.split(" ")[0]) for coord in coords]
+            x = [float(coord.split(" ")[0]) for coord in coords]
+            y = [float(coord.split(" ")[1]) for coord in coords]
 
-            lat_min = min(x)
-            lat_max = max(x)
-            long_min = min(y)
-            long_max = max(y)
+            lat_min = min(y)
+            lat_max = max(y)
+            long_min = min(x)
+            long_max = max(x)
 
         long_range = [long_min, long_max]
         lat_range = [lat_min, lat_max]
 
-        bounds = Boundary(long_range, lat_range)
+        bounds = Boundary(lat_range, long_range)
 
         return bounds
 
@@ -102,7 +112,7 @@ class Boundary:
         """
         if time_range is None:
             time_range=[]
-        else: 
+        elif time_range != []: 
              time_range[0] = self.parse_datetime(time_range[0])
              time_range[1] = self.parse_datetime(time_range[1])
 
@@ -112,7 +122,8 @@ class Boundary:
         self.long_range = long_range
         self.time_range = time_range
 
-    def parse_datetime(self, datetime_str: str):
+    @staticmethod
+    def parse_datetime(datetime_str):
         """
             Attempts to parse a string containing reference to system time into datetime format.
             If given the string 'TODAY', will return system time.
@@ -121,7 +132,7 @@ class Boundary:
             
             Args:
                 datetime_str (String): String attempted to be parsed to datetime format. 
-                    Expected input format is '%d%m%Y'
+                    Expected input format is '%Y-%m-%d', or 'TODAY +- n'
             Returns:
                 date (String): date in a String format, '%Y-%m-%d'.
             Raises:
@@ -180,13 +191,15 @@ class Boundary:
         if len(lat_range) < 2 or len (long_range)<2 :
             raise ValueError('Boundary: range should contain two values')
         if lat_range[0] > lat_range [1]:
-             raise ValueError('Boundary: Latitude start range should be smaller than range end')
+             raise ValueError(f'Boundary: Latitude start range {lat_range[0]} should be smaller than range end {lat_range[1]}')
         if long_range[0] < -180 or long_range[1] > 180:
             raise ValueError('Boundary: Longtitude range should be within -180:180')
-        if len (time_range) > 0:
-            if datetime.strptime(time_range[0], '%Y-%m-%d') > datetime.strptime(time_range[1], '%Y-%m-%d'):
-                     raise ValueError('Boundary: Start time range should be smaller than range end')
-
+        if time_range != []:
+            if len(time_range) == 2:
+                if datetime.strptime(time_range[0], '%Y-%m-%d') > datetime.strptime(time_range[1], '%Y-%m-%d'):
+                        raise ValueError('Boundary: Start time range should be smaller than range end')
+            else:
+                raise ValueError(f'Boundary: Time range needs two dates, instead got {len(time_range)}')
     # Functions used for getting data from a cellbox
     def getcx(self):
         """
@@ -389,10 +402,10 @@ class Boundary:
 
         # 0 = south_west, 1 = north_west, 2 = south_east, 3 = north_east
         bounds = [
-            Boundary([self.get_lat_min(), lat_mid], [self.get_long_min(), long_mid]),
-            Boundary([lat_mid, self.get_lat_max()], [self.get_long_min(), long_mid]),
-            Boundary([self.get_lat_min(), lat_mid], [long_mid, self.get_long_max()]),
-            Boundary([lat_mid, self.get_lat_max()], [long_mid, self.get_long_max()])
+            Boundary([self.get_lat_min(), lat_mid], [self.get_long_min(), long_mid], self.get_time_range()),
+            Boundary([lat_mid, self.get_lat_max()], [self.get_long_min(), long_mid], self.get_time_range()),
+            Boundary([self.get_lat_min(), lat_mid], [long_mid, self.get_long_max()], self.get_time_range()),
+            Boundary([lat_mid, self.get_lat_max()], [long_mid, self.get_long_max()], self.get_time_range())
         ]
 
         return bounds
@@ -408,4 +421,42 @@ class Boundary:
 
         return "{"+ lat_range + ", " + long_range + ", " + time_range + "}"
 
+    def __eq__(self, other):
+        """
+        Evaluates whether two Boundary objects have the same lat/long min/max, 
+        and start/end time
 
+        Args:
+            other (Boundary): Boundary object being compared to
+
+        Returns:
+            bool: True if all boundary edges are equal
+        """
+        # List to store each check for equality
+        boundary_checks = []
+        # Add bool indicating if spatial boundary matches between the two
+        boundary_checks += [(self.get_lat_min()  == other.get_lat_min())]
+        boundary_checks += [(self.get_lat_max()  == other.get_lat_max())]
+        boundary_checks += [(self.get_long_min() == other.get_long_min())]
+        boundary_checks += [(self.get_long_max() == other.get_long_max())]
+
+        # Check if obects have the attributes to be tested
+        has_start_time = ([hasattr(self, 'start_time'), hasattr(other, 'start_time')])
+        has_end_time   = ([hasattr(self, 'end_time'),   hasattr(other, 'end_time')])
+
+        # If they both have the attribute, check that they are equal
+        if all(has_start_time):
+            boundary_checks += [(self.get_start_time() == other.get_start_time())]
+        # If only one has the attribute, they aren't equal
+        elif any(has_start_time):
+            boundary_checks += [False]
+        # Otherwise, we don't need to append to the check list
+
+        # Same logic, just with other temporal boundary
+        if all(has_end_time):
+            boundary_checks += [(self.get_end_time() == other.get_end_time())]
+        elif any(has_end_time):
+            boundary_checks += [False]
+        
+        # See if every check has passed
+        return all(boundary_checks)

@@ -30,3 +30,4 @@ dev_venv/*
 *.ipynb
 splitting_experiments/*
 GRF_Plots/*
+tests/regression_tests/.outputs/*
