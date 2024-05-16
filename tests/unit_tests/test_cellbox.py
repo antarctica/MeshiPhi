@@ -2,24 +2,50 @@ import unittest
 from meshiphi.mesh_generation.metadata import Metadata
 from meshiphi.dataloaders.factory import DataLoaderFactory
 from meshiphi.mesh_generation.cellbox import CellBox
-<<<<<<< HEAD
-from meshiphi.mesh_generation.boundary import Boundary
-
-=======
 
 from meshiphi.mesh_generation.boundary import Boundary
->>>>>>> 970bf87d867e03abe004f62071912e762ab30209
+from meshiphi.utils import longitude_domain
 class TestCellBox (unittest.TestCase):
 
     def setUp(self):
+
+        def create_cellbox(bounds, id=0):
+            params = {
+                'dataloader_name': 'circle',
+                'data_name': 'dummy_data',
+                'radius': bounds.get_width()/2
+            }
+
+            splitting_conds = {
+                'threshold': 0.5,
+                'upper_bound': 0.75,
+                'lower_bound': 0.25
+            }
+
+            dataloader = DataLoaderFactory().get_dataloader('circle', bounds, params, min_dp=10)
+            datasource = Metadata(dataloader, 
+                                  splitting_conditions=splitting_conds, 
+                                  value_fill_type='parent', 
+                                  data_subset=dataloader.trim_datapoints(bounds))
+
+            new_cellbox = CellBox(bounds, id)
+
+            new_cellbox.data_source = [datasource]
+            
+            # Create a parent boundary defined as being twice as big in each axis. Parent extends cellbox boundary to the NW
+            parent_bounds = Boundary([bounds.get_lat_min(),  bounds.get_lat_max()  + bounds.get_height()],
+                                     [longitude_domain(bounds.get_long_min()), 
+                                      longitude_domain(bounds.get_long_max() + bounds.get_width())])
+            # Make ID a 2 digit number to avoid any conflicts
+            new_cellbox.parent = CellBox(parent_bounds, id + 10)
+            
+            return new_cellbox
+
+
         # Set a 'dummy_cellbox' for testing all the setters
-        self.dummy_cellbox        = CellBox(Boundary([ 10,  20], [ 30,  40]), 0)
+        self.dummy_cellbox        = create_cellbox(Boundary([ 10,  20], [ 30,  40]), id=0)
         # Don't want to reuse dummy cellbox for testing getters since the values may be borked from the setter tests
-        self.temporal_cellbox     = CellBox(Boundary([ 10,  20], [ 30,  40], ['1970-01-01','2021-12-31']), 1)
-        self.arbitrary_cellbox    = CellBox(Boundary([ 10,  20], [ 30,  40]), 2)
-        self.meridian_cellbox     = CellBox(Boundary([-50, -40], [-10,  10]), 3)
-        self.antimeridian_cellbox = CellBox(Boundary([-50, -40], [170,-170]), 4)
-        self.equatorial_cellbox   = CellBox(Boundary([-10,  10], [ 30,  40]), 5)
+        self.arbitrary_cellbox    = create_cellbox(Boundary([ 10,  20], [ 30,  40]), id=1)
 
     def test_set_minimum_datapoints(self):
         self.assertRaises(ValueError, self.dummy_cellbox.set_minimum_datapoints, -1)
@@ -56,7 +82,7 @@ class TestCellBox (unittest.TestCase):
         self.assertEqual(self.dummy_cellbox.id, 123)
         
     def test_get_id(self):
-        self.assertEqual(self.arbitrary_cellbox.get_id(), 2)
+        self.assertEqual(self.arbitrary_cellbox.get_id(), 1)
 
     def test_get_bounds(self):
         raise NotImplementedError
