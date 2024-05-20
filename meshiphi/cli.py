@@ -4,10 +4,10 @@ import inspect
 import logging
 
 from meshiphi import __version__ as version
-from meshiphi.utils import setup_logging, timed_call, convert_decimal_days
+from meshiphi.utils import setup_logging, timed_call
 from meshiphi.mesh_generation.mesh_builder import MeshBuilder
 from meshiphi.mesh_generation.environment_mesh import EnvironmentMesh
-
+from meshiphi.test_automation.test_automater import TestAutomater
 
 @setup_logging
 def get_args(
@@ -196,3 +196,83 @@ def merge_mesh_cli():
 
     logging.info("Saving merged mesh to {}".format(args.output))
     json.dump(merged_mesh_json, open(args.output, "w"), indent=4)
+
+
+
+@timed_call
+def meshiphi_test_cli():
+    """
+    CLI Entry point for automated testing. Assumes you have git and pytest installed.
+
+    Usage: 
+    meshiphi_test <reference_branch> [OPTIONS]               # Compares current branch to reference_branch
+    meshiphi_test <test_branch> <reference_branch> [OPTIONS] # Compares test_branch to reference_branch
+    """
+
+    @setup_logging
+    def get_test_automater_args():
+        ap = argparse.ArgumentParser()
+        # Add one or two arguments as branches
+        # If one, compare current branch to specified one
+        # If two, compare one to the other
+        ap.add_argument('branch_a', action='append')
+        ap.add_argument('branch_b', nargs='?', action='append')
+
+        # Want only regression tests
+        ap.add_argument("-r", "--regression",
+                        default=False,
+                        action="store_true",
+                        help="Run only regression tests")
+        # Want only unit tests
+        ap.add_argument("-u", "--unit",
+                        default=False,
+                        action="store_true",
+                        help="Run only unit tests")
+        # Save pytest fixtures generated
+        ap.add_argument("-s", "--save",
+                        default=False,
+                        action="store_true",
+                        help="Creates a 'pytest_output' folder in your current "\
+                             "working directory and populates it with test "\
+                             "outputs")
+        # Save pytest fixtures generated
+        ap.add_argument("-p", "--plot",
+                        default=False,
+                        action="store_true",
+                        help="Plot differences between generated output to reference")
+
+        # Verbose logging specified
+        ap.add_argument("-v", "--verbose",
+                        default=False,
+                        action="store_true",
+                        help="Turn on DEBUG level logging")
+        
+        return ap.parse_args()
+
+    args = get_test_automater_args()
+
+    # Turn one off if only one specified
+    if sum([args.regression, args.unit]) == 1:
+        reg  = args.regression
+        unit = args.unit
+    # Else, either both are selected, or neither are selected
+    # If neither selected, run both (makes no sense to run none)
+    else:
+        reg  = True
+        unit = True
+
+    # Set appropriate from/into branch to pass to TestAutomater
+    if args.branch_b != [None]:
+        from_branch = args.branch_a[0]
+        into_branch = args.branch_b[0]
+    else:
+        from_branch = None
+        into_branch = args.branch_a[0]
+
+    # Select and run appropriate tests
+    TestAutomater(from_branch=from_branch, 
+                  into_branch=into_branch,
+                  regression=reg,
+                  unit=unit,
+                  plot=args.plot,
+                  save=args.save)

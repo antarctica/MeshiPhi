@@ -28,21 +28,21 @@ LOGGER.setLevel(logging.INFO)
 
 #File locations of all environmental meshes to be recalculated for regression testing.
 TEST_ENV_MESHES = [
-    # './example_meshes/env_meshes/grf_normal.json',
-    # './example_meshes/env_meshes/grf_downsample.json',
-    # './example_meshes/env_meshes/grf_reprojection.json',
+    './example_meshes/env_meshes/grf_normal.json',
+    './example_meshes/env_meshes/grf_downsample.json',
+    './example_meshes/env_meshes/grf_reprojection.json',
     './example_meshes/env_meshes/grf_sparse.json'
 ]
 
 TEST_ABSTRACT_MESHES = [
-    # './example_meshes/abstract_env_meshes/vgrad.json',
+    './example_meshes/abstract_env_meshes/vgrad.json',
     './example_meshes/abstract_env_meshes/hgrad.json',
-    # './example_meshes/abstract_env_meshes/checkerboard_1.json',
-    # './example_meshes/abstract_env_meshes/checkerboard_2.json',
-    # './example_meshes/abstract_env_meshes/checkerboard_3.json',
-    # './example_meshes/abstract_env_meshes/circle.json',
-    # './example_meshes/abstract_env_meshes/circle_quadrant_split.json',
-    # './example_meshes/abstract_env_meshes/circle_quadrant_nosplit.json'
+    './example_meshes/abstract_env_meshes/checkerboard_1.json',
+    './example_meshes/abstract_env_meshes/checkerboard_2.json',
+    './example_meshes/abstract_env_meshes/checkerboard_3.json',
+    './example_meshes/abstract_env_meshes/circle.json',
+    './example_meshes/abstract_env_meshes/circle_quadrant_split.json',
+    './example_meshes/abstract_env_meshes/circle_quadrant_nosplit.json'
 ]
 
 def setup_module():
