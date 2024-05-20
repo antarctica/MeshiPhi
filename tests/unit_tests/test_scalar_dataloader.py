@@ -129,7 +129,7 @@ class TestScalarDataloader(unittest.TestCase):
             self.assertEqual(complete_params['x_col'], 'lat')
             self.assertEqual(complete_params['y_col'], 'long')
             self.assertFalse(complete_params['fast_reprojection'])
-
+            self.assertIsNone(complete_params['irrelevant_key'])
 
     def test_calculate_coverage(self):
         raise NotImplementedError
