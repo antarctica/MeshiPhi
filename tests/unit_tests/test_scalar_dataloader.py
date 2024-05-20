@@ -53,17 +53,29 @@ def around_val(mid_val, total_range=10, axis=None):
     return [range_min, range_max]
 
 def year_of(year):
-    return [f'{year}-01-01', f'{year}-12-31']    
+    return [f'{year}-01-01', f'{year}-12-31']
 
-# Quadrants of Earth
-NE_BOUNDARY   = Boundary(around_val( 45, axis='lat'), around_val( 90, axis='long'), year_of(2000))
-NW_BOUNDARY   = Boundary(around_val( 45, axis='lat'), around_val(-90, axis='long'), year_of(2000))
-SE_BOUNDARY   = Boundary(around_val(-45, axis='lat'), around_val( 90, axis='long'), year_of(2000))
-SW_BOUNDARY   = Boundary(around_val(-45, axis='lat'), around_val(-90, axis='long'), year_of(2000))
-# Equator, meridian, antimeridian
-EQ_BOUNDARY   = Boundary(around_val(  0, axis='lat'), around_val( 90, axis='long'), year_of(2000))
-M_BOUNDARY    = Boundary(around_val( 45, axis='lat'), around_val(  0, axis='long'), year_of(2000))
-AM_BOUNDARY   = Boundary(around_val(-45, axis='lat'), around_val(180, axis='long'), year_of(2000))
+def create_bounds(mid_lat, mid_long, year, deg_range=10):
+    lat_range = around_val(mid_lat, total_range=deg_range, axis='lat')
+    long_range = around_val(mid_long, total_range=deg_range, axis='long')
+    time_range = year_of(year)
+
+    return Boundary(lat_range, long_range, time_range)
+
+
+ALL_BOUNDS = {
+    # Quadrants of earth
+    'north_east':   create_bounds( 45,  90, 2000),
+    'north_west':   create_bounds( 45, -90, 2000),
+    'south_east':   create_bounds(-45,  90, 2000),
+    'south_west':   create_bounds(-45, -90, 2000),
+    # Edge cases
+    'equatorial':   create_bounds(  0,  90, 2000),
+    'meridian':     create_bounds(-45,   0, 2000),
+    'antimeridian': create_bounds(-45, 180, 2000),
+    'north_pole':   create_bounds( 85,  90, 2000),
+    'south_pole':   create_bounds(-85,  90, 2000)
+}
 
 
 class PytestDataLoader(ScalarDataLoader):
@@ -101,22 +113,38 @@ class TestScalarDataloader(unittest.TestCase):
         self.dataloaders = [self.xr_dataloader, self.pd_dataloader]
     
     def test_add_default_params(self):
-        pass
+        incomplete_params = {
+            'irrelevant_key': None
+        }
+        for dataloader in self.dataloaders:
+            complete_params = dataloader.add_default_params(incomplete_params)
+            
+            self.assertIsNone(complete_params['data_name'])
+            self.assertEqual(complete_params['dataloader_name'], 'PytestDataLoader')
+            self.assertEqual(complete_params['downsample_factors'], [1,1])
+            self.assertEqual(complete_params['aggregate_type'], 'MEAN')
+            self.assertEqual(complete_params['min_dp'], 5)
+            self.assertEqual(complete_params['in_proj'], 'EPSG:4326')
+            self.assertEqual(complete_params['out_proj'], 'EPSG:4326')
+            self.assertEqual(complete_params['x_col'], 'lat')
+            self.assertEqual(complete_params['y_col'], 'long')
+            self.assertFalse(complete_params['fast_reprojection'])
+
 
     def test_calculate_coverage(self):
-        pass
+        raise NotImplementedError
 
     def test_trim_datapoints(self):
-        pass
+        raise NotImplementedError
 
     def test_get_value(self):
-        pass
+        raise NotImplementedError
 
     def test_get_hom_condition(self):
-        pass
+        raise NotImplementedError
 
     def test_reproject(self):
-        pass
+        raise NotImplementedError
 
     def test_downsample(self):
         for dataloader in self.dataloaders:
@@ -148,4 +176,4 @@ class TestScalarDataloader(unittest.TestCase):
                 data_names = list(data.keys())
             # Ensure there is still only one variable, with the name 'data_test'
             assert len(data_names) == 1
-            assert 'data_test' in data_names#
+            assert 'data_test' in data_names
