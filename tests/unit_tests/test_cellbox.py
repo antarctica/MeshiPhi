@@ -5,47 +5,79 @@ from meshiphi.mesh_generation.cellbox import CellBox
 
 from meshiphi.mesh_generation.boundary import Boundary
 from meshiphi.utils import longitude_domain
+
+
+def create_cellbox(bounds, id=0, parent=None, params=None, splitting_conds=None):
+    """
+    Helper function that simplifies creation of test cases
+
+    Args:
+        bounds (Boundary): Boundary of cellbox
+        id (int, optional): Cellbox ID to initialise. Defaults to 0.
+        parent (CellBox, optional): Cellbox to link as a parent. Defaults to None.
+
+    Returns:
+        CellBox: Cellbox with completed attributes
+    """
+    dataloader = create_dataloader(bounds, params)
+    metadata = create_metadata(bounds, dataloader, splitting_conds=splitting_conds)
+
+    new_cellbox = CellBox(bounds, id)
+    new_cellbox.data_source = [metadata]
+    new_cellbox.parent = parent
+    
+    return new_cellbox
+
+def create_dataloader(bounds, params=None):
+    if params is None:
+        params = {
+            'dataloader_name': 'rectangle',
+            'data_name': 'dummy_data',
+            'width': bounds.get_width(),
+            'height': bounds.get_height()/3,
+            'centre': (bounds.getcx(), bounds.getcy())
+        }
+    dataloader = DataLoaderFactory().get_dataloader(params['dataloader_name'],
+                                                    bounds,
+                                                    params,
+                                                    min_dp=10)
+    return dataloader
+
+def create_metadata(bounds, dataloader, splitting_conds = None):
+    if splitting_conds is None:
+        splitting_conds = {
+            'threshold': 0.5,
+            'upper_bound': 0.75,
+            'lower_bound': 0.25
+        }
+    data_source = Metadata(dataloader,
+                           splitting_conds=splitting_conds,
+                           value_fill_type='parent',
+                           data_subset=dataloader.trim_datapoints(bounds))
+    return data_source
+
 class TestCellBox (unittest.TestCase):
 
     def setUp(self):
+        
+        self.parent_cellbox = create_cellbox(Boundary([-10, 10], [-10, 10]), 
+                                             id=0, 
+                                             parent=None)
+        self.child_cellbox1 = create_cellbox(Boundary([-10,  0], [-10,  0]), 
+                                             id=1, 
+                                             parent=self.parent_cellbox)
+        self.child_cellbox2 = create_cellbox(Boundary([-10,  0], [  0, 10]), 
+                                             id=2, 
+                                             parent=self.parent_cellbox)
+        self.child_cellbox3 = create_cellbox(Boundary([  0, 10], [-10,  0]), 
+                                             id=3, 
+                                             parent=self.parent_cellbox)
+        self.child_cellbox4 = create_cellbox(Boundary([  0, 10], [  0, 10]), 
+                                             id=4, 
+                                             parent=self.parent_cellbox)
+        
+        self.dummy_cellbox = create_cellbox(Boundary([10, 20], [30, 40]))
 
-        def create_cellbox(bounds, id=0):
-            params = {
-                'dataloader_name': 'circle',
-                'data_name': 'dummy_data',
-                'radius': bounds.get_width()/2
-            }
-
-            splitting_conds = {
-                'threshold': 0.5,
-                'upper_bound': 0.75,
-                'lower_bound': 0.25
-            }
-
-            dataloader = DataLoaderFactory().get_dataloader('circle', bounds, params, min_dp=10)
-            datasource = Metadata(dataloader, 
-                                  splitting_conditions=splitting_conds, 
-                                  value_fill_type='parent', 
-                                  data_subset=dataloader.trim_datapoints(bounds))
-
-            new_cellbox = CellBox(bounds, id)
-
-            new_cellbox.data_source = [datasource]
-            
-            # Create a parent boundary defined as being twice as big in each axis. Parent extends cellbox boundary to the NW
-            parent_bounds = Boundary([bounds.get_lat_min(),  bounds.get_lat_max()  + bounds.get_height()],
-                                     [longitude_domain(bounds.get_long_min()), 
-                                      longitude_domain(bounds.get_long_max() + bounds.get_width())])
-            # Make ID a 2 digit number to avoid any conflicts
-            new_cellbox.parent = CellBox(parent_bounds, id + 10)
-            
-            return new_cellbox
-
-
-        # Set a 'dummy_cellbox' for testing all the setters
-        self.dummy_cellbox        = create_cellbox(Boundary([ 10,  20], [ 30,  40]), id=0)
-        # Don't want to reuse dummy cellbox for testing getters since the values may be borked from the setter tests
-        self.arbitrary_cellbox    = create_cellbox(Boundary([ 10,  20], [ 30,  40]), id=1)
 
     def test_set_minimum_datapoints(self):
         self.assertRaises(ValueError, self.dummy_cellbox.set_minimum_datapoints, -1)
@@ -57,16 +89,42 @@ class TestCellBox (unittest.TestCase):
         self.assertEqual(self.arbitrary_cellbox.get_minimum_datapoints(), 10)
 
     def test_set_data_source(self):
-        raise NotImplementedError
+        arbitrary_bounds = Boundary([-50, -40], [-30, -20])
+        arbitrary_params = {
+            'dataloader_name': 'gradient',
+            'data_name': 'dummy_data',
+            'vertcal': True
+        }
+        arbitrary_dataloader  = create_dataloader(arbitrary_bounds, arbitrary_params)
+        arbitrary_data_source = create_metadata(arbitrary_bounds, arbitrary_dataloader)
+        
+        self.dummy_cellbox.set_data_source([arbitrary_data_source])
+        self.assertEqual(self.dummy_cellbox.data_source, arbitrary_data_source)
 
     def test_get_data_source(self):
-        raise NotImplementedError
-    
+        arbitrary_bounds = Boundary([-40, -20], [-20, 0])
+        arbitrary_params = {
+            'dataloader_name': 'gradient',
+            'data_name': 'dummy_data',
+            'vertcal': False
+        }
+        arbitrary_dataloader  = create_dataloader(arbitrary_bounds, arbitrary_params)
+        arbitrary_data_source = create_metadata(arbitrary_bounds, arbitrary_dataloader)
+
+        self.dummy_cellbox.data_source = arbitrary_data_source
+        self.assertEqual(self.dummy_cellbox.get_data_source(), arbitrary_data_source)
+
     def test_set_parent(self):
-        raise NotImplementedError
+        arbitrary_cellbox = create_cellbox(Boundary([10, 30], [30, 50]))
+        self.dummy_cellbox.set_parent(arbitrary_cellbox)
+        self.assertEqual(self.dummy_cellbox.parent, arbitrary_cellbox)
 
     def test_get_parent(self):
-        raise NotImplementedError
+        # Make sure to set bounds values different to test_set_parent() method
+        # to ensure that the value being checked isn't leftover from a previous test
+        arbitrary_cellbox = create_cellbox(Boundary([0, 20], [20, 40]))
+        self.dummy_cellbox.parent = arbitrary_cellbox
+        self.assertEqual(self.dummy_cellbox.get_parent(), arbitrary_cellbox)
 
     def test_set_split_depth(self):
         self.assertRaises(ValueError, self.dummy_cellbox.set_split_depth, -1)
@@ -75,7 +133,10 @@ class TestCellBox (unittest.TestCase):
         self.assertEqual(self.dummy_cellbox.split_depth, 5)
 
     def test_get_split_depth(self):
-        raise NotImplementedError
+        # Make sure to set split_depth values different to test_set_split_depth() method
+        # to ensure that the value being checked isn't leftover from a previous test
+        self.dummy_cellbox.split_depth = 3
+        self.assertEqual(self.dummy_cellbox.get_split_depth(), 3)
 
     def test_set_id(self):
         self.dummy_cellbox.set_id(123)
@@ -84,8 +145,17 @@ class TestCellBox (unittest.TestCase):
     def test_get_id(self):
         self.assertEqual(self.arbitrary_cellbox.get_id(), 1)
 
+    def test_set_bounds(self):
+        arbitrary_bounds = Boundary([30, 50], [50, 70])
+        self.dummy_cellbox.set_bounds(arbitrary_bounds)
+        self.assertEqual(self.dummy_cellbox.bounds, arbitrary_bounds)
+
     def test_get_bounds(self):
-        raise NotImplementedError
+        # Make sure to set bounds values different to test_set_bounds() method
+        # to ensure that the value being checked isn't leftover from a previous test
+        arbitrary_bounds = Boundary([20, 40], [40, 60])
+        self.dummy_cellbox.bounds = arbitrary_bounds
+        self.assertEqual(self.dummy_cellbox.get_bounds(), arbitrary_bounds)
 
     def test_should_split(self):
         raise NotImplementedError
@@ -128,11 +198,6 @@ class TestCellBox (unittest.TestCase):
    #       gebco = DataLoaderFactory().get_dataloader('GEBCO', boundary, params, min_dp = 5)
    #       self.cellbox.set_data_source ([Metadata (gebco , [split_conds] , params ['value_fill_types'])])
 
-   # def test_minimum_data_points (self):
-   #    self.assertRaises(ValueError, self.cellbox.set_minimum_datapoints , -1 )
-   
-   # def test_split_depth (self):
-   #    self.assertRaises(ValueError, self.cellbox.set_split_depth ,  -1 )
 
    # def test_should_split (self):
    #    self.assertTrue(self.cellbox.should_split(1))
