@@ -1,13 +1,15 @@
 import unittest
+
 from meshiphi.mesh_generation.metadata import Metadata
 from meshiphi.dataloaders.factory import DataLoaderFactory
 from meshiphi.mesh_generation.cellbox import CellBox
+from meshiphi.mesh_generation.aggregated_cellbox import AggregatedCellBox
 
 from meshiphi.mesh_generation.boundary import Boundary
 from meshiphi.utils import longitude_domain
 
 
-def create_cellbox(bounds, id=0, parent=None, params=None, splitting_conds=None):
+def create_cellbox(bounds, id=0, parent=None, params=None, splitting_conds=None, min_dp=5):
     """
     Helper function that simplifies creation of test cases
 
@@ -19,7 +21,7 @@ def create_cellbox(bounds, id=0, parent=None, params=None, splitting_conds=None)
     Returns:
         CellBox: Cellbox with completed attributes
     """
-    dataloader = create_dataloader(bounds, params)
+    dataloader = create_dataloader(bounds, params, min_dp=min_dp)
     metadata = create_metadata(bounds, dataloader, splitting_conds=splitting_conds)
 
     new_cellbox = CellBox(bounds, id)
@@ -28,55 +30,82 @@ def create_cellbox(bounds, id=0, parent=None, params=None, splitting_conds=None)
     
     return new_cellbox
 
-def create_dataloader(bounds, params=None):
+def create_dataloader(bounds, params=None, min_dp=5):
     if params is None:
         params = {
             'dataloader_name': 'rectangle',
             'data_name': 'dummy_data',
-            'width': bounds.get_width(),
-            'height': bounds.get_height()/3,
-            'centre': (bounds.getcx(), bounds.getcy())
+            'width': bounds.get_width()/4,
+            'height': bounds.get_height()/4,
+            'centre': (bounds.getcx(), bounds.getcy()),
+            'nx': 15,
+            'ny': 15,
+            "aggregate_type": "MEAN",
+            "value_fill_type": 'parent'
         }
     dataloader = DataLoaderFactory().get_dataloader(params['dataloader_name'],
                                                     bounds,
                                                     params,
-                                                    min_dp=10)
+                                                    min_dp=min_dp)
     return dataloader
 
 def create_metadata(bounds, dataloader, splitting_conds = None):
     if splitting_conds is None:
-        splitting_conds = {
+        splitting_conds = [{
             'threshold': 0.5,
             'upper_bound': 0.75,
             'lower_bound': 0.25
-        }
+        }]
     data_source = Metadata(dataloader,
-                           splitting_conds=splitting_conds,
+                           splitting_conditions=splitting_conds,
                            value_fill_type='parent',
                            data_subset=dataloader.trim_datapoints(bounds))
     return data_source
 
+def compare_cellbox_lists(s, t):
+    t = list(t)   # make a mutable copy
+    try:
+        for elem in s:
+            t.remove(elem)
+    except ValueError:
+        return False
+    return not t
+
 class TestCellBox (unittest.TestCase):
 
     def setUp(self):
-        
-        self.parent_cellbox = create_cellbox(Boundary([-10, 10], [-10, 10]), 
-                                             id=0, 
-                                             parent=None)
-        self.child_cellbox1 = create_cellbox(Boundary([-10,  0], [-10,  0]), 
-                                             id=1, 
-                                             parent=self.parent_cellbox)
-        self.child_cellbox2 = create_cellbox(Boundary([-10,  0], [  0, 10]), 
-                                             id=2, 
-                                             parent=self.parent_cellbox)
-        self.child_cellbox3 = create_cellbox(Boundary([  0, 10], [-10,  0]), 
-                                             id=3, 
-                                             parent=self.parent_cellbox)
-        self.child_cellbox4 = create_cellbox(Boundary([  0, 10], [  0, 10]), 
-                                             id=4, 
-                                             parent=self.parent_cellbox)
-        
+
+        # Cellbox to modify on the fly
         self.dummy_cellbox = create_cellbox(Boundary([10, 20], [30, 40]))
+        # Cellboxes to test splitting conditions        
+        arbitrary_bounds = Boundary([-10, 10], [-10, 10])
+
+        het_splitting_conds = {
+                    'threshold': 0.5,
+                    'upper_bound': 1,
+                    'lower_bound': 0
+                }
+        hom_splitting_conds = {
+                    'threshold': 0.5,
+                    'upper_bound': 0.5,
+                    'lower_bound': 0.5
+                }
+        
+        clr_splitting_conds = {
+                    'threshold': 1,
+                    'upper_bound': 1,
+                    'lower_bound': 1
+                }
+        
+        self.het_cellbox = create_cellbox(arbitrary_bounds, 
+                                          splitting_conds=[het_splitting_conds])
+        self.hom_cellbox = create_cellbox(arbitrary_bounds, 
+                                          splitting_conds=[hom_splitting_conds])
+        self.clr_cellbox = create_cellbox(arbitrary_bounds, 
+                                          splitting_conds=[clr_splitting_conds])
+        self.min_cellbox = create_cellbox(arbitrary_bounds, 
+                                          splitting_conds=[het_splitting_conds], 
+                                          min_dp=99999999)
 
 
     def test_set_minimum_datapoints(self):
@@ -86,7 +115,8 @@ class TestCellBox (unittest.TestCase):
         self.assertEqual(self.dummy_cellbox.minimum_datapoints, 5)
 
     def test_get_minimum_datapoints(self):
-        self.assertEqual(self.arbitrary_cellbox.get_minimum_datapoints(), 10)
+        self.dummy_cellbox.minimum_datapoints = 10
+        self.assertEqual(self.dummy_cellbox.get_minimum_datapoints(), 10)
 
     def test_set_data_source(self):
         arbitrary_bounds = Boundary([-50, -40], [-30, -20])
@@ -99,7 +129,7 @@ class TestCellBox (unittest.TestCase):
         arbitrary_data_source = create_metadata(arbitrary_bounds, arbitrary_dataloader)
         
         self.dummy_cellbox.set_data_source([arbitrary_data_source])
-        self.assertEqual(self.dummy_cellbox.data_source, arbitrary_data_source)
+        self.assertEqual(self.dummy_cellbox.data_source, [arbitrary_data_source])
 
     def test_get_data_source(self):
         arbitrary_bounds = Boundary([-40, -20], [-20, 0])
@@ -143,7 +173,8 @@ class TestCellBox (unittest.TestCase):
         self.assertEqual(self.dummy_cellbox.id, 123)
         
     def test_get_id(self):
-        self.assertEqual(self.arbitrary_cellbox.get_id(), 1)
+        self.dummy_cellbox.id = 321
+        self.assertEqual(self.dummy_cellbox.get_id(), 321)
 
     def test_set_bounds(self):
         arbitrary_bounds = Boundary([30, 50], [50, 70])
@@ -158,83 +189,134 @@ class TestCellBox (unittest.TestCase):
         self.assertEqual(self.dummy_cellbox.get_bounds(), arbitrary_bounds)
 
     def test_should_split(self):
-        raise NotImplementedError
+        self.assertTrue(self.het_cellbox.should_split(1))
+        self.assertFalse(self.hom_cellbox.should_split(1))
+        self.assertFalse(self.clr_cellbox.should_split(1))
+        self.assertFalse(self.min_cellbox.should_split(1))
+
 
     def test_should_split_breadth_first(self):
-        raise NotImplementedError
+        self.assertTrue(self.het_cellbox.should_split_breadth_first())
+        self.assertFalse(self.hom_cellbox.should_split_breadth_first())
+        self.assertFalse(self.clr_cellbox.should_split_breadth_first())
+        self.assertFalse(self.min_cellbox.should_split_breadth_first())
 
     def test_split(self):
-        raise NotImplementedError
+        parent_cellbox   = create_cellbox(Boundary([-10, 10], [-10, 10]), 
+                                          id=0, 
+                                          parent=None)
+        children_cellboxes = parent_cellbox.create_splitted_cell_boxes(0)
+        
+        for child in children_cellboxes:
+            parent_metadata = parent_cellbox.get_data_source()[0]
+            child_data_subset = parent_metadata.data_loader.trim_datapoints(child.bounds, 
+                                                        data=parent_metadata.data_subset)
+            child_metadata = Metadata(parent_metadata.get_data_loader(),
+                                      parent_metadata.get_splitting_conditions(),
+                                      parent_metadata.get_value_fill_type(),
+                                      child_data_subset)
+            child.set_data_source([child_metadata])
+            child.set_parent(parent_cellbox)
+            child.set_split_depth(parent_cellbox.get_split_depth() + 1)
+        
+        self.assertEqual(parent_cellbox.split(0), children_cellboxes)
 
     def test_create_splitted_cell_boxes(self):
-        raise NotImplementedError
+        parent_cellbox   = create_cellbox(Boundary([-10, 10], [-10, 10]), 
+                                          id=1, 
+                                          parent=None)
+        nw_child = CellBox(Boundary([0, 10], [-10,0]), '0')
+        ne_child = CellBox(Boundary([0, 10], [0, 10]), '1')
+        sw_child = CellBox(Boundary([-10,0], [-10,0]), '2')
+        se_child = CellBox(Boundary([-10,0], [0, 10]), '3')
+
+        children_cellboxes = [nw_child,
+                              ne_child,
+                              sw_child,
+                              se_child]
+
+        split_cbs = parent_cellbox.create_splitted_cell_boxes(0)
+
+        self.assertEqual(split_cbs, children_cellboxes)
 
     def test_aggregate(self):
-        raise NotImplementedError
+        parent_cellbox   = create_cellbox(Boundary([-10, 10], [-10, 10]), 
+                                          id=1, 
+                                          parent=None)
+        parent_agg_cb = parent_cellbox.aggregate()
+        self.assertAlmostEqual(parent_agg_cb.agg_data['dummy_data'], 0.25, 3)
+
+        # Create a child, set values to NaN, and test that it inherits parent value 
+        # intead of aggregating to NaN        
+        child_cellbox = parent_cellbox.split(1)[0]
+        child_data = child_cellbox.get_data_source()[0].get_data_loader().data.dummy_data
+        nan_data = child_data.where(child_data==float('nan'), other=float('nan'))
+        child_cellbox.get_data_source()[0].get_data_loader().data['dummy_data'] = nan_data
+        child_agg_cb  = child_cellbox.aggregate()
+
+        self.assertAlmostEqual(child_agg_cb.agg_data['dummy_data'], 0.245, 3)
 
     def test_check_vector_data(self):
-        raise NotImplementedError
+        vector_bounds = Boundary([-10, 10], [-10, 10])
+        vector_params = {
+                    'dataloader_name': 'vector_rectangle',
+                    'data_name': 'dummy_data_u,dummy_data_v',
+                    'width': vector_bounds.get_width(),
+                    'height': vector_bounds.get_height()/2,
+                    'centre': (vector_bounds.getcx(), vector_bounds.getcy()),
+                    'nx': 15,
+                    'ny': 15,
+                    "aggregate_type": "MEAN",
+                    "multiplier_u": 3,
+                    "multiplier_v": 1
+                }
+        
+        vector_parent_cb = create_cellbox(vector_bounds, 
+                                          params=vector_params,
+                                          id=1,
+                                          parent=None)
+        vector_child_cb = vector_parent_cb.split(1)[0]
+
+        arbitrary_cb = create_cellbox(vector_bounds, 
+                                      params=vector_params,
+                                      id=1,
+                                      parent=vector_parent_cb)
+        
+        parent_agg_val = {'dummy_data_u': float('3'), 'dummy_data_v': float('1')}
+        child_agg_val = {'dummy_data_u': float('nan'), 'dummy_data_v': float('nan')}
+
+        self.assertEqual(vector_parent_cb.check_vector_data(vector_parent_cb.data_source[0],
+                                                           vector_parent_cb.data_source[0].get_data_loader(),
+                                                           dict(parent_agg_val),
+                                                           vector_params['data_name']),
+                         parent_agg_val)
+
+        self.assertEqual(vector_child_cb.check_vector_data(vector_child_cb.data_source[0],
+                                                           vector_child_cb.data_source[0].get_data_loader(),
+                                                           dict(child_agg_val),
+                                                           vector_params['data_name']),
+                         parent_agg_val)
+        
+        self.assertRaises(ValueError, 
+                          arbitrary_cb.check_vector_data, 
+                          arbitrary_cb.data_source[0],                                           
+                          vector_child_cb.data_source[0].get_data_loader(), 
+                          dict(child_agg_val), 
+                          vector_params['data_name'])
 
     def test_deallocate_cellbox(self):
-        raise NotImplementedError
-
-
-   # def setUp(self):
-   #       boundary = Boundary([-85,-84.9], [-135,-134.9], ['1970-01-01','2021-12-31'])
-   #       self.cellbox = CellBox (boundary , 1)
-   #       params = {
-   #    'file': '../../datastore/bathymetry/GEBCO/gebco_2022_n-40.0_s-90.0_w-140.0_e0.0.nc',
-	# 	'downsample_factors': (5,5),
-	# 	'data_name': 'elevation',
-	# 	'aggregate_type': 'MAX',
-   #     'value_fill_types': "parent"
-   #       }
-   #       split_conds = {
-	# 'threshold': 620,
-	# 'upper_bound': 0.9,
-	# 'lower_bound': 0.1
-	# }
-         
-   #       gebco = DataLoaderFactory().get_dataloader('GEBCO', boundary, params, min_dp = 5)
-   #       self.cellbox.set_data_source ([Metadata (gebco , [split_conds] , params ['value_fill_types'])])
-
-
-   # def test_should_split (self):
-   #    self.assertTrue(self.cellbox.should_split(1))
-
-   # def test_split (self):
-   #     splitted_boxes = self.cellbox.split (1)
-   #     # test the splitted cellboxes have valid Ids
-   #     self.assertEqual ('1' , splitted_boxes [0].get_id())
-   #     self.assertEqual ('2' , splitted_boxes [1].get_id())
-   #     self.assertEqual ('3', splitted_boxes [2].get_id())
-   #     self.assertEqual ('4' , splitted_boxes [3].get_id())
-
-   #    # test the bounds of the splitted cellboxes
-   #     self.assertEqual ( self.cellbox.bounds.get_long_min() , splitted_boxes [0].bounds.get_long_min ())
-   #     self.assertGreater ( self.cellbox.bounds.get_long_max() , splitted_boxes [0].bounds.get_long_max ())
-   #     self.assertLess ( self.cellbox.bounds.get_lat_min() , splitted_boxes [0].bounds.get_lat_min ())
-   #     self.assertEqual ( self.cellbox.bounds.get_lat_max() , splitted_boxes [0].bounds.get_lat_max ())
-
-   #     self.assertLess ( self.cellbox.bounds.get_long_min() , splitted_boxes [1].bounds.get_long_min ())
-   #     self.assertEqual( self.cellbox.bounds.get_long_max() , splitted_boxes [1].bounds.get_long_max ())
-   #     self.assertLess ( self.cellbox.bounds.get_lat_min() , splitted_boxes [1].bounds.get_lat_min ())
-   #     self.assertEqual ( self.cellbox.bounds.get_lat_max() , splitted_boxes [1].bounds.get_lat_max ())
-
-   #     self.assertEqual ( self.cellbox.bounds.get_long_min() , splitted_boxes [2].bounds.get_long_min ())
-   #     self.assertGreater( self.cellbox.bounds.get_long_max() , splitted_boxes [2].bounds.get_long_max ())
-   #     self.assertEqual ( self.cellbox.bounds.get_lat_min() , splitted_boxes [2].bounds.get_lat_min ())
-   #     self.assertGreater ( self.cellbox.bounds.get_lat_max() , splitted_boxes [2].bounds.get_lat_max ())
-
-   #     self.assertLess ( self.cellbox.bounds.get_long_min() , splitted_boxes [3].bounds.get_long_min ())
-   #     self.assertEqual( self.cellbox.bounds.get_long_max() , splitted_boxes [3].bounds.get_long_max ())
-   #     self.assertEqual ( self.cellbox.bounds.get_lat_min() , splitted_boxes [3].bounds.get_lat_min ())
-   #     self.assertGreater ( self.cellbox.bounds.get_lat_max() , splitted_boxes [3].bounds.get_lat_max ())
-
-       
-   # def test_aggregate (self):
-   #    self.assertEqual ({'elevation': 627.0}, self.cellbox.aggregate().get_agg_data())
-
-
-
-
+        parent_cellbox   = create_cellbox(Boundary([-10, 10], [-10, 10]), 
+                                          id=1, 
+                                          parent=None)
+        child_cellbox = parent_cellbox.split(1)[0]
+        try:
+            child_cellbox.deallocate_cellbox()
+            # del arbitrary_cellbox
+            x = child_cellbox.get_parent()
+            y = x.aggregate()
+            # y = x[0].get_data_loader()
+        except NameError:
+            pass
+        else:
+            self.fail(f'{y.agg_data["dummy_data"]}')
+        
