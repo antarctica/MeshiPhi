@@ -399,28 +399,3 @@ class CellBox:
             del parent
             parent = grandparent
         del self
-
-
-    def __eq__(self, other):
-        """
-        Checks all the explicitly defined attributes for equality between 
-
-        Args:
-            other (CellBox): Cellbox that is being compared against for equality
-
-        Returns:
-            bool: True if all attributes match. False if any mismatch.
-        """
-        eq_checks = []
-
-        eq_checks += [self.bounds == other.bounds]
-        eq_checks += [self.parent == other.parent]
-        eq_checks += [self.minimum_datapoints == other.minimum_datapoints]
-        eq_checks += [self.split_depth == other.split_depth]
-        eq_checks += [self.data_source == other.data_source]
-        eq_checks += [self.id == other.id]
-
-        if all(eq_checks):
-            return True
-        else:
-            return False

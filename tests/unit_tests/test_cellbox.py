@@ -218,8 +218,15 @@ class TestCellBox (unittest.TestCase):
             child.set_data_source([child_metadata])
             child.set_parent(parent_cellbox)
             child.set_split_depth(parent_cellbox.get_split_depth() + 1)
-        
-        self.assertEqual(parent_cellbox.split(0), children_cellboxes)
+
+        cb_pairs = zip(parent_cellbox.split(0), children_cellboxes)
+        for cb_pair in cb_pairs:
+            self.assertEqual(cb_pair[0].bounds, cb_pair[1].bounds)
+            self.assertEqual(cb_pair[0].parent, cb_pair[1].parent)
+            self.assertEqual(cb_pair[0].minimum_datapoints, cb_pair[1].minimum_datapoints)
+            self.assertEqual(cb_pair[0].split_depth, cb_pair[1].split_depth)
+            self.assertEqual(cb_pair[0].data_source, cb_pair[1].data_source)
+            self.assertEqual(cb_pair[0].id, cb_pair[1].id)
 
     def test_create_splitted_cell_boxes(self):
         parent_cellbox   = create_cellbox(Boundary([-10, 10], [-10, 10]), 
@@ -237,7 +244,15 @@ class TestCellBox (unittest.TestCase):
 
         split_cbs = parent_cellbox.create_splitted_cell_boxes(0)
 
-        self.assertEqual(split_cbs, children_cellboxes)
+        cb_pairs = zip(split_cbs, children_cellboxes)
+        for cb_pair in cb_pairs:
+            self.assertEqual(cb_pair[0].bounds, cb_pair[1].bounds)
+            self.assertEqual(cb_pair[0].parent, cb_pair[1].parent)
+            self.assertEqual(cb_pair[0].minimum_datapoints, cb_pair[1].minimum_datapoints)
+            self.assertEqual(cb_pair[0].split_depth, cb_pair[1].split_depth)
+            self.assertEqual(cb_pair[0].data_source, cb_pair[1].data_source)
+            self.assertEqual(cb_pair[0].id, cb_pair[1].id)
+
 
     def test_aggregate(self):
         parent_cellbox   = create_cellbox(Boundary([-10, 10], [-10, 10]), 
