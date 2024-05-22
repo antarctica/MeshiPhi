@@ -3,10 +3,8 @@ import unittest
 from meshiphi.mesh_generation.metadata import Metadata
 from meshiphi.dataloaders.factory import DataLoaderFactory
 from meshiphi.mesh_generation.cellbox import CellBox
-from meshiphi.mesh_generation.aggregated_cellbox import AggregatedCellBox
 
 from meshiphi.mesh_generation.boundary import Boundary
-from meshiphi.utils import longitude_domain
 
 
 def create_cellbox(bounds, id=0, parent=None, params=None, splitting_conds=None, min_dp=5):
