@@ -81,7 +81,7 @@ ALL_BOUNDS = {
 class PytestDataLoader(ScalarDataLoader):
     def import_data(self, bounds):
 
-        self.data = gen_dataset(bounds, 
+        self.data = gen_dataset(bounds,                        
                                 'test_data', 
                                 data=ZEROS_DATASET)
     
@@ -103,14 +103,22 @@ class PytestDataLoader(ScalarDataLoader):
             self.data = dataloader_data.to_dataframe()
 
 class TestScalarDataloader(unittest.TestCase):
-    def setUp(self, bounds):
-        self.xr_dataloader = PytestDataLoader(bounds)
-        self.xr_dataloader.set_data(bounds, ZEROS_DATASET, datatype='xr')
+    def setUp(self):
+        self.xr_dataloaders = dict()
+        self.df_dataloaders = dict()
         
-        self.pd_dataloader = PytestDataLoader(bounds)
-        self.pd_dataloader.set_data(bounds, ZEROS_DATASET, datatype='df')
-        
-        self.dataloaders = [self.xr_dataloader, self.pd_dataloader]
+        # Create an xarray and pandas dataloader for each boundary to test
+        for name, bounds in ALL_BOUNDS.items():
+            
+            xr_dataloader = PytestDataLoader(bounds)
+            xr_dataloader.set_data(bounds, ZEROS_DATASET, datatype='xr')
+            self.xr_dataloaders[name+'_xr'] = xr_dataloader
+
+            pd_dataloader = PytestDataLoader(bounds)
+            pd_dataloader.set_data(bounds, ZEROS_DATASET, datatype='df')
+            self.pd_dataloaders[name+'_df'] = pd_dataloader
+
+        self.dataloaders = self.xr_dataloaders + self.pd_dataloaders
     
     def test_add_default_params(self):
         incomplete_params = {
@@ -151,11 +159,17 @@ class TestScalarDataloader(unittest.TestCase):
             dataloader.downsample_factors = (2,2)
 
             data = dataloader.downsample(agg_type='MIN')
+            self.assertAlmostEqual(data, val, 5)
             data = dataloader.downsample(agg_type='MAX')
+            self.assertAlmostEqual(data, val, 5)
             data = dataloader.downsample(agg_type='MEAN')
+            self.assertAlmostEqual(data, val, 5)
             data = dataloader.downsample(agg_type='MEDIAN')
+            self.assertAlmostEqual(data, val, 5)
             data = dataloader.downsample(agg_type='STD')
+            self.assertAlmostEqual(data, val, 5)
             data = dataloader.downsample(agg_type='COUNT')
+            self.assertAlmostEqual(data, val, 5)
 
 
     def test_get_data_col_name(self):
