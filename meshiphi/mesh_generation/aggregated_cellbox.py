@@ -53,7 +53,7 @@ class AggregatedCellBox:
         def load_agg_data (cellbox_json):
             dict_obj = {}
             for key in cellbox_json:
-                if key  not in [  "geometry","cx", "cy", "dcx", "dcy"]:
+                if key  not in [  "geometry","cx", "cy", "dcx", "dcy", "id"]:
                     dict_obj[key] = cellbox_json[key]
 
             return dict_obj

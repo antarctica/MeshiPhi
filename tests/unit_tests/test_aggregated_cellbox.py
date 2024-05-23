@@ -36,7 +36,7 @@ class TestAggregatedCellBox(unittest.TestCase):
         
         agg_cb_boundary = Boundary.from_poly_string(agg_cb_json['geometry'])
         
-        data_keys = ['elevation', 'SIC', 'thickness', 'density', 'id']
+        data_keys = ['elevation', 'SIC', 'thickness', 'density']
         agg_cb_data = {k: agg_cb_json[k] for k in data_keys if k in agg_cb_json}
         
         agg_cb_id = agg_cb_json['id']
@@ -94,7 +94,7 @@ class TestAggregatedCellBox(unittest.TestCase):
         }
         agg_cb_boundary = Boundary.from_poly_string(agg_cb_json['geometry'])
         
-        data_keys = ['elevation', 'SIC', 'thickness', 'density', 'id']
+        data_keys = ['elevation', 'SIC', 'thickness', 'density']
         agg_cb_data = {k: agg_cb_json[k] for k in data_keys if k in agg_cb_json}
         
         agg_cb_id = agg_cb_json['id']
