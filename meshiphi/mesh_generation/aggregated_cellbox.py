@@ -22,7 +22,7 @@ class AggregatedCellBox:
                 cellbox_json(Json): json object that encapsulates boundary, agg_data and id of the CellBox
         """
         cellbox_id = cellbox_json ['id']
-        def load_boundary (cellbox_json):
+        def load_bounds(cellbox_json):
             shape = shapely.wkt.loads (cellbox_json ["geometry"])
             # Take case where crossing antimeridian
             if shape.geom_type == 'MultiPolygon':
@@ -58,7 +58,7 @@ class AggregatedCellBox:
 
             return dict_obj
         
-        boundary = load_boundary( cellbox_json)
+        boundary = load_bounds( cellbox_json)
         agg_data = load_agg_data( cellbox_json)
         obj = AggregatedCellBox(boundary , agg_data ,cellbox_id )
         return obj
@@ -80,7 +80,7 @@ class AggregatedCellBox:
         self.id = id
         
 ######## setters and getters ########
-    def set_boundary(self, boundary):
+    def set_bounds(self, boundary):
         """
             set the boundary of the CellBox
         """

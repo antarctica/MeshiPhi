@@ -48,9 +48,9 @@ class TestAggregatedCellBox(unittest.TestCase):
         self.assertEqual(agg_cb_from_json, agg_cb_initialised_normally)
 
 
-    def test_set_boundary(self):
+    def test_set_bounds(self):
         dummy_bounds = Boundary([10, 20], [30,40])
-        self.dummy_agg_cb.set_boundary(dummy_bounds)
+        self.dummy_agg_cb.set_bounds(dummy_bounds)
         self.assertEqual(self.dummy_agg_cb.boundary, dummy_bounds)
     
     def test_get_bounds(self):
