@@ -90,15 +90,16 @@ class Metadata:
 
     def __eq__(self, other):
         
-        eq_check = []
+        if isinstance(other, Metadata):
+            eq_check = []
 
-        eq_check += [self.data_loader == other.data_loader]
-        eq_check += [self.splitting_conditions == other.splitting_conditions]
-        eq_check += [self.value_fill_type == other.value_fill_type]
-        eq_check += [self.data_name == other.data_name]
-        eq_check += [self.data_subset == other.data_subset]
+            eq_check += [self.data_loader == other.data_loader]
+            eq_check += [self.splitting_conditions == other.splitting_conditions]
+            eq_check += [self.value_fill_type == other.value_fill_type]
+            eq_check += [self.data_name == other.data_name]
+            eq_check += [self.data_subset == other.data_subset]
 
-        if all(eq_check):
-            return True
-        else:
-            return False
+            if all(eq_check):
+                return True
+        
+        return False
