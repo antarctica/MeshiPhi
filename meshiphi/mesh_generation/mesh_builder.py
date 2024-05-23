@@ -22,7 +22,6 @@ import numpy as np
 
 from tqdm import tqdm
 
-from meshiphi.mesh_generation.jgrid_cellbox import JGridCellBox
 from meshiphi.mesh_generation.boundary import Boundary
 from meshiphi.mesh_generation.cellbox import CellBox
 from meshiphi.mesh_generation.direction import Direction
@@ -102,9 +101,8 @@ class MeshBuilder:
         cellboxes = []
         cellboxes = self.initialize_cellboxes(bounds, cell_width, cell_height)
         
-        # Account for going over the antimeridian with longitude_distance        
-        grid_width = np.divide(bounds.get_long_max() - bounds.get_long_min(),
-                               cell_width)
+        # Calculate width of mesh in cell-coordinates rather than degrees
+        grid_width = np.divide(bounds.get_width(), cell_width)
         
         min_datapoints = 5
         if 'splitting' in self.config:
@@ -139,9 +137,6 @@ class MeshBuilder:
         self.mesh = Mesh(bounds, cellboxes,
                          self.neighbour_graph, max_split_depth)
         self.mesh.set_config(config)
-        if self.is_jgrid_mesh():
-            logging.warning("We're using the legacy Java style cell grid")
-
 
     def initialize_meta_data(self, bounds, min_datapoints):
         '''
@@ -239,11 +234,6 @@ class MeshBuilder:
                 logging.warning("Invalid value for value_fill_types, setting to the default(parent) instead.")
         return value_fill_type
 
-    def is_jgrid_mesh(self):
-        if 'j_grid' in self.config.keys():
-            if  self.config['j_grid'] == "True":
-                return True
-        return False
 
     def initialize_cellboxes(self, bounds, cell_width, cell_height):
         cellboxes = []
@@ -277,17 +267,7 @@ class MeshBuilder:
                 cell_bounds = Boundary(
                     cell_lat_range, cell_long_range, bounds.get_time_range())
                 cell_id = str(len(cellboxes))
-                if self.is_jgrid_mesh():
-                    cellbox_indx = len(cellboxes)
-                    cellbox = JGridCellBox(cell_bounds, cell_id)
-                    x_coord = cellbox_indx % grid_width
-                    y_coord = abs(math.floor(
-                        cellbox_indx / grid_width) - (grid_height - 1))
-                    cellbox.set_grid_coord(x_coord, y_coord)
-                    cellbox.set_initial_bounds(cell_bounds)
-
-                else:
-                    cellbox = CellBox(cell_bounds, cell_id)
+                cellbox = CellBox(cell_bounds, cell_id)
                 cellboxes.append(cellbox)
         return cellboxes
     
@@ -337,7 +317,7 @@ class MeshBuilder:
         
 
     def validate_bounds(self, bounds, cell_width, cell_height):
-        assert (bounds.get_long_max() - bounds.get_long_min()) % cell_width == 0, \
+        assert (bounds.get_long_max() - bounds.get_long_min()) % 360 % cell_width == 0, \
             f"""The defined longitude region <{bounds.get_long_min()} :{bounds.get_long_max()}>
             is not divisable by the initial cell width <{cell_width}>"""
 
