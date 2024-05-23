@@ -170,3 +170,17 @@ class AggregatedCellBox:
                 return True
         return False
     
+    def __eq__(self, other):
+
+        if isinstance(other, AggregatedCellBox):
+
+            eq_checks = []
+
+            eq_checks += [self.get_id() == other.get_id()]
+            eq_checks += [self.get_agg_data() == other.get_agg_data()]
+            eq_checks += [self.get_bounds() == other.get_bounds()]
+
+            if all(eq_checks):
+                return True
+            
+        return False
