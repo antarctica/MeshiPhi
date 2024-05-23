@@ -331,6 +331,6 @@ class TestCellBox (unittest.TestCase):
         # except NameError:
         #     pass
         # else:
-        #     self.fail(f'{y.agg_data["dummy_data"]}')
+        #     self.fail(f'Cellbox still exists after running deallocate_cellbox()')
         
         raise NotImplementedError
