@@ -1,4 +1,4 @@
-from shapely.geometry import Polygon
+from shapely.geometry import Polygon, Point
 from meshiphi.mesh_generation.boundary import Boundary
 import shapely.wkt
 
@@ -165,10 +165,9 @@ class AggregatedCellBox:
                 contains_points (bool): True if this CellBox contains a point given by
                     parameters (lat, long)
         """
-        if (lat >= self.boundary.get_lat_min()) & (lat < self.boundary.get_lat_max()):
-            if (long >= self.boundary.get_long_min()) & (long < self.boundary.get_long_max()):
-                return True
-        return False
+        shapely_boundary = self.boundary.to_polygon()
+        point = Point(long, lat)
+        return shapely_boundary.contains(point)
     
     def __eq__(self, other):
 

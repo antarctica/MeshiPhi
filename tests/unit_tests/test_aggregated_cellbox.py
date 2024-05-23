@@ -107,4 +107,4 @@ class TestAggregatedCellBox(unittest.TestCase):
         self.assertTrue(self.arbitrary_agg_cb.contains_point(50, 50))
         self.assertTrue(self.equatorial_agg_cb.contains_point(0, 50))
         self.assertTrue(self.meridian_agg_cb.contains_point(50, 0))
-        # self.assertTrue(self.antimeridian_agg_cb.contains_point(50, 180))
+        self.assertTrue(self.antimeridian_agg_cb.contains_point(50, 179))
