@@ -32,7 +32,7 @@ UNIT_TESTS_BY_FILE = {
     'mesh.py':              [],
     'neighbour_graph.py':   ['test_neighbour_graph.py'],
     'metadata.py':          [],
-    'aggregated_cellbox.py':[],
+    'aggregated_cellbox.py':['test_aggregated_cellbox.py'],
     'boundary.py':          ['test_boundary.py'],
     'cellbox.py':           ['test_cellbox.py'],
     'direction.py':         [],
