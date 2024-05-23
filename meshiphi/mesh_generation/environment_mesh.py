@@ -10,7 +10,6 @@ import os
 import tempfile
 from shapely import wkt
 
-from meshiphi.mesh_generation.jgrid_aggregated_cellbox import JGridAggregatedCellBox
 from meshiphi.mesh_generation.boundary import Boundary
 from meshiphi.mesh_generation.aggregated_cellbox import AggregatedCellBox
 from meshiphi.mesh_generation.neighbour_graph import NeighbourGraph
@@ -1498,23 +1497,3 @@ class EnvironmentMesh:
         else:
             logging.warning(f"Cannot save mesh in a {format} format")
 
-        if isinstance(self.agg_cellboxes[0], JGridAggregatedCellBox):
-            dump_path = path.replace(".json", ".dump")
-            with open(dump_path, 'w') as dump_f:
-                self.dump_mesh(dump_f)
-
-
-    def dump_mesh(self, file):
-        """
-            creates a string representation of this Mesh which
-            is then saved to a file location specified by parameter
-            'file' for use in j_grid regression testing,
-
-        """
-        mesh_dump_str = ""
-        for cell_box in self.agg_cellboxes:
-            if isinstance(cell_box, JGridAggregatedCellBox):
-                mesh_dump_str += cell_box.mesh_dump()
-
-        file.write(mesh_dump_str)
-        file.close()
