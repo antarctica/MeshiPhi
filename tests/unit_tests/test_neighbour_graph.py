@@ -10,7 +10,30 @@ from meshiphi.mesh_generation.boundary import Boundary
 class TestNeighbourGraph (unittest.TestCase):
     
     def setUp(self):
-        pass
+        
+        # Cases to account for
+        # 3x3 grid
+        # 1x2
+        # 1x2 on antimeridian
+        # 1x(0.5+0.5)
+        # global
+        
+        # 3x3 Neighbour graph, "5" in the middle, with the others all surrounding it
+        self.arbitrary_neighbour_graph =  {"1": {1: [ ], 2: [ ], 3: [5], 4: [ ], -1: [ ], -2: [ ], -3: [ ], -4: [ ]},
+                                           "2": {1: [ ], 2: [ ], 3: [ ], 4: [5], -1: [ ], -2: [ ], -3: [ ], -4: [ ]},
+                                           "3": {1: [ ], 2: [ ], 3: [ ], 4: [ ], -1: [5], -2: [ ], -3: [ ], -4: [ ]},
+                                           "4": {1: [ ], 2: [5], 3: [ ], 4: [ ], -1: [ ], -2: [ ], -3: [ ], -4: [ ]},
+                                           "5": {1: [3], 2: [6], 3: [9], 4: [8], -1: [7], -2: [4], -3: [1], -4: [2]},
+                                           "6": {1: [ ], 2: [ ], 3: [ ], 4: [ ], -1: [ ], -2: [5], -3: [ ], -4: [ ]},
+                                           "7": {1: [5], 2: [ ], 3: [ ], 4: [ ], -1: [ ], -2: [ ], -3: [ ], -4: [ ]},
+                                           "8": {1: [ ], 2: [ ], 3: [ ], 4: [ ], -1: [ ], -2: [ ], -3: [ ], -4: [5]},
+                                           "9": {1: [ ], 2: [ ], 3: [ ], 4: [ ], -1: [ ], -2: [ ], -3: [5], -4: [ ]}}
+        
+        # 1x2 Neighbour graph, oriented E-W
+        self.antimeridian_neighbour_graph = {"1":{1: [ ], 2: [2], 3: [ ], 4: [ ], -1: [ ], -2: [ ], -3: [ ], -4: [ ]},
+                                             "2":{1: [ ], 2: [ ], 3: [ ], 4: [ ], -1: [ ], -2: [1], -3: [ ], -4: [ ]}}
+
+        raise NotImplementedError
 
     def test_from_json(self):
         raise NotImplementedError
