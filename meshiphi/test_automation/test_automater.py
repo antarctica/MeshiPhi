@@ -432,9 +432,10 @@ class TestAutomater:
             identical_meshes = [df.empty for df in comparison.values()]
             # If no difference in meshes, remove the file
             if all(identical_meshes):
-                shutil.rmtree(pytest_output_basename+'.json')
+                os.remove(pytest_output_basename+'.json')
                 # Remove plot if it exists
-                shutil.rmtree(pytest_output_basename+'.svg',  ignore_errors=True)
+                if os.path.isfile(pytest_output_basename+'.svg'):
+                    os.remove(pytest_output_basename+'.svg')
             # If there is a difference, move the file to current directory
             else:
                 save_filename = os.path.join(output_folder, 
