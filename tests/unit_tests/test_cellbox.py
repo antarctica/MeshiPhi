@@ -318,16 +318,16 @@ class TestCellBox (unittest.TestCase):
                           vector_params['data_name'])
 
     def test_deallocate_cellbox(self):
+
+        ### Test code commented in case method is fixed rather than deprecated
         # parent_cellbox   = create_cellbox(Boundary([-10, 10], [-10, 10]), 
         #                                   id=1, 
         #                                   parent=None)
         # child_cellbox = parent_cellbox.split(1)[0]
         # try:
         #     child_cellbox.deallocate_cellbox()
-        #     # del arbitrary_cellbox
+        #     # Try to force a NameError by calling any CellBox method
         #     x = child_cellbox.get_parent()
-        #     y = x.aggregate()
-        #     # y = x[0].get_data_loader()
         # except NameError:
         #     pass
         # else:
