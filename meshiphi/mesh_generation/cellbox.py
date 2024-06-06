@@ -100,6 +100,12 @@ class CellBox:
         """
         self.id = id
 
+    def set_bounds(self, bounds):
+        """
+        Set the boundary of this cellbox
+        """
+        self.bounds = bounds
+
     def get_id(self):
         """
         method returns cellbox cell id
