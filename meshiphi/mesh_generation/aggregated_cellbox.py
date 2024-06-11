@@ -1,4 +1,4 @@
-from shapely.geometry import Polygon
+from shapely.geometry import Polygon, Point
 from meshiphi.mesh_generation.boundary import Boundary
 import shapely.wkt
 
@@ -22,7 +22,7 @@ class AggregatedCellBox:
                 cellbox_json(Json): json object that encapsulates boundary, agg_data and id of the CellBox
         """
         cellbox_id = cellbox_json ['id']
-        def load_boundary (cellbox_json):
+        def load_bounds(cellbox_json):
             shape = shapely.wkt.loads (cellbox_json ["geometry"])
             # Take case where crossing antimeridian
             if shape.geom_type == 'MultiPolygon':
@@ -53,12 +53,12 @@ class AggregatedCellBox:
         def load_agg_data (cellbox_json):
             dict_obj = {}
             for key in cellbox_json:
-                if key  not in [  "geometry","cx", "cy", "dcx", "dcy"]:
+                if key  not in [  "geometry","cx", "cy", "dcx", "dcy", "id"]:
                     dict_obj[key] = cellbox_json[key]
 
             return dict_obj
         
-        boundary = load_boundary( cellbox_json)
+        boundary = load_bounds( cellbox_json)
         agg_data = load_agg_data( cellbox_json)
         obj = AggregatedCellBox(boundary , agg_data ,cellbox_id )
         return obj
@@ -80,7 +80,7 @@ class AggregatedCellBox:
         self.id = id
         
 ######## setters and getters ########
-    def set_boundary(self, boundary):
+    def set_bounds(self, boundary):
         """
             set the boundary of the CellBox
         """
@@ -165,8 +165,21 @@ class AggregatedCellBox:
                 contains_points (bool): True if this CellBox contains a point given by
                     parameters (lat, long)
         """
-        if (lat >= self.boundary.get_lat_min()) & (lat < self.boundary.get_lat_max()):
-            if (long >= self.boundary.get_long_min()) & (long < self.boundary.get_long_max()):
-                return True
-        return False
+        shapely_boundary = self.boundary.to_polygon()
+        point = Point(long, lat)
+        return shapely_boundary.contains(point)
     
+    def __eq__(self, other):
+
+        if isinstance(other, AggregatedCellBox):
+
+            eq_checks = []
+
+            eq_checks += [self.get_id() == other.get_id()]
+            eq_checks += [self.get_agg_data() == other.get_agg_data()]
+            eq_checks += [self.get_bounds() == other.get_bounds()]
+
+            if all(eq_checks):
+                return True
+            
+        return False
