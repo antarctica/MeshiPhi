@@ -49,11 +49,11 @@ class TestCLI (unittest.TestCase):
 
     def tearDown(self):
         self.tmp_config_file.close()
-        self.tmp_mesh_file.close()  
-        self.tmp_mesh_file_1.close()    
-        self.tmp_mesh_file_2.close()    
-        self.tmp_merge_file.close() 
-        self.tmp_output_file.close()    
+        self.tmp_mesh_file.close()
+        self.tmp_mesh_file_1.close()
+        self.tmp_mesh_file_2.close()
+        self.tmp_merge_file.close()
+        self.tmp_output_file.close()
     
     def test_get_args_cli(self):
         raise NotImplementedError
