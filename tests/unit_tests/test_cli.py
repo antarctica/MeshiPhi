@@ -9,7 +9,6 @@ from meshiphi.cli import meshiphi_test_cli
 import tempfile
 import sys
 import unittest
-import warnings
 import json
 from unittest.mock import patch
 
@@ -74,7 +73,12 @@ class TestCLI (unittest.TestCase):
         self.tmp_output_file.close()
     
     def test_get_args_cli(self):
-        warnings.warn("Unit test not implemented, skipping")
+        # TODO:
+        #   - Set up arbitrary arguments to patch into sys.argv
+        #   - Test that argparser correctly ID's these arguments
+        #       - Should have entries for each possible combination of arguments,
+        #         so should be updated whenever CLI is updated
+        pass
     
     def test_rebuild_mesh_cli(self):
         # Command line entry
@@ -122,8 +126,14 @@ class TestCLI (unittest.TestCase):
             self.assertEqual(orig_mesh, created_mesh)
     
     def test_export_mesh_cli(self):
-        warnings.warn("Unit test not implemented, skipping")
-    
+        # TODO:
+        #   - Test GeoJSON output
+        #   - Set up method for comparing PNG and test
+        #       - Also allow PNG creation of empty mesh?
+        #   - Fix TIF export on Windows
+        #   - Set up method for comparing TIF and test
+        pass
+
     def test_merge_mesh_cli(self):
         # Command line entry
         test_args = ['merge_mesh', 
@@ -150,4 +160,9 @@ class TestCLI (unittest.TestCase):
             self.assertEqual(orig_mesh, created_mesh)
         
     def test_meshiphi_test_cli(self):
-        warnings.warn("Unit test not implemented, skipping")
+        # TODO:
+        #  - Set up method for comparing SVG images
+        #  - Compare output json, create BASIC_REG_TEST_OUTPUT constant as ground truth
+        #       - And come up with way to consistently test this with only changes to
+        #         cli.py
+        pass
