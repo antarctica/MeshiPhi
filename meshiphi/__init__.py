@@ -1,4 +1,4 @@
-__version__ = "2.1.9"
+__version__ = "2.1.10"
 __description__ = "MeshiPhi: Earth's digital twin mapped on a non-uniform mesh"
 __license__ = "MIT"
 __author__ = "Autonomous Marine Operations Planning (AMOP) Team, AI Lab, British Antarctic Survey"
@@ -36,5 +36,6 @@ UNIT_TESTS_BY_FILE = {
     'boundary.py':          ['test_boundary.py'],
     'cellbox.py':           ['test_cellbox.py'],
     'direction.py':         [],
-    'environment_mesh.py':  ['test_env_mesh.py']
+    'environment_mesh.py':  ['test_env_mesh.py'],
+    'cli.py':               ['test_cli.py']
 }
