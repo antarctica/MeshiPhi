@@ -52,7 +52,7 @@ class TestNeighbourGraph (unittest.TestCase):
                             9: {1: [ ], 2: [ ], 3: [ ], 4: [ ], -1: [ ], -2: [8], -3: [5], -4: [6]}}
         
         # Non-global 3x3 Neighbour graph, "5" in the middle, with the others all surrounding it
-        self.arbitrary_neighbour_graph = create_ng_from_dict(self.ng_dict_3x3)
+        self.neighbour_graph = create_ng_from_dict(self.ng_dict_3x3)
         
         # 1x2 Neighbour graph, oriented E-W
         self.antimeridian_neighbour_graph = {"1":{1: [ ], 2: [2], 3: [ ], 4: [ ], -1: [ ], -2: [ ], -3: [ ], -4: [ ]},
@@ -84,7 +84,7 @@ class TestNeighbourGraph (unittest.TestCase):
 
     def test_get_graph(self):
         
-        ng_dict = self.arbitrary_neighbour_graph.get_graph()
+        ng_dict = self.neighbour_graph.get_graph()
         self.assertEqual(ng_dict, self.ng_dict_3x3)
     
     def test_update_neighbour(self):
@@ -141,7 +141,7 @@ class TestNeighbourGraph (unittest.TestCase):
 
         for cb_index in self.ng_dict_3x3.keys():
             for direction in ALL_DIRECTIONS:
-                ng_neighbours = self.arbitrary_neighbour_graph.get_neighbours(cb_index, direction)
+                ng_neighbours = self.neighbour_graph.get_neighbours(cb_index, direction)
                 self.assertEqual(ng_neighbours, self.ng_dict_3x3[cb_index][direction])
     
     def test_add_node(self):
@@ -446,8 +446,32 @@ class TestNeighbourGraph (unittest.TestCase):
         self.assertEqual(ng.get_graph(), manually_adjusted_ng)
     
     def test_initialise_neighbour_graph(self):
-        raise NotImplementedError
-    
+        # Initialise a new neighbour graph to modify
+        ng = NeighbourGraph()
+        # Initial CB layout
+        cbs = [
+            CellBox(Boundary([2,3],[0,1]), 1), CellBox(Boundary([2,3],[1,2]), 2), CellBox(Boundary([2,3],[2,3]), 3),
+            CellBox(Boundary([1,2],[0,1]), 4), CellBox(Boundary([1,2],[1,2]), 5), CellBox(Boundary([1,2],[2,3]), 6),
+            CellBox(Boundary([0,1],[0,1]), 7), CellBox(Boundary([0,1],[1,2]), 8), CellBox(Boundary([0,1],[2,3]), 9),
+        ]
+        # Create neighbourgraph based on cb list
+        ng.initialise_neighbour_graph(cbs, 3)
+
+        # Manually define what the output should be
+        reference_neighbour_graph = {
+            0: {1: [4], 2: [1], 3: [ ], 4: [ ], -1: [ ], -2: [ ], -3: [ ], -4: [3]}, 
+            1: {1: [5], 2: [2], 3: [ ], 4: [ ], -1: [ ], -2: [0], -3: [3], -4: [4]}, 
+            2: {1: [ ], 2: [ ], 3: [ ], 4: [ ], -1: [ ], -2: [1], -3: [4], -4: [5]}, 
+            3: {1: [7], 2: [4], 3: [1], 4: [0], -1: [ ], -2: [ ], -3: [ ], -4: [6]}, 
+            4: {1: [8], 2: [5], 3: [2], 4: [1], -1: [0], -2: [3], -3: [6], -4: [7]}, 
+            5: {1: [ ], 2: [ ], 3: [ ], 4: [2], -1: [1], -2: [4], -3: [7], -4: [8]}, 
+            6: {1: [ ], 2: [7], 3: [4], 4: [3], -1: [ ], -2: [ ], -3: [ ], -4: [ ]}, 
+            7: {1: [ ], 2: [8], 3: [5], 4: [4], -1: [3], -2: [6], -3: [ ], -4: [ ]}, 
+            8: {1: [ ], 2: [ ], 3: [ ], 4: [5], -1: [4], -2: [7], -3: [ ], -4: [ ]}
+        }
+
+        self.assertEqual(ng.get_graph(), reference_neighbour_graph)
+
     def test_initialise_map(self):
         raise NotImplementedError
     
