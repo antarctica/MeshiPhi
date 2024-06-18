@@ -9,7 +9,6 @@ from meshiphi.mesh_generation.cellbox import CellBox
 
 from meshiphi.mesh_generation.boundary import Boundary
 
-
 def create_ng_from_dict(ng_dict, global_mesh=False):
     ng = NeighbourGraph()
     ng.neighbour_graph = copy.deepcopy(ng_dict)
@@ -168,7 +167,64 @@ class TestNeighbourGraph (unittest.TestCase):
         raise NotImplementedError
     
     def test_get_neighbour_case_bounds(self):
-        raise NotImplementedError
+
+        # Set base boundary
+        lat_range = [-10, 10]
+        long_range = [-10, 10]
+
+        base_bounds  = Boundary(lat_range, long_range)
+
+        # Initialise a neighbourgraph object to get access to get_neighbour_case_bounds()
+        ng = NeighbourGraph()
+
+        # Define which direction each cardinal direction lies
+        northern_directions  = [Direction.north_east, Direction.north, Direction.north_west]
+        eastern_directions   = [Direction.north_east, Direction.east,  Direction.south_east]
+        southern_directions  = [Direction.south_east, Direction.south, Direction.south_west]
+        western_directions   = [Direction.south_west, Direction.west,  Direction.north_west]
+        all_directions = [Direction.north, Direction.north_east,
+                          Direction.east,  Direction.south_east,
+                          Direction.south, Direction.south_west,
+                          Direction.west,  Direction.north_west]
+        
+        for direction in all_directions:
+            # Offset a second boundary object depending on which direction is being tested
+            if direction in northern_directions:
+                lat_offset = 20
+            elif direction in southern_directions:
+                lat_offset = -20
+            
+            if direction in eastern_directions:
+                long_offset = 20
+            elif direction in western_directions:
+                long_offset = -20
+
+            # Add offsets to base boundary and create new boundary object
+            offset_lat_range = [lat + lat_offset for lat in lat_range]
+            offset_long_range = [long + long_offset for long in long_range]
+
+            offset_bounds = Boundary(offset_lat_range, offset_long_range)
+
+            # Make sure it returns the correct case
+            self.assertEqual(ng.get_neighbour_case_bounds(base_bounds, 
+                                                          offset_bounds), 
+                             direction)
+        
+        # Final test: make sure that two boundaries that don't touch return an invalid direction (0)
+        lat_offset = 100
+        long_offset = 100
+        # Add offsets to base boundary and create new boundary object
+        offset_lat_range = [lat + lat_offset for lat in lat_range]
+        offset_long_range = [long + long_offset for long in long_range]
+
+        offset_bounds = Boundary(offset_lat_range, offset_long_range)
+
+        # Make sure it returns the correct case
+        self.assertEqual(ng.get_neighbour_case_bounds(base_bounds, 
+                                                        offset_bounds), 
+                         0)
+
+
     
     def test_get_neighbour_case(self):
         raise NotImplementedError
