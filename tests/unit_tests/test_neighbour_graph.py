@@ -16,6 +16,7 @@ NORTHERN_DIRECTIONS  = [Direction.north_east, Direction.north, Direction.north_w
 EASTERN_DIRECTIONS   = [Direction.north_east, Direction.east,  Direction.south_east]
 SOUTHERN_DIRECTIONS  = [Direction.south_east, Direction.south, Direction.south_west]
 WESTERN_DIRECTIONS   = [Direction.south_west, Direction.west,  Direction.north_west]
+DIAGONAL_DIRECTIONS  = [Direction.north_east, Direction.north_west, Direction.south_east, Direction.south_west]
 ALL_DIRECTIONS = [Direction.north, Direction.north_east,
                     Direction.east,  Direction.south_east,
                     Direction.south, Direction.south_west,
@@ -40,15 +41,25 @@ class TestNeighbourGraph (unittest.TestCase):
         # 1x(0.5+0.5)
         # global
         
-        self.ng_dict_3x3 = {"1": {1: [ ], 2: [2], 3: [5], 4: [4], -1: [ ], -2: [ ], -3: [ ], -4: [ ]},
-                            "2": {1: [ ], 2: [3], 3: [6], 4: [5], -1: [4], -2: [1], -3: [ ], -4: [ ]},
-                            "3": {1: [ ], 2: [ ], 3: [ ], 4: [6], -1: [5], -2: [2], -3: [ ], -4: [ ]},
-                            "4": {1: [2], 2: [5], 3: [8], 4: [7], -1: [ ], -2: [ ], -3: [ ], -4: [1]},
-                            "5": {1: [3], 2: [6], 3: [9], 4: [8], -1: [7], -2: [4], -3: [1], -4: [2]},
-                            "6": {1: [ ], 2: [ ], 3: [ ], 4: [9], -1: [8], -2: [5], -3: [2], -4: [3]},
-                            "7": {1: [5], 2: [8], 3: [ ], 4: [ ], -1: [ ], -2: [ ], -3: [ ], -4: [4]},
-                            "8": {1: [6], 2: [9], 3: [ ], 4: [ ], -1: [ ], -2: [7], -3: [4], -4: [5]},
-                            "9": {1: [ ], 2: [ ], 3: [ ], 4: [ ], -1: [ ], -2: [8], -3: [5], -4: [6]}}
+        self.ng_dict_3x3 = {1: {1: [ ], 2: [2], 3: [5], 4: [4], -1: [ ], -2: [ ], -3: [ ], -4: [ ]},
+                            2: {1: [ ], 2: [3], 3: [6], 4: [5], -1: [4], -2: [1], -3: [ ], -4: [ ]},
+                            3: {1: [ ], 2: [ ], 3: [ ], 4: [6], -1: [5], -2: [2], -3: [ ], -4: [ ]},
+                            4: {1: [2], 2: [5], 3: [8], 4: [7], -1: [ ], -2: [ ], -3: [ ], -4: [1]},
+                            5: {1: [3], 2: [6], 3: [9], 4: [8], -1: [7], -2: [4], -3: [1], -4: [2]},
+                            6: {1: [ ], 2: [ ], 3: [ ], 4: [9], -1: [8], -2: [5], -3: [2], -4: [3]},
+                            7: {1: [5], 2: [8], 3: [ ], 4: [ ], -1: [ ], -2: [ ], -3: [ ], -4: [4]},
+                            8: {1: [6], 2: [9], 3: [ ], 4: [ ], -1: [ ], -2: [7], -3: [4], -4: [5]},
+                            9: {1: [ ], 2: [ ], 3: [ ], 4: [ ], -1: [ ], -2: [8], -3: [5], -4: [6]}}
+
+        # self.ng_dict_3x3 = {1: {"1": [ ], "2": [2], "3": [5], "4": [4], "-1": [ ], "-2": [ ], "-3": [ ], "-4": [ ]},
+        #                     2: {"1": [ ], "2": [3], "3": [6], "4": [5], "-1": [4], "-2": [1], "-3": [ ], "-4": [ ]},
+        #                     3: {"1": [ ], "2": [ ], "3": [ ], "4": [6], "-1": [5], "-2": [2], "-3": [ ], "-4": [ ]},
+        #                     4: {"1": [2], "2": [5], "3": [8], "4": [7], "-1": [ ], "-2": [ ], "-3": [ ], "-4": [1]},
+        #                     5: {"1": [3], "2": [6], "3": [9], "4": [8], "-1": [7], "-2": [4], "-3": [1], "-4": [2]},
+        #                     6: {"1": [ ], "2": [ ], "3": [ ], "4": [9], "-1": [8], "-2": [5], "-3": [2], "-4": [3]},
+        #                     7: {"1": [5], "2": [8], "3": [ ], "4": [ ], "-1": [ ], "-2": [ ], "-3": [ ], "-4": [4]},
+        #                     8: {"1": [6], "2": [9], "3": [ ], "4": [ ], "-1": [ ], "-2": [7], "-3": [4], "-4": [5]},
+        #                     9: {"1": [ ], "2": [ ], "3": [ ], "4": [ ], "-1": [ ], "-2": [8], "-3": [5], "-4": [6]}}
         
         # Non-global 3x3 Neighbour graph, "5" in the middle, with the others all surrounding it
         self.arbitrary_neighbour_graph = create_ng_from_dict(self.ng_dict_3x3)
@@ -65,7 +76,6 @@ class TestNeighbourGraph (unittest.TestCase):
         self.assertIsInstance(ng, NeighbourGraph)
         self.assertEqual(ng.neighbour_graph, self.ng_dict_3x3)
 
-    
     def test_increment_ids(self):
         
         increment = 10
@@ -83,7 +93,6 @@ class TestNeighbourGraph (unittest.TestCase):
         
         self.assertEqual(ng.get_graph(), manually_incremented_ng.get_graph())
 
-    
     def test_get_graph(self):
         
         ng_dict = self.arbitrary_neighbour_graph.get_graph()
@@ -91,7 +100,7 @@ class TestNeighbourGraph (unittest.TestCase):
     
     def test_update_neighbour(self):
         
-        node_to_update = "1"
+        node_to_update = 1
         direction_to_update = 1
         updated_neighbours = [1,2,3,4,5]
 
@@ -104,7 +113,7 @@ class TestNeighbourGraph (unittest.TestCase):
         self.assertEqual(ng.get_graph(), manually_updated_ng)
     
     def test_add_neighbour(self):
-        node_to_update = "1"
+        node_to_update = 1
         direction_to_update = 1
         neighbour_to_add = 123
 
@@ -141,6 +150,7 @@ class TestNeighbourGraph (unittest.TestCase):
 
         for cb_index in self.ng_dict_3x3.keys():
             for direction in dir_obj.__dict__.values():
+                direction = direction
                 ng_neighbours = self.arbitrary_neighbour_graph.get_neighbours(cb_index, direction)
                 self.assertEqual(ng_neighbours, self.ng_dict_3x3[cb_index][direction])
     
@@ -159,7 +169,7 @@ class TestNeighbourGraph (unittest.TestCase):
     
     def test_remove_node(self):
 
-        index_to_remove = '5'
+        index_to_remove = 5
         ng = create_ng_from_dict(self.ng_dict_3x3)
         ng.remove_node(index_to_remove)
 
@@ -177,8 +187,25 @@ class TestNeighbourGraph (unittest.TestCase):
         raise NotImplementedError
     
     def test_update_corner_neighbours(self):
-        raise NotImplementedError
-    
+
+        # Arbitrary values that don't alreayd appear in NG
+        nw_idx = 111
+        ne_idx = 222
+        sw_idx = 333
+        se_idx = 444
+
+        base_cb_idx = 5
+        # Create new neighbourgraph to avoid editing base copy
+        ng = create_ng_from_dict(self.ng_dict_3x3)
+        # Create updated graph with arbitrary values above
+        ng.update_corner_neighbours(base_cb_idx,nw_idx, ne_idx, sw_idx, se_idx)
+
+        # Test to see if the corner values were updated
+        self.assertEqual(ng.neighbour_graph[1][-Direction.north_west], [nw_idx])
+        self.assertEqual(ng.neighbour_graph[3][-Direction.north_east], [ne_idx])
+        self.assertEqual(ng.neighbour_graph[7][-Direction.south_west], [sw_idx])
+        self.assertEqual(ng.neighbour_graph[9][-Direction.south_east], [se_idx])
+        
     def test_get_neighbour_case_bounds(self):
 
         # Set base boundary
@@ -369,7 +396,7 @@ class TestNeighbourGraph (unittest.TestCase):
     def test_get_neighbour_map(self):
         ng = create_ng_from_dict(self.ng_dict_3x3)
 
-        self.assertEqual(ng.get_neighbour_map("1"), self.ng_dict_3x3["1"])
+        self.assertEqual(ng.get_neighbour_map(1), self.ng_dict_3x3[1])
 
 
 
