@@ -169,11 +169,64 @@ class TestNeighbourGraph (unittest.TestCase):
         self.assertEqual(ng.get_graph(), manually_removed_ng_dict)
     
     def test_update_neighbours(self):
-        ## I think there's a bug in remove_node_in_neighbours
-        raise NotImplementedError
-        
-        
-    
+        # Initialise a new neighbour graph to modify
+        ng = create_ng_from_dict(self.ng_dict_3x3)
+        # Initial CB layout that matches ng
+        cbs = [
+            CellBox(Boundary([2,3],[0,1]), 1), CellBox(Boundary([2,3],[1,2]), 2), CellBox(Boundary([2,3],[2,3]), 3),
+            CellBox(Boundary([1,2],[0,1]), 4), CellBox(Boundary([1,2],[1,2]), 5), CellBox(Boundary([1,2],[2,3]), 6),
+            CellBox(Boundary([0,1],[0,1]), 7), CellBox(Boundary([0,1],[1,2]), 8), CellBox(Boundary([0,1],[2,3]), 9),
+        ]
+
+        # Creates the cellboxes that the centre cellbox would become when split
+        split_cbs = [
+            CellBox(Boundary([1.5,2],[1,1.5]), 51),
+            CellBox(Boundary([1.5,2],[1.5,2]), 53),
+            CellBox(Boundary([1,1.5],[1,1.5]), 57),
+            CellBox(Boundary([1,1.5],[1.5,2]), 59),
+        ]
+
+        # Cast to a list so that indexes match up with indexes (using index as key essentially)
+        all_cbs = {cb.id: cb for cb in cbs + split_cbs}
+
+        # Original cellbox from neighbour graph
+        unsplit_cb_idx = 5
+
+        # Indexes of split cellboxes 
+        north_split_cb_idxs = [51, 53]
+        east_split_cb_idxs  = [53, 59]
+        south_split_cb_idxs = [57, 59]
+        west_split_cb_idxs  = [51, 57]
+
+        # Update the neighbourgraph with the new split cellbox ids
+        ng.update_neighbours(unsplit_cb_idx, north_split_cb_idxs, Direction.north, all_cbs)
+        ng.update_neighbours(unsplit_cb_idx, east_split_cb_idxs,  Direction.east,  all_cbs)
+        ng.update_neighbours(unsplit_cb_idx, south_split_cb_idxs, Direction.south, all_cbs)
+        ng.update_neighbours(unsplit_cb_idx, west_split_cb_idxs,  Direction.west,  all_cbs)
+
+        # Create this neighbourgraph manually
+        manually_adjusted_ng = copy.deepcopy(self.ng_dict_3x3)
+        manually_adjusted_ng[2][Direction.south] = north_split_cb_idxs
+        manually_adjusted_ng[4][Direction.east]  = west_split_cb_idxs
+        manually_adjusted_ng[6][Direction.west]  = east_split_cb_idxs
+        manually_adjusted_ng[8][Direction.north] = south_split_cb_idxs
+
+        # Final neighbourgraph should look like
+        #
+        #    1 |    2    | 3
+        #    --+---------+---
+        #      | 51 | 53 |
+        #    4 |---------| 6
+        #      | 57 | 59 |  
+        #   ---+---------+---
+        #    7 |    8    | 9
+        #   
+
+        self.assertEqual(ng.get_graph()[2], manually_adjusted_ng[2])
+        self.assertEqual(ng.get_graph()[4], manually_adjusted_ng[4])
+        self.assertEqual(ng.get_graph()[6], manually_adjusted_ng[6])
+        self.assertEqual(ng.get_graph()[8], manually_adjusted_ng[8])
+
     def test_remove_node_from_neighbours(self):
         # Create a new neighbour graph to edit freely
         ng = create_ng_from_dict(self.ng_dict_3x3)
