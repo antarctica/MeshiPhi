@@ -127,30 +127,32 @@ class TestNeighbourGraph (unittest.TestCase):
     
     def test_remove_node_and_update_neighbours(self):
         
-        # node_to_remove = '5'
+        # Remove central (i.e. most connected) node for testing
+        node_to_remove = 5
 
-        # ng = create_ng_from_dict(self.ng_dict_3x3)
-        # ng.remove_node_and_update_neighbours(node_to_remove)
+        # Create a new neighbourgraph
+        ng = create_ng_from_dict(self.ng_dict_3x3)
+        # Remove node using ng method
+        ng.remove_node_and_update_neighbours(node_to_remove)
         
-        # manually_removed_ng_dict = copy.deepcopy(self.ng_dict_3x3)
-        # for node, dir_map in manually_removed_ng_dict.items():
-        #     for direction in dir_map.keys():
-        #         if node_to_remove in node[direction]:
-        #             node[direction].pop(node_to_remove)
-        # manually_removed_ng_dict.pop(node_to_remove)
+        # Reconstruct manually to test method works
+        # Create a new neighbour graph
+        manually_removed_ng_dict = copy.deepcopy(self.ng_dict_3x3)
+        # Remove the central node by popping it out of neighbour lists
+        for node, dir_map in manually_removed_ng_dict.items():
+            for direction, neighbours in dir_map.items():
+                if node_to_remove in neighbours:
+                    neighbours.pop(neighbours.index(node_to_remove))
+        # Then remove the central node entirely
+        manually_removed_ng_dict.pop(node_to_remove)
 
-        # self.assertEqual(ng.get_graph(), manually_removed_ng_dict)
+        self.assertEqual(ng.get_graph(), manually_removed_ng_dict)
 
-
-        ## I think there's a bug in remove_node_in_neighbours
-        raise NotImplementedError
     
     def test_get_neighbours(self):
-        dir_obj = Direction()
 
         for cb_index in self.ng_dict_3x3.keys():
-            for direction in dir_obj.__dict__.values():
-                direction = direction
+            for direction in ALL_DIRECTIONS:
                 ng_neighbours = self.arbitrary_neighbour_graph.get_neighbours(cb_index, direction)
                 self.assertEqual(ng_neighbours, self.ng_dict_3x3[cb_index][direction])
     
