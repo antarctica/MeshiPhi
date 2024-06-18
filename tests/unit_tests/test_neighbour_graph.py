@@ -50,16 +50,6 @@ class TestNeighbourGraph (unittest.TestCase):
                             7: {1: [5], 2: [8], 3: [ ], 4: [ ], -1: [ ], -2: [ ], -3: [ ], -4: [4]},
                             8: {1: [6], 2: [9], 3: [ ], 4: [ ], -1: [ ], -2: [7], -3: [4], -4: [5]},
                             9: {1: [ ], 2: [ ], 3: [ ], 4: [ ], -1: [ ], -2: [8], -3: [5], -4: [6]}}
-
-        # self.ng_dict_3x3 = {1: {"1": [ ], "2": [2], "3": [5], "4": [4], "-1": [ ], "-2": [ ], "-3": [ ], "-4": [ ]},
-        #                     2: {"1": [ ], "2": [3], "3": [6], "4": [5], "-1": [4], "-2": [1], "-3": [ ], "-4": [ ]},
-        #                     3: {"1": [ ], "2": [ ], "3": [ ], "4": [6], "-1": [5], "-2": [2], "-3": [ ], "-4": [ ]},
-        #                     4: {"1": [2], "2": [5], "3": [8], "4": [7], "-1": [ ], "-2": [ ], "-3": [ ], "-4": [1]},
-        #                     5: {"1": [3], "2": [6], "3": [9], "4": [8], "-1": [7], "-2": [4], "-3": [1], "-4": [2]},
-        #                     6: {"1": [ ], "2": [ ], "3": [ ], "4": [9], "-1": [8], "-2": [5], "-3": [2], "-4": [3]},
-        #                     7: {"1": [5], "2": [8], "3": [ ], "4": [ ], "-1": [ ], "-2": [ ], "-3": [ ], "-4": [4]},
-        #                     8: {"1": [6], "2": [9], "3": [ ], "4": [ ], "-1": [ ], "-2": [7], "-3": [4], "-4": [5]},
-        #                     9: {"1": [ ], "2": [ ], "3": [ ], "4": [ ], "-1": [ ], "-2": [8], "-3": [5], "-4": [6]}}
         
         # Non-global 3x3 Neighbour graph, "5" in the middle, with the others all surrounding it
         self.arbitrary_neighbour_graph = create_ng_from_dict(self.ng_dict_3x3)
@@ -67,7 +57,6 @@ class TestNeighbourGraph (unittest.TestCase):
         # 1x2 Neighbour graph, oriented E-W
         self.antimeridian_neighbour_graph = {"1":{1: [ ], 2: [2], 3: [ ], 4: [ ], -1: [ ], -2: [ ], -3: [ ], -4: [ ]},
                                              "2":{1: [ ], 2: [ ], 3: [ ], 4: [ ], -1: [ ], -2: [1], -3: [ ], -4: [ ]}}
-
 
     def test_from_json(self):
 
@@ -148,7 +137,6 @@ class TestNeighbourGraph (unittest.TestCase):
 
         self.assertEqual(ng.get_graph(), manually_removed_ng_dict)
 
-    
     def test_get_neighbours(self):
 
         for cb_index in self.ng_dict_3x3.keys():
@@ -183,10 +171,30 @@ class TestNeighbourGraph (unittest.TestCase):
     def test_update_neighbours(self):
         ## I think there's a bug in remove_node_in_neighbours
         raise NotImplementedError
+        
+        
     
     def test_remove_node_from_neighbours(self):
-        ## I think there's a bug in remove_node_in_neighbours
-        raise NotImplementedError
+        # Create a new neighbour graph to edit freely
+        ng = create_ng_from_dict(self.ng_dict_3x3)
+        # Make a copy of the neighbourgraph to edit freely
+        manually_adjusted_ng = copy.deepcopy(self.ng_dict_3x3)
+
+        # In each direction, remove the central node
+        for direction in ALL_DIRECTIONS:
+            # Remove node using ng method
+            ng.remove_node_from_neighbours(5, direction)
+            
+            # Manually remove the node
+            # Get index of cellbox in direction
+            neighbour_in_direction = manually_adjusted_ng[5][direction][0]
+            # Get neighbours of that cellbox in the direction of the node to remove (hence the negative direction)
+            neighbour_list = manually_adjusted_ng[neighbour_in_direction][-direction]
+            # Remove central node
+            neighbour_list.pop(neighbour_list.index(5))
+
+            # Compare method copy to manually removed copy
+            self.assertEqual(ng.get_graph(), manually_adjusted_ng)
     
     def test_update_corner_neighbours(self):
 
