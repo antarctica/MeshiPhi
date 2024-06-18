@@ -1,12 +1,10 @@
 
 import unittest
 import copy
+
 from meshiphi.mesh_generation.direction import Direction
 from meshiphi.mesh_generation.neighbour_graph import NeighbourGraph
-from meshiphi.mesh_generation.metadata import Metadata
-from meshiphi.dataloaders.factory import DataLoaderFactory
 from meshiphi.mesh_generation.cellbox import CellBox
-
 from meshiphi.mesh_generation.boundary import Boundary
 from meshiphi.utils import longitude_domain
 
