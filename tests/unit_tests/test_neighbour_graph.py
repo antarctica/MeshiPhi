@@ -473,8 +473,36 @@ class TestNeighbourGraph (unittest.TestCase):
         self.assertEqual(ng.get_graph(), reference_neighbour_graph)
 
     def test_initialise_map(self):
-        raise NotImplementedError
-    
+        # Initialise a new neighbour graph to modify
+        ng = NeighbourGraph()
+        # Initial CB layout
+        cbs = [
+            CellBox(Boundary([2,3],[0,1]), 1), CellBox(Boundary([2,3],[1,2]), 2), CellBox(Boundary([2,3],[2,3]), 3),
+            CellBox(Boundary([1,2],[0,1]), 4), CellBox(Boundary([1,2],[1,2]), 5), CellBox(Boundary([1,2],[2,3]), 6),
+            CellBox(Boundary([0,1],[0,1]), 7), CellBox(Boundary([0,1],[1,2]), 8), CellBox(Boundary([0,1],[2,3]), 9),
+        ]
+        
+        # Manually define what the output should be
+        reference_neighbour_graph = {
+            0: {1: [4], 2: [1], 3: [ ], 4: [ ], -1: [ ], -2: [ ], -3: [ ], -4: [3]}, 
+            1: {1: [5], 2: [2], 3: [ ], 4: [ ], -1: [ ], -2: [0], -3: [3], -4: [4]}, 
+            2: {1: [ ], 2: [ ], 3: [ ], 4: [ ], -1: [ ], -2: [1], -3: [4], -4: [5]}, 
+            3: {1: [7], 2: [4], 3: [1], 4: [0], -1: [ ], -2: [ ], -3: [ ], -4: [6]}, 
+            4: {1: [8], 2: [5], 3: [2], 4: [1], -1: [0], -2: [3], -3: [6], -4: [7]}, 
+            5: {1: [ ], 2: [ ], 3: [ ], 4: [2], -1: [1], -2: [4], -3: [7], -4: [8]}, 
+            6: {1: [ ], 2: [7], 3: [4], 4: [3], -1: [ ], -2: [ ], -3: [ ], -4: [ ]}, 
+            7: {1: [ ], 2: [8], 3: [5], 4: [4], -1: [3], -2: [6], -3: [ ], -4: [ ]}, 
+            8: {1: [ ], 2: [ ], 3: [ ], 4: [5], -1: [4], -2: [7], -3: [ ], -4: [ ]}
+        }
+
+        # Run through each cellbox and create the neighbour map
+        for cb in cbs:
+            cb_idx = cbs.index(cb)
+            neighbour_map = ng.initialise_map(cb_idx, 3, 9)
+
+            self.assertEqual(neighbour_map, reference_neighbour_graph[cb_idx])
+            
+
     def test_set_global_mesh(self):
         global_ng = create_ng_from_dict(self.ng_dict_3x3,    global_mesh=True)
         nonglobal_ng = create_ng_from_dict(self.ng_dict_3x3, global_mesh=False)
