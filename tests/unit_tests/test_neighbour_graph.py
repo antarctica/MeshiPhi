@@ -434,7 +434,16 @@ class TestNeighbourGraph (unittest.TestCase):
                          0)
     
     def test_remove_neighbour(self):
-        raise NotImplementedError
+        # Create a new neighbourgraph to edit freely
+        ng = create_ng_from_dict(self.ng_dict_3x3)
+        # Remove element 3 from the NE direction of cb 5 in the neighbourgraph
+        ng.remove_neighbour(5, Direction.north_east, 3)
+
+        # Do this again by manually editing the neighbourgraph
+        manually_adjusted_ng = copy.deepcopy(self.ng_dict_3x3)
+        manually_adjusted_ng[5][Direction.north_east] = []
+
+        self.assertEqual(ng.get_graph(), manually_adjusted_ng)
     
     def test_initialise_neighbour_graph(self):
         raise NotImplementedError
