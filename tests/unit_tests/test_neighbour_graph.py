@@ -8,6 +8,7 @@ from meshiphi.dataloaders.factory import DataLoaderFactory
 from meshiphi.mesh_generation.cellbox import CellBox
 
 from meshiphi.mesh_generation.boundary import Boundary
+from meshiphi.utils import longitude_domain
 
 
 # Define which direction each cardinal direction lies
@@ -190,6 +191,9 @@ class TestNeighbourGraph (unittest.TestCase):
         ng = NeighbourGraph()
        
         for direction in ALL_DIRECTIONS:
+            lat_offset = 0
+            long_offset = 0
+
             # Offset a second boundary object depending on which direction is being tested
             if direction in NORTHERN_DIRECTIONS:
                 lat_offset = 20
@@ -241,6 +245,8 @@ class TestNeighbourGraph (unittest.TestCase):
         ng = NeighbourGraph()
         
         for direction in ALL_DIRECTIONS:
+            lat_offset = 0
+            long_offset = 0
             # Offset a second boundary object depending on which direction is being tested
             if direction in NORTHERN_DIRECTIONS:
                 lat_offset = 20
@@ -280,7 +286,62 @@ class TestNeighbourGraph (unittest.TestCase):
                          0)
     
     def test_get_global_mesh_neighbour_case(self):
-        raise NotImplementedError
+        # Set base boundary
+        lat_range = [-10, 10]
+
+        # Initialise a neighbourgraph object to get access to get_neighbour_case_bounds()
+        ng = NeighbourGraph()
+
+        for direction in ALL_DIRECTIONS:
+            lat_offset = 0
+            long_offset = 0
+            
+            # If in purely N/S direction, then don't need to test
+            if direction in [Direction.north, Direction.south]:
+                continue
+
+            # Offset a second boundary object depending on which direction is being tested
+            if direction in NORTHERN_DIRECTIONS:
+                lat_offset = 20
+            elif direction in SOUTHERN_DIRECTIONS:
+                lat_offset = -20
+            
+            # If on positive side of antimeridian, have to test neighbours to the east
+            if direction in EASTERN_DIRECTIONS:
+                long_range = [160,180]
+                base_bounds  = Boundary(lat_range, long_range)
+                base_cellbox = CellBox(base_bounds, 0)
+                long_offset = 20
+            elif direction in WESTERN_DIRECTIONS:
+                long_range = [-180,-160]
+                base_bounds  = Boundary(lat_range, long_range)
+                base_cellbox = CellBox(base_bounds, 0)
+                long_offset = -20
+
+            
+            # Add offsets to base boundary and create new boundary object
+            offset_lat_range = [lat + lat_offset 
+                                for lat in lat_range]
+            offset_long_range = [longitude_domain(long + long_offset) 
+                                 for long in long_range]
+
+            offset_bounds = Boundary(offset_lat_range, offset_long_range)
+            offset_cellbox = CellBox(offset_bounds, 1)
+
+            # Make sure it returns the correct case
+            self.assertEqual(ng.get_neighbour_case(base_cellbox, 
+                                                   offset_cellbox), 
+                             direction)
+        
+        # Final test: make sure that two boundaries that don't touch return an invalid direction (0)
+        base_bounds   = Boundary(lat_range, [160, 180])
+        base_cellbox  = CellBox(base_bounds, 0)
+        offset_bounds = Boundary(lat_range, [0,20])
+        offset_cellbox = CellBox(offset_bounds, 1)
+        # Make sure it returns the correct case
+        self.assertEqual(ng.get_neighbour_case(base_cellbox, 
+                                               offset_cellbox), 
+                         0)
     
     def test_remove_neighbour(self):
         raise NotImplementedError
