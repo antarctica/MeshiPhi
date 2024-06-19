@@ -407,8 +407,8 @@ class TestNeighbourGraph (unittest.TestCase):
             offset_cellbox = CellBox(offset_bounds, 1)
 
             # Make sure it returns the correct case
-            self.assertEqual(ng.get_neighbour_case(base_cellbox, 
-                                                   offset_cellbox), 
+            self.assertEqual(ng.get_global_mesh_neighbour_case(base_cellbox, 
+                                                               offset_cellbox), 
                              direction)
         
         # Final test: make sure that two boundaries that don't touch return an invalid direction (0)
@@ -417,8 +417,8 @@ class TestNeighbourGraph (unittest.TestCase):
         offset_bounds = Boundary(lat_range, [0,20])
         offset_cellbox = CellBox(offset_bounds, 1)
         # Make sure it returns the correct case
-        self.assertEqual(ng.get_neighbour_case(base_cellbox, 
-                                               offset_cellbox), 
+        self.assertEqual(ng.get_global_mesh_neighbour_case(base_cellbox, 
+                                                           offset_cellbox), 
                          0)
     
     def test_remove_neighbour(self):
