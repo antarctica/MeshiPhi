@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>3. Command Line Interface &mdash; meshiphi 2.0.8 documentation</title>
+  <title>3. Command Line Interface &mdash; meshiphi 2.1.11 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
 
@@ -15,7 +15,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=505e95f4"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=8353c628"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
@@ -51,7 +51,9 @@
 <li class="toctree-l2"><a class="reference internal" href="#create-mesh">3.1. create_mesh</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#export-mesh">3.2. export_mesh</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#rebuild-mesh">3.3. rebuild_mesh</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#plot-mesh-geoplot">3.4. plot_mesh (GeoPlot)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#merge-mesh">3.4. merge_mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plot-mesh-geoplot">3.5. plot_mesh (GeoPlot)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#meshiphi-test-for-developers">3.6. meshiphi_test (for developers)</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="Code_overview.html">4. Background</a></li>
@@ -186,8 +188,27 @@ of the package.</p>
 </pre></div>
 </div>
 </section>
+<section id="merge-mesh">
+<h2><span class="section-number">3.4. </span>merge_mesh<a class="headerlink" href="#merge-mesh" title="Permalink to this heading"></a></h2>
+<p>When multiple compatible meshes have been created using the <a class="reference internal" href="#create-mesh"><span class="std std-ref">create_mesh</span></a> command, they can be merged together using the <a class="reference internal" href="#merge-mesh"><span class="std std-ref">merge_mesh</span></a> command.
+This will combine the meshes into a single mesh file, replacing cellboxes in mesh1 with cellboxes in mesh2 where they overlap.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">merge_mesh</span> <span class="o">&lt;</span><span class="n">mesh1</span><span class="o">.</span><span class="n">json</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">mesh2</span><span class="o">.</span><span class="n">json</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>positional arguments:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mesh1</span> <span class="p">:</span> <span class="n">A</span> <span class="n">digital</span> <span class="n">environment</span> <span class="n">file</span><span class="o">.</span>
+<span class="n">mesh2</span> <span class="p">:</span> <span class="n">A</span> <span class="n">digital</span> <span class="n">environment</span> <span class="n">file</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>optional arguments:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">v</span> <span class="p">:</span> <span class="n">verbose</span> <span class="n">logging</span>
+<span class="o">-</span><span class="n">o</span> <span class="p">:</span> <span class="n">output</span> <span class="n">location</span>
+<span class="o">-</span><span class="n">d</span><span class="p">,</span> <span class="o">--</span><span class="n">directory</span> <span class="p">:</span> <span class="n">Flag</span> <span class="n">indicating</span> <span class="n">the</span> <span class="n">mesh</span> <span class="n">files</span> <span class="n">to</span> <span class="n">be</span> <span class="n">merged</span> <span class="n">are</span> <span class="ow">in</span> <span class="n">a</span> <span class="n">directory</span><span class="p">,</span> <span class="ow">not</span> <span class="n">an</span> <span class="n">individual</span> <span class="n">file</span>
+</pre></div>
+</div>
+</section>
 <section id="plot-mesh-geoplot">
-<h2><span class="section-number">3.4. </span>plot_mesh (GeoPlot)<a class="headerlink" href="#plot-mesh-geoplot" title="Permalink to this heading"></a></h2>
+<h2><span class="section-number">3.5. </span>plot_mesh (GeoPlot)<a class="headerlink" href="#plot-mesh-geoplot" title="Permalink to this heading"></a></h2>
 <p>Meshes produced at any stage in the route planning process can be visualised using the GeoPlot
 library found at the relevant <a class="reference external" href="https://github.com/antarctica/GeoPlot">GitHub page</a>. Meshes and routes can also be
 plotted in other GIS software such as QGIS or ArcGIS by exporting the mesh to a common format such as .geojson or .tif
@@ -200,6 +221,32 @@ using the <a class="reference internal" href="#export-mesh"><span class="std std
 <span class="o">-</span><span class="n">o</span> <span class="p">:</span> <span class="n">output</span> <span class="n">location</span>
 </pre></div>
 </div>
+</section>
+<section id="meshiphi-test-for-developers">
+<h2><span class="section-number">3.6. </span>meshiphi_test (for developers)<a class="headerlink" href="#meshiphi-test-for-developers" title="Permalink to this heading"></a></h2>
+<p>Compares the current working branch of Meshiphi to a different git branch, and runs relevant unit and regression tests
+depending on what files are different between the branches. This command should be run to ensure consistent functionality before
+creating a pull request.</p>
+<p>Requires git to be installed, and for Meshiphi to be installed with pip in developer mode from a local git repo.</p>
+<p><code class="file docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">git&#64;github.com:antarctica/MeshiPhi.git</span> <span class="pre">/path/to/meshiphi</span></code> downloads Meshiphi into <code class="file docutils literal notranslate"><span class="pre">/path/to/meshiphi</span></code></p>
+<p><code class="file docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">/path/to/meshiphi</span></code> installs the local copy of Meshiphi in developer mode.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">meshiphi_test</span> <span class="o">&lt;</span><span class="n">from_branch</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">into_branch</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>positional arguments:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">from_branch</span> <span class="p">:</span> <span class="n">Git</span> <span class="n">branch</span> <span class="n">that</span> <span class="n">you</span> <span class="n">want</span> <span class="n">to</span> <span class="n">test</span> <span class="p">(</span><span class="n">optional</span><span class="p">,</span> <span class="n">defaults</span> <span class="n">to</span> <span class="n">current</span> <span class="n">branch</span><span class="p">)</span>
+<span class="n">into_branch</span> <span class="p">:</span> <span class="n">Git</span> <span class="n">branch</span> <span class="n">that</span> <span class="n">you</span> <span class="n">want</span> <span class="n">to</span> <span class="n">compare</span> <span class="n">against</span>
+</pre></div>
+</div>
+<p>optional arguments:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>-r : run regression tests only
+-u : run unit tests only
+-s : save mesh of failed regression tests to `./pytest_meshiphi`. This is to avoid having to recompute meshes upon pytest failure
+-p : plots difference between newly generated mesh and the reference mesh for easier diagnosis. Only computes on pytest failure
+</pre></div>
+</div>
+<p>If -s or -p flag provided, a folder <code class="file docutils literal notranslate"><span class="pre">pytest_meshiphi</span></code> will be created in your current working directory, populated with
+the failing tests to aid debugging and avoid having to regenerate them manually.</p>
 </section>
 </section>
 

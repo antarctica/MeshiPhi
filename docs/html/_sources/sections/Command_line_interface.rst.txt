@@ -125,6 +125,34 @@ optional arguments:
     -o : output location
 
 
+^^^^^^^^^^^^^^
+merge_mesh
+^^^^^^^^^^^^^^
+
+When multiple compatible meshes have been created using the :ref:`create_mesh` command, they can be merged together using the :ref:`merge_mesh` command.
+This will combine the meshes into a single mesh file, replacing cellboxes in mesh1 with cellboxes in mesh2 where they overlap.
+
+
+::
+
+    merge_mesh <mesh1.json> <mesh2.json>
+
+positional arguments:
+
+::
+
+    mesh1 : A digital environment file.
+    mesh2 : A digital environment file.
+   
+optional arguments:
+
+::
+
+    -v : verbose logging
+    -o : output location
+    -d, --directory : Flag indicating the mesh files to be merged are in a directory, not an individual file 
+
+
 ^^^^^^^^^^^^^^^^^^^^^
 plot_mesh (GeoPlot)
 ^^^^^^^^^^^^^^^^^^^^^
@@ -143,3 +171,42 @@ optional arguments:
     
         -v : verbose logging
         -o : output location
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+meshiphi_test (for developers)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Compares the current working branch of Meshiphi to a different git branch, and runs relevant unit and regression tests 
+depending on what files are different between the branches. This command should be run to ensure consistent functionality before
+creating a pull request.  
+
+Requires git to be installed, and for Meshiphi to be installed with pip in developer mode from a local git repo. 
+
+:file:`git clone git@github.com:antarctica/MeshiPhi.git /path/to/meshiphi` downloads Meshiphi into :file:`/path/to/meshiphi`
+
+:file:`pip install -e /path/to/meshiphi` installs the local copy of Meshiphi in developer mode.
+
+::
+
+    meshiphi_test <from_branch> <into_branch>
+
+positional arguments:
+
+::
+
+    from_branch : Git branch that you want to test (optional, defaults to current branch)
+    into_branch : Git branch that you want to compare against
+   
+optional arguments:
+
+::
+
+    -r : run regression tests only
+    -u : run unit tests only
+    -s : save mesh of failed regression tests to `./pytest_meshiphi`. This is to avoid having to recompute meshes upon pytest failure
+    -p : plots difference between newly generated mesh and the reference mesh for easier diagnosis. Only computes on pytest failure 
+
+
+If -s or -p flag provided, a folder :file:`pytest_meshiphi` will be created in your current working directory, populated with 
+the failing tests to aid debugging and avoid having to regenerate them manually.

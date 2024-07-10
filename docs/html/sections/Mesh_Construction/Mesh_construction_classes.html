@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>8.4.1. Mesh Construction - Classes &mdash; meshiphi 2.0.8 documentation</title>
+  <title>8.4.1. Mesh Construction - Classes &mdash; meshiphi 2.1.11 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
 
@@ -15,7 +15,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=505e95f4"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=8353c628"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -384,6 +384,17 @@ created by the MeshBuilder object, though the object is mutable and can be updat
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="meshiphi.mesh_generation.environment_mesh.EnvironmentMesh.merge_mesh">
+<span class="sig-name descname"><span class="pre">merge_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#meshiphi.mesh_generation.environment_mesh.EnvironmentMesh.merge_mesh" title="Permalink to this definition"></a></dt>
+<dd><p>merges the given mesh with this mesh. The given mesh is not modified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mesh2</strong> (<a class="reference internal" href="#meshiphi.mesh_generation.environment_mesh.EnvironmentMesh" title="meshiphi.mesh_generation.environment_mesh.EnvironmentMesh"><em>EnvironmentMesh</em></a>) – the mesh to be merged with this mesh</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="meshiphi.mesh_generation.environment_mesh.EnvironmentMesh.save">
 <span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'JSON'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#meshiphi.mesh_generation.environment_mesh.EnvironmentMesh.save" title="Permalink to this definition"></a></dt>
 <dd><p>Saves this object to a location in local storage in a specific format.</p>
@@ -402,6 +413,17 @@ Supported formats are</p>
 </div></blockquote>
 </p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="meshiphi.mesh_generation.environment_mesh.EnvironmentMesh.split_and_replace">
+<span class="sig-name descname"><span class="pre">split_and_replace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cellbox_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#meshiphi.mesh_generation.environment_mesh.EnvironmentMesh.split_and_replace" title="Permalink to this definition"></a></dt>
+<dd><p>splits the cellbox with the given id and replaces it with the new cellboxes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cellbox_id</strong> (<em>string</em>) – the id of the cellbox to be split</p>
 </dd>
 </dl>
 </dd></dl>
