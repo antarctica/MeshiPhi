@@ -4,17 +4,18 @@ import inspect
 import logging
 
 from meshiphi import __version__ as version
-from meshiphi.utils import setup_logging, timed_call, convert_decimal_days
+from meshiphi.utils import setup_logging, timed_call
 from meshiphi.mesh_generation.mesh_builder import MeshBuilder
 from meshiphi.mesh_generation.environment_mesh import EnvironmentMesh
-
+from meshiphi.test_automation.test_automater import TestAutomater
 
 @setup_logging
 def get_args(
         default_output: str,
         config_arg: bool = True,
         mesh_arg: bool = False,
-        format_arg: bool = False):
+        format_arg: bool = False,
+        merge_arg: bool = False):
     """
     Adds required command line arguments to all CLI entry points.
 
@@ -56,6 +57,16 @@ def get_args(
         ap.add_argument( "-f", "--format_conf",
                         default = None,
                         help = "File location of Export to Tif configuration parameters")
+
+    if merge_arg:
+        ap.add_argument("merge",
+                    help="File location of the environmental mesh to merge with")
+        ap.add_argument("-d", "--directory",
+                    default=None,
+                    action="store_true",
+                    help="Flag to indicate that the merge file is a directory of meshes \
+                        to merge. If set, the merge file is expected to be a directory of \
+                        meshes to merge with the input mesh. The output will be a single merged mesh.")
 
 
 
@@ -142,3 +153,126 @@ def export_mesh_cli():
     logging.info(f"exporting mesh to {args.output} in format {args.format}")
 
     env_mesh.save(args.output, args.format , args.format_conf)
+
+@timed_call
+def merge_mesh_cli():
+    """
+        CLI entry point for merging two meshes.
+    """
+
+    from os import listdir 
+    from os.path import isfile, join
+
+    default_output = "merged_mesh.output.json"
+    args = get_args(default_output, config_arg = False, mesh_arg=True, merge_arg=True)
+    logging.info("{} {}".format(inspect.stack()[0][3][:-4], version))
+
+    with open(args.mesh.name, "r") as f:
+        mesh1 = json.load(args.mesh)
+    env_mesh1 = EnvironmentMesh.load_from_json(mesh1)
+    
+    if args.directory:
+        logging.debug("Merging multiple meshes from directory {} with input mesh".format(args.merge))
+
+        merge_dir = args.merge
+        merge_meshes = [f for f in listdir(merge_dir) if isfile(join(merge_dir, f))]
+
+        for mesh in merge_meshes:
+            path = join(merge_dir, mesh)
+            with open(path, "r") as f:
+                merge_mesh = json.load(f)
+            env_mesh_merge = EnvironmentMesh.load_from_json(merge_mesh)
+
+            env_mesh1.merge_mesh(env_mesh_merge)
+    else:
+    
+        with open(args.merge, "r") as f:
+            mesh2 = json.load(f)    
+        env_mesh2 = EnvironmentMesh.load_from_json(mesh2)
+
+        env_mesh1.merge_mesh(env_mesh2)
+       
+    merged_mesh_json = env_mesh1.to_json()
+
+    logging.info("Saving merged mesh to {}".format(args.output))
+    json.dump(merged_mesh_json, open(args.output, "w"), indent=4)
+
+
+
+@timed_call
+def meshiphi_test_cli():
+    """
+    CLI Entry point for automated testing. Assumes you have git and pytest installed.
+
+    Usage: 
+    meshiphi_test <reference_branch> [OPTIONS]               # Compares current branch to reference_branch
+    meshiphi_test <test_branch> <reference_branch> [OPTIONS] # Compares test_branch to reference_branch
+    """
+
+    @setup_logging
+    def get_test_automater_args():
+        ap = argparse.ArgumentParser()
+        # Add one or two arguments as branches
+        # If one, compare current branch to specified one
+        # If two, compare one to the other
+        ap.add_argument('branch_a', action='append')
+        ap.add_argument('branch_b', nargs='?', action='append')
+
+        # Want only regression tests
+        ap.add_argument("-r", "--regression",
+                        default=False,
+                        action="store_true",
+                        help="Run only regression tests")
+        # Want only unit tests
+        ap.add_argument("-u", "--unit",
+                        default=False,
+                        action="store_true",
+                        help="Run only unit tests")
+        # Save pytest fixtures generated
+        ap.add_argument("-s", "--save",
+                        default=False,
+                        action="store_true",
+                        help="Creates a 'pytest_output' folder in your current "\
+                             "working directory and populates it with test "\
+                             "outputs")
+        # Save pytest fixtures generated
+        ap.add_argument("-p", "--plot",
+                        default=False,
+                        action="store_true",
+                        help="Plot differences between generated output to reference")
+
+        # Verbose logging specified
+        ap.add_argument("-v", "--verbose",
+                        default=False,
+                        action="store_true",
+                        help="Turn on DEBUG level logging")
+        
+        return ap.parse_args()
+
+    args = get_test_automater_args()
+
+    # Turn one off if only one specified
+    if sum([args.regression, args.unit]) == 1:
+        reg  = args.regression
+        unit = args.unit
+    # Else, either both are selected, or neither are selected
+    # If neither selected, run both (makes no sense to run none)
+    else:
+        reg  = True
+        unit = True
+
+    # Set appropriate from/into branch to pass to TestAutomater
+    if args.branch_b != [None]:
+        from_branch = args.branch_a[0]
+        into_branch = args.branch_b[0]
+    else:
+        from_branch = None
+        into_branch = args.branch_a[0]
+
+    # Select and run appropriate tests
+    TestAutomater(from_branch=from_branch, 
+                  into_branch=into_branch,
+                  regression=reg,
+                  unit=unit,
+                  plot=args.plot,
+                  save=args.save)

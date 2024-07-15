@@ -3,6 +3,7 @@ from setuptools import setup, find_packages
 import meshiphi
 import meshiphi.dataloaders
 import meshiphi.mesh_generation
+import tests
 
 def get_content(filename):
     with open(filename, "r") as fh:
@@ -39,7 +40,9 @@ setup(
         'console_scripts': [
             "create_mesh=meshiphi.cli:create_mesh_cli",
             "export_mesh=meshiphi.cli:export_mesh_cli",
-            "rebuild_mesh=meshiphi.cli:rebuild_mesh_cli"],
+            "rebuild_mesh=meshiphi.cli:rebuild_mesh_cli",
+            "merge_mesh=meshiphi.cli:merge_mesh_cli",
+            "meshiphi_test=meshiphi.cli:meshiphi_test_cli"]
     },
     keywords=[],
     packages=find_packages(),
