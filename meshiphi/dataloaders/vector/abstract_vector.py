@@ -559,19 +559,29 @@ class VectorDataLoader(DataLoaderInterface):
             # Split if magnitude of curl(data) is larger than threshold 
             if 'curl' in splitting_conds:
                 curl = self.calc_curl(bounds)
-                if np.abs(curl) > splitting_conds['curl']:
-                    hom_type =  'HET'
-            # Split if max magnitude(any_vector - ave_vector) is larger than threshold
-            if 'dmag' in splitting_conds:
-                dmag = self.calc_dmag(bounds)
-                if np.abs(dmag) > splitting_conds['dmag']:
-                    hom_type = 'HET'
+                num_over_threshold = (curl > splitting_conds['curl']['threshold']).sum()
+                frac_over_threshold = num_over_threshold / curl.size
+
+                if   frac_over_threshold <= splitting_conds['curl']['lower_bound']: 
+                    hom_type = "CLR"
+                elif frac_over_threshold >= splitting_conds['curl']['upper_bound']:
+                    if splitting_conds['split_lock'] == True: 
+                        hom_type = "HOM"
+                    else: 
+                        hom_type = "CLR"
+                else: hom_type = "HET"
+
+            # # Split if max magnitude(any_vector - ave_vector) is larger than threshold
+            # if 'dmag' in splitting_conds:
+            #     dmag = self.calc_dmag(bounds)
+            #     if np.abs(dmag) > splitting_conds['dmag']:
+            #         hom_type = 'HET'
                 
-            # Split if Reynolds number is larger than threshold
-            if 'reynolds' in splitting_conds:        
-                reynolds = self.calc_reynolds_number(bounds)
-                if reynolds > splitting_conds['reynolds']:
-                    hom_type = 'HET'
+            # # Split if Reynolds number is larger than threshold
+            # if 'reynolds' in splitting_conds:        
+            #     reynolds = self.calc_reynolds_number(bounds)
+            #     if reynolds > splitting_conds['reynolds']:
+            #         hom_type = 'HET'
 
         logging.debug(f"\thom_condition for attribute: '{self.data_name}' in bounds:'{bounds}' returned '{hom_type}'")
         
