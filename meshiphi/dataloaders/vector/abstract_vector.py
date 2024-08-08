@@ -558,14 +558,16 @@ class VectorDataLoader(DataLoaderInterface):
             # To allow multiple modes of splitting, chuck them in the splitting conditions
             # Split if magnitude of curl(data) is larger than threshold 
             if 'curl' in splitting_conds:
-                curl = self.calc_curl(bounds)
+                curl = self.calc_curl(bounds, collapse=False)
+                if isinstance(curl, type(np.nan)) and np.isnan(curl):
+                    return "CLR"
                 num_over_threshold = (curl > splitting_conds['curl']['threshold']).sum()
                 frac_over_threshold = num_over_threshold / curl.size
 
                 if   frac_over_threshold <= splitting_conds['curl']['lower_bound']: 
                     hom_type = "CLR"
                 elif frac_over_threshold >= splitting_conds['curl']['upper_bound']:
-                    if splitting_conds['split_lock'] == True: 
+                    if splitting_conds['split_lock'] == True:
                         hom_type = "HOM"
                     else: 
                         hom_type = "CLR"
