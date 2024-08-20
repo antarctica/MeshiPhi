@@ -555,35 +555,21 @@ class VectorDataLoader(DataLoaderInterface):
             logging.debug(f"\t{num_dp} datapoints found for attribute '{self.data_name}' within bounds '{bounds}'")
             hom_type = 'CLR'
         else:
-            # To allow multiple modes of splitting, chuck them in the splitting conditions
-            # Split if magnitude of curl(data) is larger than threshold 
-            if 'curl' in splitting_conds:
-                curl = self.calc_curl(bounds, collapse=False)
-                if isinstance(curl, type(np.nan)) and np.isnan(curl):
-                    return "CLR"
-                num_over_threshold = (curl > splitting_conds['curl']['threshold']).sum()
-                frac_over_threshold = num_over_threshold / curl.size
+            # Vector splitting based on curl of input vector field
+            curl = self.calc_curl(bounds, collapse=False)
+            if isinstance(curl, type(np.nan)) and np.isnan(curl):
+                return "CLR"
+            num_over_threshold = (curl > splitting_conds['threshold']).sum()
+            frac_over_threshold = num_over_threshold / curl.size
 
-                if   frac_over_threshold <= splitting_conds['curl']['lower_bound']: 
+            if   frac_over_threshold <= splitting_conds['lower_bound']: 
+                hom_type = "CLR"
+            elif frac_over_threshold >= splitting_conds['upper_bound']:
+                if splitting_conds['split_lock'] == True:
+                    hom_type = "HOM"
+                else: 
                     hom_type = "CLR"
-                elif frac_over_threshold >= splitting_conds['curl']['upper_bound']:
-                    if splitting_conds['split_lock'] == True:
-                        hom_type = "HOM"
-                    else: 
-                        hom_type = "CLR"
-                else: hom_type = "HET"
-
-            # # Split if max magnitude(any_vector - ave_vector) is larger than threshold
-            # if 'dmag' in splitting_conds:
-            #     dmag = self.calc_dmag(bounds)
-            #     if np.abs(dmag) > splitting_conds['dmag']:
-            #         hom_type = 'HET'
-                
-            # # Split if Reynolds number is larger than threshold
-            # if 'reynolds' in splitting_conds:        
-            #     reynolds = self.calc_reynolds_number(bounds)
-            #     if reynolds > splitting_conds['reynolds']:
-            #         hom_type = 'HET'
+            else: hom_type = "HET"
 
         logging.debug(f"\thom_condition for attribute: '{self.data_name}' in bounds:'{bounds}' returned '{hom_type}'")
         
@@ -915,89 +901,6 @@ class VectorDataLoader(DataLoaderInterface):
         self.data_name_list = new_names
         return self.set_data_col_name(new_data_name)
 
-    def calc_reynolds_number(self, bounds):
-        '''
-        Calculates an approximate Reynolds number from the mean vector velocity
-        and cellbox size.
-        
-        CURRENTLY ASSUMES DENSITY AND VISCOSITY OF SEAWATER AT 4°C! 
-        WILL NEED MINOR REWORKING TO INCLUDE DIFFERENT FLUIDS
-        
-        Args:
-            bounds (Boundary): 
-                Cellbox boundary to calculate characteristic length from
-                
-        Returns:
-            float:
-                Reynolds number of cellbox
-        '''
-        # Extract the speed
-        velocity = self.get_value(bounds, agg_type='MEAN')
-        speed = np.linalg.norm(list(velocity.values())) # Calculates magnitude
-        # Extract the characteristic length
-        length = bounds.calc_size()
-        # Calculate the reynolds number and return
-        logging.warning("\tReynold number used for splitting, this function assumes properties of ocean water!")
-        return 1028 * 0.00167 * speed * length
-
-    def calc_divergence(self, bounds, data=None, collapse=True, agg_type='MAX'):
-        '''
-        Calculates the divergence of vectors in a cellbox
-        
-        Args:
-            bounds (Boundary):
-                Cellbox boundary in which all relevant vectors are contained
-            data (pd.DataFrame or xr.Dataset):
-                Dataset with 'lat' and 'long' columns/dimensions with vectors
-            collapes (bool): 
-                Flag determining whether to return an aggregated value, or a 
-                vector field (values for each individual vector).
-            agg_type (str):
-                Method of aggregation if collapsing value. 
-                Accepts 'MAX' or 'MEAN'
-        
-        Returns:
-            float or pd.DataFrame:
-                float value of aggregated div if collapse=True, or
-                pd.DataFrame of div vector field if collapse=False 
-
-        Raises:
-            ValueError: If agg_type is not 'MAX' or 'MEAN'
-        '''
-        if data is None:    dps = self.trim_datapoints(bounds, data=data)
-        else:               dps = data
-        
-        # Create a meshgrid of vectors from the data
-        vector_field = self._create_vector_meshgrid(dps, self.data_name_list)
-
-        # Get component values for each vector
-        fx, fy = vector_field[:, :, 0], vector_field[:, :, 1]
-        # If not enough datapoints to compute gradient
-        if 1 in fx.shape or 1 in fy.shape:
-            logging.debug('\tUnable to compute gradient across cell for divergence calculation')
-            div = np.nan
-        else:
-            # Compute partial derivatives
-            dfx_dy = np.gradient(fx, axis=1)
-            dfy_dx = np.gradient(fy, axis=0)
-            # Compute curl
-            div = dfy_dx + dfx_dy
-        
-        # If div is nan
-        if np.isnan(div).all():
-            logging.debug('\tAll NaN cellbox encountered')
-            return np.nan
-        # If want to collapse to max mag value, return scalar
-        elif collapse:   
-            if agg_type == 'MAX':       return max(np.nanmax(div), np.nanmin(div), key=abs)
-            elif agg_type == 'MEAN':    return np.nanmean(div)
-            else: 
-                raise ValueError(f"agg_type '{agg_type}' not understood! Requires 'MAX' or 'MEAN'")
-        # Else return field
-        else:
-            return div
-
-
     def calc_curl(self, bounds, data=None, collapse=True, agg_type='MAX'):
         '''
         Calculates the curl of vectors in a cellbox
@@ -1053,60 +956,6 @@ class VectorDataLoader(DataLoaderInterface):
         else:
             return curl
 
-    def calc_dmag(self, bounds, data=None, collapse=True, agg_type='MEAN'):
-        '''
-        Calculates the dmag of vectors in a cellbox.
-        dmag is defined as being the difference in magnitudes between 
-        each vector and the average vector within the bounds.\n
-        dmag = mag(vector - mean_vector)
-        
-        Args:
-            bounds (Boundary):
-                Cellbox boundary in which all relevant vectors are contained
-            data (pd.DataFrame or xr.Dataset):
-                Dataset with 'lat' and 'long' columns/dimensions with vectors
-            collapes (bool): 
-                Flag determining whether to return an aggregated value, or a 
-                vector field (values for each individual vector).
-            agg_type (str):
-                Method of aggregation if collapsing value. 
-                Accepts 'MAX' or 'MEAN'
-        
-        Returns:
-            float or pd.DataFrame:
-                float value of aggregated dmag if collapse=True, or
-                pd.DataFrame of dmag vector field if collapse=False
-                
-        Raises:
-            ValueError: If agg_type is not 'MAX' or 'MEAN'
-        '''
-        if data is None:    dps = self.trim_datapoints(bounds, data=data)
-        else:               dps = data
-            
-        data_names = self.data_name_list
-        each_vector = dps[data_names].to_numpy()
-        ave_vector = list(self.get_value(bounds, agg_type=agg_type).values())
-        
-        delta_vector = each_vector - ave_vector
-        
-        d_mag = np.linalg.norm(delta_vector, axis=1)
-        if len(d_mag) == 0:
-            logging.debug('\tEmpty cellbox encountered')
-            return np.nan
-        # If div is nan
-        elif np.isnan(d_mag).all():
-            logging.debug('\tAll NaN cellbox encountered')
-            return np.nan
-        # If want to collapse to max mag value, return scalar
-        elif collapse:
-            if agg_type == 'MAX':       return np.nanmax(d_mag)
-            elif agg_type == 'MEAN':    return np.nanmean(d_mag)
-            else:
-                raise ValueError(f"agg_type '{agg_type}' not understood! Requires 'MAX' or 'MEAN'")
-        # Else return field
-        else:          return d_mag
-
-    
     @staticmethod
     def _create_vector_meshgrid(data, data_name_list):
         '''
