@@ -422,10 +422,16 @@ class VectorDataLoader(DataLoaderInterface):
                 values = [data_count, data_count]
             elif agg_type == 'MIN':
                 index = dps['_magnitude'].idxmin(skipna=skipna)
-                values = [dps[name][index] for name in variable_names]
+                if ~np.isnan(index):
+                    values = [dps[name][index] for name in variable_names]
+                else:
+                    values = [np.nan for name in variable_names]
             elif agg_type == 'MAX':
                 index = dps['_magnitude'].idxmax(skipna=skipna)
-                values = [dps[name][index] for name in variable_names]
+                if ~np.isnan(index):
+                    values = [dps[name][index] for name in variable_names]
+                else:
+                    values = [np.nan for name in variable_names]
             elif agg_type == 'MEAN':
                 values = [dps[name].mean(skipna=skipna) for name in variable_names]
             elif agg_type == 'STD':
