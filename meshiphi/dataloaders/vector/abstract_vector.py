@@ -558,20 +558,27 @@ class VectorDataLoader(DataLoaderInterface):
             # To allow multiple modes of splitting, chuck them in the splitting conditions
             # Split if magnitude of curl(data) is larger than threshold 
             if 'curl' in splitting_conds:
-                curl = self.calc_curl(bounds)
-                if np.abs(curl) > splitting_conds['curl']:
-                    hom_type =  'HET'
+                flow = self.calc_curl(bounds, collapse=False)
+                sc = splitting_conds['curl']
             # Split if max magnitude(any_vector - ave_vector) is larger than threshold
-            if 'dmag' in splitting_conds:
-                dmag = self.calc_dmag(bounds)
-                if np.abs(dmag) > splitting_conds['dmag']:
-                    hom_type = 'HET'
+            elif 'dmag' in splitting_conds:
+                flow = self.calc_dmag(bounds, collapse=False)
+                sc = splitting_conds['dmag']
+
+            if isinstance(flow, type(np.nan)) and np.isnan(flow):
+                return "CLR"
+            num_over_threshold = (flow > sc['threshold']).sum()
+            frac_over_threshold = num_over_threshold / flow.size
+
+            if   frac_over_threshold <= sc['lower_bound']: 
+                hom_type = "CLR"
+            elif frac_over_threshold >= sc['upper_bound']:
+                if splitting_conds['split_lock'] == True:
+                    hom_type = "HOM"
+                else: 
+                    hom_type = "CLR"
+            else: hom_type = "HET"
                 
-            # Split if Reynolds number is larger than threshold
-            if 'reynolds' in splitting_conds:        
-                reynolds = self.calc_reynolds_number(bounds)
-                if reynolds > splitting_conds['reynolds']:
-                    hom_type = 'HET'
 
         logging.debug(f"\thom_condition for attribute: '{self.data_name}' in bounds:'{bounds}' returned '{hom_type}'")
         
