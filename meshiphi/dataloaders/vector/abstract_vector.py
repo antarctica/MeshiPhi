@@ -925,89 +925,6 @@ class VectorDataLoader(DataLoaderInterface):
         self.data_name_list = new_names
         return self.set_data_col_name(new_data_name)
 
-    def calc_reynolds_number(self, bounds):
-        '''
-        Calculates an approximate Reynolds number from the mean vector velocity
-        and cellbox size.
-        
-        CURRENTLY ASSUMES DENSITY AND VISCOSITY OF SEAWATER AT 4°C! 
-        WILL NEED MINOR REWORKING TO INCLUDE DIFFERENT FLUIDS
-        
-        Args:
-            bounds (Boundary): 
-                Cellbox boundary to calculate characteristic length from
-                
-        Returns:
-            float:
-                Reynolds number of cellbox
-        '''
-        # Extract the speed
-        velocity = self.get_value(bounds, agg_type='MEAN')
-        speed = np.linalg.norm(list(velocity.values())) # Calculates magnitude
-        # Extract the characteristic length
-        length = bounds.calc_size()
-        # Calculate the reynolds number and return
-        logging.warning("\tReynold number used for splitting, this function assumes properties of ocean water!")
-        return 1028 * 0.00167 * speed * length
-
-    def calc_divergence(self, bounds, data=None, collapse=True, agg_type='MAX'):
-        '''
-        Calculates the divergence of vectors in a cellbox
-        
-        Args:
-            bounds (Boundary):
-                Cellbox boundary in which all relevant vectors are contained
-            data (pd.DataFrame or xr.Dataset):
-                Dataset with 'lat' and 'long' columns/dimensions with vectors
-            collapes (bool): 
-                Flag determining whether to return an aggregated value, or a 
-                vector field (values for each individual vector).
-            agg_type (str):
-                Method of aggregation if collapsing value. 
-                Accepts 'MAX' or 'MEAN'
-        
-        Returns:
-            float or pd.DataFrame:
-                float value of aggregated div if collapse=True, or
-                pd.DataFrame of div vector field if collapse=False 
-
-        Raises:
-            ValueError: If agg_type is not 'MAX' or 'MEAN'
-        '''
-        if data is None:    dps = self.trim_datapoints(bounds, data=data)
-        else:               dps = data
-        
-        # Create a meshgrid of vectors from the data
-        vector_field = self._create_vector_meshgrid(dps, self.data_name_list)
-
-        # Get component values for each vector
-        fx, fy = vector_field[:, :, 0], vector_field[:, :, 1]
-        # If not enough datapoints to compute gradient
-        if 1 in fx.shape or 1 in fy.shape:
-            logging.debug('\tUnable to compute gradient across cell for divergence calculation')
-            div = np.nan
-        else:
-            # Compute partial derivatives
-            dfx_dy = np.gradient(fx, axis=1)
-            dfy_dx = np.gradient(fy, axis=0)
-            # Compute curl
-            div = dfy_dx + dfx_dy
-        
-        # If div is nan
-        if np.isnan(div).all():
-            logging.debug('\tAll NaN cellbox encountered')
-            return np.nan
-        # If want to collapse to max mag value, return scalar
-        elif collapse:   
-            if agg_type == 'MAX':       return max(np.nanmax(div), np.nanmin(div), key=abs)
-            elif agg_type == 'MEAN':    return np.nanmean(div)
-            else: 
-                raise ValueError(f"agg_type '{agg_type}' not understood! Requires 'MAX' or 'MEAN'")
-        # Else return field
-        else:
-            return div
-
-
     def calc_curl(self, bounds, data=None, collapse=True, agg_type='MAX'):
         '''
         Calculates the curl of vectors in a cellbox
@@ -1049,7 +966,7 @@ class VectorDataLoader(DataLoaderInterface):
             # Compute curl
             curl = dfy_dx - dfx_dy
 
-        # If div is nan
+        # If curl is nan
         if np.isnan(curl).all():
             logging.debug('\tAll NaN cellbox encountered')
             return np.nan
@@ -1103,7 +1020,7 @@ class VectorDataLoader(DataLoaderInterface):
         if len(d_mag) == 0:
             logging.debug('\tEmpty cellbox encountered')
             return np.nan
-        # If div is nan
+        # If d_mag is nan
         elif np.isnan(d_mag).all():
             logging.debug('\tAll NaN cellbox encountered')
             return np.nan
@@ -1116,7 +1033,6 @@ class VectorDataLoader(DataLoaderInterface):
         # Else return field
         else:          return d_mag
 
-    
     @staticmethod
     def _create_vector_meshgrid(data, data_name_list):
         '''
