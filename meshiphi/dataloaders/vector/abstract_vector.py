@@ -574,7 +574,13 @@ class VectorDataLoader(DataLoaderInterface):
             if isinstance(flow, type(np.nan)) and np.isnan(flow):
                 return "CLR"
             num_over_threshold = (flow > sc['threshold']).sum()
-            frac_over_threshold = num_over_threshold / flow.size
+            
+            num_non_nan = np.count_nonzero(~np.isnan(flow))
+            if num_non_nan > 0:
+                frac_over_threshold = num_over_threshold/num_non_nan
+            else:
+                frac_over_threshold = 0
+
 
             if   frac_over_threshold <= sc['lower_bound']: 
                 hom_type = "CLR"
