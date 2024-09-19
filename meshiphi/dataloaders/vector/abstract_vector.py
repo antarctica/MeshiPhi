@@ -571,6 +571,9 @@ class VectorDataLoader(DataLoaderInterface):
                 flow = self.calc_dmag(bounds, collapse=False)
                 sc = splitting_conds['dmag']
 
+            if 'split_lock' not in sc:
+                sc['split_lock'] = False
+
             if isinstance(flow, type(np.nan)) and np.isnan(flow):
                 return "CLR"
             num_over_threshold = (flow > sc['threshold']).sum()
@@ -585,7 +588,7 @@ class VectorDataLoader(DataLoaderInterface):
             if   frac_over_threshold <= sc['lower_bound']: 
                 hom_type = "CLR"
             elif frac_over_threshold >= sc['upper_bound']:
-                if splitting_conds['split_lock'] == True:
+                if sc['split_lock'] == True:
                     hom_type = "HOM"
                 else: 
                     hom_type = "CLR"
