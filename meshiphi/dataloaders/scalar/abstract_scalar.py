@@ -524,7 +524,11 @@ class ScalarDataLoader(DataLoaderInterface):
             else:
                 # Determine fraction of datapoints over threshold value
                 num_over_threshold = dps[dps > splitting_conds['threshold']]
-                frac_over_threshold = num_over_threshold.shape[0]/dps.shape[0]
+                num_non_nan = np.count_nonzero(~np.isnan(dps))
+                if num_non_nan > 0:
+                    frac_over_threshold = num_over_threshold.shape[0]/num_non_nan
+                else:
+                    frac_over_threshold = 0
 
                 # Return homogeneity condition
                 if   frac_over_threshold <= splitting_conds['lower_bound']: hom_type = "CLR"
@@ -560,7 +564,11 @@ class ScalarDataLoader(DataLoaderInterface):
             else:
                 # Determine fraction of datapoints over threshold value
                 num_over_threshold = np.count_nonzero(dps > splitting_conds['threshold'])
-                frac_over_threshold = num_over_threshold/dps.size
+                num_non_nan = np.count_nonzero(~np.isnan(dps))
+                if num_non_nan > 0:
+                    frac_over_threshold = num_over_threshold/num_non_nan
+                else:
+                    frac_over_threshold = 0
                 # Return homogeneity condition
                 if   frac_over_threshold <= splitting_conds['lower_bound']: hom_type = "CLR"
                 elif frac_over_threshold >= splitting_conds['upper_bound']: 
