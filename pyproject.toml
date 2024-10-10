@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "meshiphi"
+description = "MeshiPhi: Earth's digital twin mapped on a non-uniform mesh"
+authors = [
+    {name = "Autonomous Marine Operations Planning (AMOP) Team, AI Lab, British Antarctic Survey", email = "amop@bas.ac.uk"}
+]
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">= 3.8"
+classifiers = ["Intended Audience :: Science/Research",
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14"
+]
+keywords= ["Polar Science",
+    "Geospatial",
+    "Marine Science"]
+dynamic = ["version", "dependencies", "optional-dependencies"]
+
+[tool.setuptools]
+packages = ["meshiphi"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+version = {attr = "meshiphi.__version__"}
+optional-dependencies.test = { file = ["tests/requirements.txt"] }
+
+[project.urls]
+Homepage = "https://www.bas.ac.uk/project/autonomous-marine-operations-planning"
+Documentation = "https://antarctica.github.io/MeshiPhi"
+Repository = "https://github.com/antarctica/MeshiPhi"
+Issues = "https://github.com/antarctica/MeshiPhi/issues"
+
+[project.scripts]
+create_mesh = "meshiphi.cli:create_mesh_cli"
+export_mesh = "meshiphi.cli:export_mesh_cli"
+rebuild_mesh = "meshiphi.cli:rebuild_mesh_cli"
+merge_mesh = "meshiphi.cli:merge_mesh_cli"
+meshiphi_test = "meshiphi.cli:meshiphi_test_cli"
