@@ -3,6 +3,7 @@ from meshiphi.dataloaders.vector.abstract_vector import VectorDataLoader
 import logging
 
 import xarray as xr
+import numpy as np
 
 from datetime import datetime
 from os.path import basename
@@ -45,5 +46,7 @@ class DuacsCurrentDataLoader(VectorDataLoader):
 
         # Trim to initial datapoints
         data = self.trim_datapoints(bounds, data=data)
+
+        data = data.reduce(np.nanmean, dim='time')
 
         return data
