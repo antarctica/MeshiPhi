@@ -47,6 +47,11 @@ class DuacsCurrentDataLoader(VectorDataLoader):
         # Trim to initial datapoints
         data = self.trim_datapoints(bounds, data=data)
 
+        # Reduce time dimension to averaged value
         data = data.reduce(np.nanmean, dim='time')
+
+        # Use DataFrame since dmag calcs aren't working in xarray at the moment
+        # TODO Fix abstract_vector.py to allow xarray datasets in calc_dmag
+        data = data.to_dataframe().reset_index()
 
         return data
