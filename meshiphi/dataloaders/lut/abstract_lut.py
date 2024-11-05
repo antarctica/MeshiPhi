@@ -334,17 +334,18 @@ class LutDataLoader(DataLoaderInterface):
         # Extract polygons that overlap the boundary
         polygons = self.trim_datapoints(bounds, data=data)['geometry'].tolist()
         
-    
+        hom_type = 'CLR'
         # If there's no polygon that overlaps with bounds        
         if not any([polygon.intersects(bounds_polygon) for polygon in polygons]):
-            return 'CLR'
+            if splitting_conds['split_lock'] == True: 
+                hom_type = "HOM"
         # If we want to split on the boundary
         elif splitting_conds['boundary']:
             if any(p.boundary.intersects(bounds_polygon) for p in polygons):
-                return 'HET'
+                hom_type = 'HET'
             
         # Otherwise no boundaries intersected bounds
-        return 'CLR'
+        return hom_type
 
     def reproject(self):
         '''
