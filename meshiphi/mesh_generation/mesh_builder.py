@@ -18,7 +18,7 @@ Example:
 
 import logging
 import numpy as np
-from tqdm import tqdm
+# from tqdm import tqdm
 from meshiphi.mesh_generation.boundary import Boundary
 from meshiphi.mesh_generation.cellbox import CellBox
 from meshiphi.mesh_generation.direction import Direction
@@ -109,10 +109,11 @@ class MeshBuilder:
         # Initialise the metadata for each cellbox, including subsets of each
         # dataloader's data set
         logger.info("Initialising cellbox metadata...")
-        for cellbox in tqdm(
-            cellboxes,
-            bar_format="{desc}{n_fmt}/{total_fmt} |{bar}| {percentage:3.0f}%, [{elapsed} elapsed] ",
-        ):
+        for cellbox in cellboxes:
+        #     tqdm(
+        #     cellboxes,
+        #     bar_format="{desc}{n_fmt}/{total_fmt} |{bar}| {percentage:3.0f}%, [{elapsed} elapsed] ",
+        # ):
             # checking to avoid any dummy cellboxes
             # (the ones that were split and replaced)
             if isinstance(cellbox, CellBox):
@@ -726,52 +727,52 @@ class MeshBuilder:
         # this impl assumws all the cellboxes have the same data sources. should not be the caase once we switch to breadth-first splitting.
         data_sources = self.mesh.cellboxes[0].get_data_source()
 
-        # Set up data_source progress bar
-        ds_pbar = tqdm(
-            range(0, len(data_sources)),
-            position=0,
-            bar_format="{desc}{n_fmt}/{total_fmt} |{bar}| {percentage:3.0f}%, [{elapsed} elapsed] ",
-        )
-        sd_pbar = tqdm(
-            range(0, split_depth),
-            position=1,
-            leave=False,
-            bar_format=" Split depth: {n_fmt}/{total_fmt} |{bar}| {percentage:3.0f}%{postfix} ",
-        )
-        for index in ds_pbar:
-            # Update name of data source being processed
-            ds_pbar.set_description(
-                f" Processing {data_sources[index].get_data_loader().dataloader_name} data"
-            )
+        # # Set up data_source progress bar
+        # ds_pbar = tqdm(
+        #     range(0, len(data_sources)),
+        #     position=0,
+        #     bar_format="{desc}{n_fmt}/{total_fmt} |{bar}| {percentage:3.0f}%, [{elapsed} elapsed] ",
+        # )
+        # sd_pbar = tqdm(
+        #     range(0, split_depth),
+        #     position=1,
+        #     leave=False,
+        #     bar_format=" Split depth: {n_fmt}/{total_fmt} |{bar}| {percentage:3.0f}%{postfix} ",
+        # )
+        for index in range(0, len(data_sources)):
+            # # Update name of data source being processed
+            # ds_pbar.set_description(
+            #     f" Processing {data_sources[index].get_data_loader().dataloader_name} data"
+            # )
 
             if len(data_sources[index].get_splitting_conditions()) > 0:
                 # Set up split depth progress bar
                 level = 0
-                sd_pbar = tqdm(
-                    range(0, split_depth),
-                    position=1,
-                    leave=False,
-                    bar_format=" Split depth: {n_fmt}/{total_fmt} |{bar}| {percentage:3.0f}%{postfix} ",
-                )
+                # sd_pbar = tqdm(
+                #     range(0, split_depth),
+                #     position=1,
+                #     leave=False,
+                #     bar_format=" Split depth: {n_fmt}/{total_fmt} |{bar}| {percentage:3.0f}%{postfix} ",
+                # )
 
                 for cb_index, cellbox in enumerate(self.mesh.cellboxes):
-                    ds_pbar.update(0)
+                    # ds_pbar.update(0)
                     if isinstance(cellbox, CellBox):
                         if cellbox.get_split_depth() > level:
                             level = cellbox.get_split_depth()
-                            # If we're a split level further down, iterate progress in progress bar
-                            sd_pbar.update()
+                            # # If we're a split level further down, iterate progress in progress bar
+                            # sd_pbar.update()
                         # Split the cellbox
                         should_split = cellbox.should_split(index + 1)
                         if (cellbox.get_split_depth() < split_depth) & should_split:
                             self.split_and_replace(cellbox)
-                        # Update number of cellboxes processed
-                        sd_pbar.set_postfix_str(
-                            f"[Cellbox {cb_index + 1} / {len(self.mesh.cellboxes)}]"
-                        )
-        tqdm.write("")
-        ds_pbar.clear()
-        sd_pbar.clear()
+                        # # Update number of cellboxes processed
+                        # sd_pbar.set_postfix_str(
+                        #     f"[Cellbox {cb_index + 1} / {len(self.mesh.cellboxes)}]"
+                        # )
+        # tqdm.write("")
+        # ds_pbar.clear()
+        # sd_pbar.clear()
 
     def build_environmental_mesh(self):
         """
@@ -785,10 +786,11 @@ class MeshBuilder:
 
         agg_cell_count = 0
         logger.info("Aggregating cellboxes...")
-        for cellbox in tqdm(
-            self.mesh.cellboxes,
-            bar_format=" Aggregating cellboxes: {n_fmt}/{total_fmt} |{bar}| {percentage:3.0f}%, [{elapsed} elapsed] ",
-        ):
+        for cellbox in self.mesh.cellboxes:
+        #     tqdm(
+        #     self.mesh.cellboxes,
+        #     bar_format=" Aggregating cellboxes: {n_fmt}/{total_fmt} |{bar}| {percentage:3.0f}%, [{elapsed} elapsed] ",
+        # ):
             agg_cell_count += 1
             if isinstance(cellbox, CellBox):
                 logger.debug(
