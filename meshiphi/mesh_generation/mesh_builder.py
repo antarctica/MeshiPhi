@@ -18,6 +18,8 @@ Example:
 
 import logging
 import numpy as np
+
+from meshiphi.mesh_generation import cellbox
 # from tqdm import tqdm
 from meshiphi.mesh_generation.boundary import Boundary
 from meshiphi.mesh_generation.cellbox import CellBox
@@ -425,7 +427,7 @@ class MeshBuilder:
         self.mesh.cellboxes += split_cellboxes
         cb_length += len(split_cellboxes)
         cellboxes = self.mesh.cellboxes
-        cellbox_indx = cellboxes.index(cellbox)
+        cellbox_indx = cellbox.get_id()
 
         north_west_indx = cb_length-4
         north_east_indx = cb_length-3

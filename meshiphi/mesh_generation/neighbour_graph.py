@@ -1,3 +1,4 @@
+from meshiphi.mesh_generation import cellbox
 from meshiphi.mesh_generation.direction import Direction
 
 
@@ -485,7 +486,7 @@ class NeighbourGraph:
         initialize the neighbour graph
         """
         for cellbox in cellboxes:
-            cellbox_indx = cellboxes.index(cellbox)
+            cellbox_indx = cellbox.get_id()
             neighbour_map = self.initialise_map(
                 cellbox_indx, grid_width, len(cellboxes)
             )
