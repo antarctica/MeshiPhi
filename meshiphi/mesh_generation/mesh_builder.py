@@ -420,15 +420,17 @@ class MeshBuilder:
                 4 smaller CellBox objects.
 
         """
-        split_cellboxes = cellbox.split(len(self.mesh.cellboxes))
+        cb_length = len(self.mesh.cellboxes)
+        split_cellboxes = cellbox.split(cb_length)
         self.mesh.cellboxes += split_cellboxes
+        cb_length += len(split_cellboxes)
         cellboxes = self.mesh.cellboxes
         cellbox_indx = cellboxes.index(cellbox)
 
-        north_west_indx = cellboxes.index(split_cellboxes[0])
-        north_east_indx = cellboxes.index(split_cellboxes[1])
-        south_west_indx = cellboxes.index(split_cellboxes[2])
-        south_east_indx = cellboxes.index(split_cellboxes[3])
+        north_west_indx = cb_length-4
+        north_east_indx = cb_length-3
+        south_west_indx = cb_length-2
+        south_east_indx = cb_length-1
 
         south_neighbour_indx = self.neighbour_graph.get_neighbours(cellbox_indx, 4)
         north_neighbour_indx = self.neighbour_graph.get_neighbours(cellbox_indx, -4)
