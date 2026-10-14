@@ -69,7 +69,7 @@ class NeighbourGraph:
                 inc_neighbours = [x + inc for x in ng[node][direction]]
                 ng[node][direction] = inc_neighbours
 
-            new_ng[str(int(node) + inc)] = ng[node]
+            new_ng[node + inc] = ng[node]
 
         self.neighbour_graph = new_ng
 
@@ -175,13 +175,13 @@ class NeighbourGraph:
         try:
             neighbour_indx_list = self.neighbour_graph[cellbox_indx][direction]
         except KeyError:
-            neighbour_indx_list = self.neighbour_graph[cellbox_indx][str(direction)]
+            neighbour_indx_list = self.neighbour_graph[cellbox_indx][direction]
 
         for indx in neighbour_indx_list:
             try:
                 self.neighbour_graph[indx][-1 * direction].remove(cellbox_indx)
             except KeyError:
-                self.neighbour_graph[str(indx)][str(-1 * direction)].remove(
+                self.neighbour_graph[indx][-1 * direction].remove(
                     int(cellbox_indx)
                 )
 

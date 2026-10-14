@@ -274,7 +274,7 @@ class MeshBuilder:
                 cell_bounds = Boundary(
                     cell_lat_range, cell_long_range, bounds.get_time_range()
                 )
-                cell_id = str(len(cellboxes))
+                cell_id = len(cellboxes)
                 cellbox = CellBox(cell_bounds, cell_id)
                 cellboxes.append(cellbox)
         return cellboxes
