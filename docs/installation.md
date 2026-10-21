@@ -1,7 +1,7 @@
 # Installation
 
 In this section we outline the necessary steps for installing the MeshiPhi software package. MeshiPhi requires a
-pre-existing installation of Python 3.8 or higher.
+pre-existing installation of Python 3.11 or higher.
 
 
 ## Installing MeshiPhi
@@ -46,7 +46,7 @@ With that said, below are instructions for various operating systems.
 ### Windows
 
 !!! note
-    We assume a version of Windows 10 or higher, with a working version of Python 3.9 including pip installed.
+    We assume a version of Windows 10 or higher, with a working version of Python 3.11 including pip installed.
 
 !!! note
     We recommend installing MeshiPhi into a virtual environment.

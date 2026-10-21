@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dependabot, CodeQL and OpenSSF Scorecard workflows
 
 ### Changed
+- Minimum supported Python version raised from 3.8 to 3.11.
 - `check-added-large-files` pre-commit hook now excludes `uv.lock`
 
 ## [2.3.1] - 2026-04-07
