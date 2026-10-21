@@ -16,6 +16,14 @@ We provide a `Makefile` with common development commands to streamline your work
 pip install -e .[dev]
 ```
 
+Alternatively, use [uv](https://docs.astral.sh/uv/) to create a virtual environment and install MeshiPhi with the development dependency group:
+
+```sh
+uv sync --group dev
+```
+
+Run commands inside this environment with `uv run`, e.g. `uv run pytest` or `uv run pre-commit run --all-files`.
+
 ### Makefile Commands
 
 The following commands are available via the Makefile:

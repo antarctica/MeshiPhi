@@ -10,13 +10,32 @@ MeshiPhi can be installed from one of the following two sources:
 
 from PyPI: `pip install MeshiPhi`
 
-from Github: 
+from Github:
 
 ```sh
 git clone https://github.com/bas-amop/MeshiPhi.git
 cd MeshiPhi
 pip install .
 ```
+
+### Using uv
+
+MeshiPhi can also be installed with [uv](https://docs.astral.sh/uv/):
+
+```sh
+# Install from PyPI into the current environment
+uv pip install MeshiPhi
+
+# Add MeshiPhi to a uv-managed project
+uv add meshiphi
+
+# From a clone of the repository: create .venv and install MeshiPhi in editable mode
+git clone https://github.com/bas-amop/MeshiPhi.git
+cd MeshiPhi
+uv sync
+```
+
+Commands can then be run in the project environment with `uv run`, e.g. `uv run create_mesh --help`.
 
 ## Installing GDAL (Optional)
 
@@ -27,7 +46,7 @@ With that said, below are instructions for various operating systems.
 ### Windows
 
 !!! note
-    We assume a version of Windows 10 or higher, with a working version of Python 3.9 including pip installed. 
+    We assume a version of Windows 10 or higher, with a working version of Python 3.9 including pip installed.
 
 !!! note
     We recommend installing MeshiPhi into a virtual environment.

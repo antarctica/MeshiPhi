@@ -12,16 +12,27 @@
 [![Test Status](https://github.com/bas-amop/MeshiPhi/actions/workflows/test.yml/badge.svg)](https://github.com/bas-amop/MeshiPhi/actions/workflows/test.yml)
 [![Coverage](https://img.shields.io/badge/coverage-report-blue)](https://github.com/bas-amop/MeshiPhi/actions/workflows/test.yml)
 [![Ruff](https://img.shields.io/badge/code%20style-ruff-0C3A5C?logo=ruff&logoColor=white)](https://github.com/astral-sh/ruff)
-
+[![CodeQL](https://github.com/thomaszwagerman/ai-assisted-rse-template/actions/workflows/codeql.yml/badge.svg)](https://github.com/thomaszwagerman/ai-assisted-rse-template/actions/workflows/codeql.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/thomaszwagerman/ai-assisted-rse-template/badge)](https://scorecard.dev/viewer/?uri=github.com/thomaszwagerman/ai-assisted-rse-template)
 
 Introducing Meshiφ, a versatile software package designed for comprehensive earth modeling and navigation planning. Meshiφ works by discretizing the Earth's surface into a non-uniform grid, allocating higher resolution in regions of geographic diversity, and conserving lower resolution in more uniform regions. These mesh objects can be output in standard formats, such as GeoJSON and GeoTIFF, enabling data-visualisation via GIS software such as ArcGIS. The default end products are designed to work with <a href="https://github.com/bas-amop/PolarRoute/">PolarRoute</a>.
 
 ## Installation
-Meshiφ can be installed via pip or by cloning the repository from GitHub.
+Meshiφ can be installed via pip or [uv](https://docs.astral.sh/uv/), or by cloning the repository from GitHub.
 
  Pip:
 ```
 pip install meshiphi
+```
+
+ uv:
+```
+uv pip install meshiphi
+```
+
+Or, to add Meshiφ as a dependency of a uv-managed project:
+```
+uv add meshiphi
 ```
 
 Github: (for local development)
@@ -30,6 +41,15 @@ git clone https://github.com/bas-amop/MeshiPhi
 cd MeshiPhi
 pip install -e .
 ```
+
+Or with uv, which creates a virtual environment (`.venv`) and installs the package in editable mode:
+```
+git clone https://github.com/bas-amop/MeshiPhi
+cd MeshiPhi
+uv sync
+```
+
+CLI commands can then be run inside the environment with `uv run`, e.g. `uv run create_mesh --help`.
 
 The Meshiφ package has an optional dependency on GDAL, which is required to produce outputs in GeoJSON or GeoTIFF formats. More information on setting up GDAL can be found in the manual pages linked above.
 
