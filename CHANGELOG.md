@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- [uv](https://docs.astral.sh/uv/) support: `uv.lock` and installation/development instructions in the README, docs and `CONTRIBUTING.md`
+- `make audit` command to check locked dependencies for known vulnerabilities, documented in `CONTRIBUTING.md` and the development docs
+- Dependabot, CodeQL and OpenSSF Scorecard workflows
+
+### Changed
+- `check-added-large-files` pre-commit hook now excludes `uv.lock`
+
 ## [2.3.1] - 2026-04-07
 ## What's Changed
 * Migrate documentation to mkdocs + various improvements by @davidwyld in https://github.com/bas-logist/MeshiPhi/pull/116
