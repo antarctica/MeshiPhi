@@ -6,6 +6,7 @@ Thank you for considering contributing to MeshiPhi!
 - Fork the repository and create your branch from `main`.
 - Ensure code is well-documented and type-annotated.
 - Run tests and linters before submitting a pull request.
+- Run `make audit` after changing dependencies to check for known vulnerabilities.
 - Add or update documentation as needed.
 
 ## Development Setup
@@ -28,6 +29,7 @@ Run commands inside this environment with `uv run`, e.g. `uv run pytest` or `uv 
 
 The following commands are available via the Makefile:
 
+- **`make audit`** - Check locked dependencies (`uv.lock`) for known vulnerabilities (requires [uv](https://docs.astral.sh/uv/))
 - **`make coverage`** - Generate coverage report (terminal and HTML)
 - **`make clean`** - Clean build artifacts and cache files
 - **`make docs`** - Build documentation

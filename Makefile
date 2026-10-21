@@ -1,4 +1,4 @@
-.PHONY: install test test-all lint format type-check coverage clean docs docs-clean help
+.PHONY: install test test-all lint format type-check audit coverage clean docs docs-clean help
 
 help:  ## Show this help message
 	@echo "Available commands:"
