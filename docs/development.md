@@ -12,6 +12,13 @@ To run tests:
 
 `pytest`
 
+If you use [uv](https://docs.astral.sh/uv/), set up the environment and run the tests with:
+
+```sh
+uv sync --group test
+uv run pytest
+```
+
 To run tests in parallel (faster):
 
 `pytest -n auto`
@@ -28,6 +35,16 @@ To run only slow tests:
 
 Documentation is built from the `docs/` directory using `mkdocs` and plugins.
 
-To install the docs dependencies, from the project root run `pip install --group docs` in your virtual environment.
+To install the docs dependencies, from the project root run `pip install --group docs` in your virtual environment, or with uv run `uv sync --group docs` and then `uv run mkdocs serve`.
 
 To serve the docs locally, run `mkdocs serve`.
+
+## Dependency Auditing
+
+To check the locked dependencies in `uv.lock` for known vulnerabilities, run the following from the project root (requires [uv](https://docs.astral.sh/uv/)):
+
+```sh
+make audit
+```
+
+This runs `uv audit`. Run it after updating dependencies, and address any reported vulnerabilities before submitting a pull request.
